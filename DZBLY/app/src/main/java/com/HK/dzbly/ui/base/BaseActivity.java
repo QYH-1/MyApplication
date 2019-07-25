@@ -3,7 +3,6 @@ package com.HK.dzbly.ui.base;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import androidx.appcompat.app.AppCompatActivity;
 import com.HK.dzbly.collector.ActivityCollector;
 
 /* 基类Activity 方便日志中查询界面所处的Activity*/
