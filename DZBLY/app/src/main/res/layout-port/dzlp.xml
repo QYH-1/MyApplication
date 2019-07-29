@@ -2,74 +2,64 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/blue"
+              android:background="@color/black"
               android:orientation="vertical"
               android:focusableInTouchMode="false"
 >
     <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="0dp"
+            android:layout_weight="7.5"
             android:background="@color/black"
             >
         <RelativeLayout
-                android:layout_width="260dp"
-                android:layout_height="260dp"
+                android:id="@+id/re1"
+                android:layout_centerHorizontal="true"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:background="@color/black"
         >
             <com.HK.dzbly.utils.CompassView
-                    android:layout_marginLeft="30dp"
                     android:id="@+id/activity_compass_compassview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/black"/>
-
         </RelativeLayout>
-        <Button
-                android:layout_marginTop="30dp"
-                android:layout_width="5dp"
-                android:layout_height="220dp"
-                android:background="@drawable/border_line_icon"
-                android:layout_marginLeft="310dp"
-        />
-        <TextView
-                android:id="@+id/elevation"
-                android:layout_width="wrap_content"
+        <LinearLayout
+                android:layout_below="@+id/re1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="300dp"
-                android:layout_marginTop="140dp"
-                android:rotation="90"
-                android:text="仰角0.08°"
-                android:textColor="@color/white"
-                />
-        <Button
-                android:layout_width="250dp"
-                android:layout_height="5dp"
-                android:background="@drawable/border_line_icon"
-                android:layout_marginTop="260dp"
-                android:layout_marginLeft="40dp"
-        />
-        <TextView
-                android:id="@+id/roll_angle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="270dp"
-                android:layout_marginLeft="140dp"
-                android:text="横滚角0.29°"
-                android:textSize="14dp"
-                android:textColor="@color/white"
-        />
+                android:orientation="horizontal"
+                >
+            <com.HK.dzbly.utils.Elevation
+                    android:layout_gravity="left"
+                    android:id="@+id/elevation"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+            />
+            <com.HK.dzbly.utils.Rollangle
+                    android:id="@+id/roll_angle"
+                    android:layout_gravity="right"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
     </RelativeLayout>
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="horizontal"
             >
         <CheckBox
                 android:id="@+id/occurrence_survey"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:scaleX="0.5"
-                android:scaleY="0.5"
+                android:scaleX="0.6"
+                android:scaleY="0.6"
                 android:text="产状测量:"
                 android:textColor="@color/white"
                 android:textSize="25sp"
@@ -78,18 +68,21 @@
         />
         <Switch
                 android:id="@+id/selection_method"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:showText="true"
                 android:switchTextAppearance="@style/SwitchTheme"
                 android:textOff="简易测量 "
                 android:textOn="普通测量"
+                android:layout_weight="1"
         />
         </LinearLayout>
     <FrameLayout
             android:id="@+id/measurement_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            >
     </FrameLayout>
 </LinearLayout>

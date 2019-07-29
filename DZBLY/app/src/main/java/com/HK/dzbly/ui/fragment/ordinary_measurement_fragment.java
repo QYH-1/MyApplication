@@ -1,14 +1,15 @@
 package com.HK.dzbly.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.HK.dzbly.R;
+import com.HK.dzbly.ui.activity.LpszActivity;
 
 ;
 
@@ -20,11 +21,10 @@ import com.HK.dzbly.R;
  */
 public class ordinary_measurement_fragment extends Fragment {
     private TextView explain;//说明
-    private RadioButton r_elevation;//仰角
-    private RadioButton r_roll_angle;//仰角
     private TextView save;//保存
     private TextView point_lase;//点激光
     private TextView line_laser;//线激光
+    private TextView Compass_settings;//罗盘设置
     private int type;//对在说明中的内容进行编号 0为测量方法，1为测量出的结果
 
     public ordinary_measurement_fragment() {
@@ -40,13 +40,18 @@ public class ordinary_measurement_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.ordinary_measurement,container,false);
+        //所有的方法
         methods(view);
         return  view;
     }
 
     private void methods(View view) {
+        //获取控件
         inint(view);
+        //设置说明
         setExplain(view);
+        //设置罗盘
+        setCompass_settings(view);
     }
 
     @Override
@@ -56,11 +61,10 @@ public class ordinary_measurement_fragment extends Fragment {
     //获取控件
     private void inint(View view){
         explain =view.findViewById(R.id.explain);
-        r_elevation =view.findViewById(R.id.r_elevation);
-        r_roll_angle =view.findViewById(R.id.r_roll_angle);
         point_lase =view.findViewById(R.id.point_lase);
         line_laser =view.findViewById(R.id.line_laser);
         save =view.findViewById(R.id.save);
+        Compass_settings = view.findViewById(R.id.Compass_settings);
     }
     //给定说明中的显示
     private void setExplain(View view){
@@ -81,5 +85,18 @@ public class ordinary_measurement_fragment extends Fragment {
                 break;
         }
 
+    }
+    /**
+     * 罗盘设置
+     */
+    private void setCompass_settings(View view){
+        Compass_settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), LpszActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -135,7 +135,7 @@ public class CompassView extends View {
         mTextPaint.setStyle(Paint.Style.STROKE);
         mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(35);
-        mTextPaint.setColor(context.getResources().getColor(R.color.white));
+        mTextPaint.setColor(context.getResources().getColor(R.color.red));
 
         mCircumPaint = new Paint();
         mCircumPaint.setStyle(Paint.Style.FILL);
@@ -154,13 +154,13 @@ public class CompassView extends View {
         mNorthPaint = new Paint();
         mNorthPaint.setStyle(Paint.Style.STROKE);
         mNorthPaint.setAntiAlias(true);
-        mNorthPaint.setTextSize(40);
+        mNorthPaint.setTextSize(30);
         mNorthPaint.setColor(context.getResources().getColor(R.color.red));
         //其他方位的文字设置
         mOthersPaint = new Paint();
         mOthersPaint.setStyle(Paint.Style.STROKE);
         mOthersPaint.setAntiAlias(true);
-        mOthersPaint.setTextSize(25);
+        mOthersPaint.setTextSize(23);
         mOthersPaint.setColor(context.getResources().getColor(R.color.white));
 
         mPositionRect = new Rect();
@@ -169,14 +169,14 @@ public class CompassView extends View {
         mCenterPaint = new Paint();
         mCenterPaint.setStyle(Paint.Style.STROKE);
         mCenterPaint.setAntiAlias(true);
-        mCenterPaint.setTextSize(80);
-        mCenterPaint.setColor(context.getResources().getColor(R.color.white));
+        mCenterPaint.setTextSize(45);
+        mCenterPaint.setColor(context.getResources().getColor(R.color.red));
         //其他角度文字设置
         mSamllDegreePaint = new Paint();
         mSamllDegreePaint.setStyle(Paint.Style.STROKE);
         mSamllDegreePaint.setAntiAlias(true);
-        mSamllDegreePaint.setTextSize(20);
-        mSamllDegreePaint.setColor(context.getResources().getColor(R.color.lightGray));
+        mSamllDegreePaint.setTextSize(16);
+        mSamllDegreePaint.setColor(context.getResources().getColor(R.color.white));
 
         mSencondRect = new Rect();
         mThirdRect = new Rect();

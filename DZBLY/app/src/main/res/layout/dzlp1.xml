@@ -6,6 +6,54 @@
               android:orientation="vertical"
               android:focusableInTouchMode="false"
 >
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/text_gray"
+            >
+        <ImageView
+                android:id="@+id/indicator_light"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_radio_button_unchecked_black_24dp"
+                android:layout_weight="3"
+        />
+        <TextView
+                android:id="@+id/jgcj"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="激光测距"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:clickable="true"
+                android:textColor="@color/text_clours_selector"
+                android:layout_weight="1"
+        />
+        <TextView
+                android:id="@+id/lpsz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="罗盘设置"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:clickable="true"
+                android:textColor="@color/text_clours_selector"
+                android:layout_weight="1"
+        />
+        <TextView
+            android:id="@+id/sjgl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="数据管理"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:textColor="@color/text_clours_selector"
+            android:layout_weight="1"
+    />
+    </LinearLayout>
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"

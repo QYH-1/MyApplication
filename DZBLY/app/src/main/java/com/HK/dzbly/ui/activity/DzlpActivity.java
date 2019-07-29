@@ -1,14 +1,14 @@
 package com.HK.dzbly.ui.activity;
 
 
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.*;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -16,6 +16,10 @@ import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.ordinary_measurement_fragment;
 import com.HK.dzbly.ui.fragment.simple_measurement_fragment;
 import com.HK.dzbly.utils.CompassView;
+import com.HK.dzbly.utils.Elevation;
+import com.HK.dzbly.utils.Rollangle;
+
+import java.util.Random;
 
 /**
  * @Author：qyh 版本：1.0
@@ -28,16 +32,11 @@ public class DzlpActivity extends FragmentActivity {
     private SensorManager mSensorManager;//获取传感器管理对象
     private SensorEventListener mSensorEventListener;//获取加速传感器对象
     private CompassView chaosCompassView; //获取指南针对象
-    private float val;
-    //顶端选项栏
-    private ImageView indicator_light;//指示灯
-    private TextView jgcj;//激光测距
-    private TextView lpsz;//罗盘设置
-    private TextView sjgl;//数据管理
-    private TextView elevation;//仰角
-    private TextView roll_angle;//横滚角
+    private float val;//方位角
     private CheckBox occurrence_survey;//产状测量
     private Switch selection_method;//测量模式选择
+    private Elevation elevation;//仰角图示
+    private Rollangle rollangle;//横滚角图示
     //创建fragment对象
     private ordinary_measurement_fragment mordinary_measurement_fragment;
     private simple_measurement_fragment msimple_measurement_fragment;
@@ -46,13 +45,17 @@ public class DzlpActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //屏幕旋转
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //锁定屏幕
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         setContentView(R.layout.dzlp);
+
         inint(); //获取控件
-        setLpsz();//罗盘设置
-        setSjgl();//数据管理
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
-        setJgcj();//激光测距
+        setElevation(1); //设置仰角
+        setRollangle(1); //设置横滚角
     }
     /**
      * 获取控件
@@ -62,15 +65,10 @@ public class DzlpActivity extends FragmentActivity {
         chaosCompassView = (CompassView) findViewById(R.id.activity_compass_compassview);
         //获取SensorManager实例
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        //获取顶端选项
-        jgcj = findViewById(R.id.jgcj);
-        lpsz = findViewById(R.id.lpsz);
-        sjgl = findViewById(R.id.sjgl);
-        indicator_light = findViewById(R.id.indicator_light);
-        elevation = findViewById(R.id.elevation);
-        roll_angle = findViewById(R.id.roll_angle);
         occurrence_survey = findViewById(R.id.occurrence_survey);
         selection_method = findViewById(R.id.selection_method);
+        elevation = findViewById(R.id.elevation);
+        rollangle = findViewById(R.id.roll_angle);
     }
     /**
      * 对指南针进行操作
@@ -80,6 +78,8 @@ public class DzlpActivity extends FragmentActivity {
             //重写onSensorChanged方法进行更新
             @Override
             public void onSensorChanged(SensorEvent event) {
+               // <!--接受硬件的方位角的值-->
+                //获取当前的方位角
                 val = event.values[0];
                 //通过线程进行view的刷新
                 chaosCompassView.setVal(val);
@@ -99,42 +99,6 @@ public class DzlpActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(mSensorEventListener);
-    }
-    /**
-     * 罗盘设置
-     */
-    private void setLpsz(){
-        lpsz.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(DzlpActivity.this,LpszActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-    //激光测距
-    private void setJgcj(){
-        jgcj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(DzlpActivity.this,Laser_rangingActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-    /**
-     * 数据管理
-     */
-    private void setSjgl(){
-        sjgl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);//调用文件浏览器API
-                intent.setType("*/*");//设置类型，这里是任意类型，任意后缀的可以这样写。
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent,1);
-            }
-        });
     }
     /**
      * 选择加载fragment
@@ -181,5 +145,25 @@ public class DzlpActivity extends FragmentActivity {
                     }
                 }
             });
+    }
+    /**
+     * 画仰角图示
+     * 根据硬件传值取调整指针的具体指向
+     */
+    private void setElevation(float x){
+        Random random = new Random();
+        // <!--接受硬件的仰角的值-->
+        //获取数据
+        elevation.cgangePer(90 / 180f);
+    }
+    /**
+     * 画横滚角图示
+     */
+    private void setRollangle(float x){
+        Random random = new Random();
+        // <!--接受硬件的横滚角的值-->
+        //获取数据
+        float p = 0;
+        rollangle.cgangePer(p / 360f);
     }
 }

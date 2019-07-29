@@ -1,5 +1,6 @@
 package com.HK.dzbly.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.HK.dzbly.R;
+import com.HK.dzbly.ui.activity.LpszActivity;
 
 /**
  * @Author：qyh 版本：1.0
@@ -21,6 +23,7 @@ public class simple_measurement_fragment extends Fragment {
     private TextView locking_occurrence;//锁定左侧产状物
     private TextView msave;//保存
     private int type;//说明文本显示类型
+    private TextView Compass_settings;//罗盘设置
     public simple_measurement_fragment() {
     }
 
@@ -33,13 +36,18 @@ public class simple_measurement_fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.simple_measurement,container,false);
+        //所有的方法
         methods(view);
         return view;
     }
 
     private void methods(View view) {
+        //获取控件
         inint(view);
+        //设置说明
         setExplain(view);
+        //设置罗盘
+        setCompass_settings(view);
     }
     @Override
     public void onPause() {
@@ -51,6 +59,7 @@ public class simple_measurement_fragment extends Fragment {
         re_measurement =view.findViewById(R.id.re_measurement);
         locking_occurrence =view.findViewById(R.id.locking_occurrence);
         msave =view.findViewById(R.id.msave);
+        Compass_settings = view.findViewById(R.id.Compass_settings);
     }
     //给定说明中的显示
     private void setExplain(View view) {
@@ -74,5 +83,18 @@ public class simple_measurement_fragment extends Fragment {
         }
 
     }
+    /**
+     * 罗盘设置
+     */
+    private void setCompass_settings(View view){
+        Compass_settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), LpszActivity.class);
+                startActivity(intent);
 
+            }
+        });
+    }
 }
