@@ -91,7 +91,7 @@ public class simple_measurement_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
-                intent.setClass(getActivity(), LpszActivity.class);
+                intent.setClass(getActivity(), LpszActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
 
             }

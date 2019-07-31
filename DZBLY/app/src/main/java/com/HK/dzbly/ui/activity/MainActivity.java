@@ -1,10 +1,9 @@
 package com.HK.dzbly.ui.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
@@ -16,7 +15,9 @@ import com.HK.dzbly.ui.base.BaseActivity;
 import java.io.File;
 
 public class MainActivity extends BaseActivity{
+    private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt,setting,data,camera,tools,dzcsy,shutdown;
+    private  String FILE_PATH = "/sdcard/syscamera.jpg";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,15 +50,12 @@ public class MainActivity extends BaseActivity{
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//调用相机Api
-                File out = new File(Environment.getExternalStorageDirectory(),
-                        "Pictures");//保存拍摄的照片
-                Uri uri = Uri.fromFile(out);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //图片保存为临时文件
-                startActivityForResult(intent, 0);
+                Intent intent = new Intent(MainActivity.this,CaptureActivity.class);
+                startActivity(intent);
             }
         });
     }
+
     /**
      * 设置处理事件
      */
@@ -80,6 +78,8 @@ public class MainActivity extends BaseActivity{
                 intent.setType("*/*");//设置类型，这里是任意类型，任意后缀的可以这样写。
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent,1);
+//                Intent intent = new Intent(MainActivity.this,File_mannagementActicity.class);
+//                startActivity(intent);
             }
         });
     }
@@ -105,5 +105,23 @@ public class MainActivity extends BaseActivity{
                 startActivity(intent);
             }
         });
+    }
+    /**
+     * 打开指定文件夹
+     */
+    private void openAssignFolder(String path){
+        File file = new File(path);
+        if(null==file || !file.exists()){
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.fromFile(file), "file/*");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

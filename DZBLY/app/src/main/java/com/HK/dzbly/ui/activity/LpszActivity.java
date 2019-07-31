@@ -39,7 +39,7 @@ public class LpszActivity extends BaseActivity{
         Confirm_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LpszActivity.this,DzlpActivity.class);
+                Intent intent = new Intent(LpszActivity.this,DzlpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
             }
@@ -49,7 +49,7 @@ public class LpszActivity extends BaseActivity{
             @Override
             public void onClick(View view) {
                 //界面跳转，并且清除上一层栈，这样可以保证一个界面不会重复的出现在栈中.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                Intent intent = new Intent(LpszActivity.this,DzlpActivity.class);
+                Intent intent = new Intent(LpszActivity.this,DzlpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
             }

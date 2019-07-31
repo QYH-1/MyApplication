@@ -2,8 +2,6 @@ package com.HK.dzbly.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 
@@ -21,7 +19,7 @@ public class WelcomeActivity extends BaseActivity {
         TimerTask timerTask=new TimerTask() {
             @Override
             public void run() {
-                    Intent intent1=new Intent(WelcomeActivity.this,MainActivity.class);
+                    Intent intent1=new Intent(WelcomeActivity.this,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent1);
                 WelcomeActivity.this.finish();
             }
