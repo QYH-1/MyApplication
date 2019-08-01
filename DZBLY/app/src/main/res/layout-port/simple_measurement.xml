@@ -9,7 +9,7 @@
             android:id="@+id/mexplain"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5.5"
+            android:layout_weight="5.8"
             android:background="@drawable/boder"
             android:scrollbars="vertical"
             android:textColor="@color/white"

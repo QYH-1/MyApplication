@@ -11,6 +11,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import androidx.core.content.FileProvider
 import com.HK.dzbly.utils.DecodeImgTask
 import com.HK.dzbly.utils.FileUtil
@@ -35,7 +37,6 @@ class CaptureActivity : Activity() {
         const val REQUEST_CODE_CAPTURE_CROP = 4
         const val REQUEST_CODE_ALBUM = 5
         const val REQUEST_CODE_VIDEO = 6
-
         var imgUri: Uri? = null
         var imageFile: File? = null
         var imageCropFile: File? = null
@@ -45,6 +46,8 @@ class CaptureActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)//隐藏标题栏
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)//隐藏状态栏
         setContentView(com.HK.dzbly.R.layout.activity_capture)
 
         btnCaptureRaw.setOnClickListener { gotoCaptureRaw() }        //拍照(返回原始图)
@@ -58,6 +61,7 @@ class CaptureActivity : Activity() {
     private fun gotoCaptureRaw() {
         //获取文件存储位置
         imageFile = FileUtil.createImageFile()
+        Log.d("照片存储", imageFile.toString());
         imageFile?.let {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
@@ -67,6 +71,7 @@ class CaptureActivity : Activity() {
                 intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
 
                 imgUri = FileProvider.getUriForFile(this, AUTHORITY, it)
+                Log.d("照片存储路径", imgUri.toString())
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri)
             } else {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(it))

@@ -17,12 +17,12 @@ import java.io.File;
 public class MainActivity extends BaseActivity{
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt,setting,data,camera,tools,dzcsy,shutdown;
-    private  String FILE_PATH = "/sdcard/syscamera.jpg";
+    private String AUTHORITY = "com.cs.dzl.fileProvider";//文件工具位置
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
         setContentView(R.layout.main);
         inint();//获取所有的控件
         camera(); //相机的处理事件
@@ -74,12 +74,14 @@ public class MainActivity extends BaseActivity{
         data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);//调用文件浏览器API
-                intent.setType("*/*");//设置类型，这里是任意类型，任意后缀的可以这样写。
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent,1);
-//                Intent intent = new Intent(MainActivity.this,File_mannagementActicity.class);
-//                startActivity(intent);
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);//调用文件浏览器API
+//                intent.setType("*/*");//设置类型，这里是任意类型，任意后缀的可以这样写。
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                startActivityForResult(intent,1);
+                //921497
+                Intent intent = new Intent(MainActivity.this,FileMainActivity.class);
+                startActivity(intent);
+
             }
         });
     }

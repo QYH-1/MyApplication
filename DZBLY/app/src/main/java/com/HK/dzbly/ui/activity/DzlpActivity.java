@@ -6,6 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -41,7 +43,6 @@ public class DzlpActivity extends FragmentActivity {
     private ordinary_measurement_fragment mordinary_measurement_fragment;
     private simple_measurement_fragment msimple_measurement_fragment;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,9 @@ public class DzlpActivity extends FragmentActivity {
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         //锁定屏幕
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        //屏蔽顶部导航栏
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.dzlp);
 
         inint(); //获取控件
