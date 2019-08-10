@@ -16,7 +16,7 @@
                 android:layout_height="260dp"
                 android:background="@color/black"
         >
-            <com.HK.dzbly.utils.CompassView
+            <com.HK.dzbly.utils.drawing.CompassView
                     android:layout_marginLeft="30dp"
                     android:id="@+id/activity_compass_compassview"
                     android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.HK.dzbly.utils
+package com.HK.dzbly.utils.drawing
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

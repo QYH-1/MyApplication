@@ -14,7 +14,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.HK.dzbly.R
 import com.HK.dzbly.adapter.FileInfo
-import com.HK.dzbly.utils.OnclickInterfaceFile
+import com.HK.dzbly.utils.file.OnclickInterfaceFile
 
 /**
  * @Author：qyh

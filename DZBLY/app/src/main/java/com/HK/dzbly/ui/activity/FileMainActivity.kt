@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.HK.dzbly.R
 import com.HK.dzbly.adapter.FileInfo
-import com.HK.dzbly.utils.OnclickInterfaceFile
+import com.HK.dzbly.utils.file.OnclickInterfaceFile
 import com.example.myfilemanager.FileAdapter
 import com.example.myfilemanager.FileUtils
 import java.io.File
@@ -605,6 +605,9 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         return true
     }
 
+    /**
+     * 鼠标点击事件
+     */
     override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
         val item = parent.getItemAtPosition(position) as FileInfo
         // 判断文件/文件夹
@@ -615,11 +618,10 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
 
         } else {
             // 文件: 打开
-            FileUtils.openFile(this, File(item.path))
+           FileUtils.openFile(this, File(item.path))
         }
 
     }
-
 
     private fun getExit() {
         AlertDialog.Builder(this)
@@ -685,15 +687,15 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
             for (position in mAdapter.selectMap.keys) {
                 val path = list[position!!].path
                 oldPath = File(path).toString()
-               // Log.d("根据path路径删除文件",oldPath);
+               //Log.d("根据path路径删除文件",oldPath);
                 val hz = oldPath.substring(oldPath.indexOf(".")+0)
-              //  Log.d("后缀名",hz)
+             // Log.d("后缀名",hz)
                 val hz1 =FileUtils.getnameData()
-               //Log.d("文件名hz1",hz1.toString())
+              // Log.d("文件名hz1",hz1.toString())
                 val hz2 = oldPath.substring(0,oldPath.length-hz1.length)
-               // Log.d("文件名hz2",hz2.toString())
+               //Log.d("文件名hz2",hz2.toString())
                 val newpath =hz2+name+hz
-                //Log.d("newpath",newpath.toString())
+              //  Log.d("newpath",newpath.toString())
 
                 var file = File(oldPath);
                 file.renameTo( File(newpath));
@@ -899,3 +901,4 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         return null
     }
 }
+

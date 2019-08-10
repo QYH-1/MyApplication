@@ -1,4 +1,4 @@
-package com.HK.dzbly.utils;
+package com.HK.dzbly.utils.drawing;
 
 import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
@@ -13,7 +13,10 @@ import androidx.annotation.RequiresApi;
 import com.HK.dzbly.R;
 
 /**
- * 通过自定义View画指南针
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/7/26$
+ * 描述：通过自定义View画指南针
+ * 修订历史：
  */
 public class CompassView extends View {
     private Canvas mCanvas;
@@ -117,13 +120,13 @@ public class CompassView extends View {
         mDarkRedPaint = new Paint();
         mDarkRedPaint.setStyle(Paint.Style.STROKE);
         mDarkRedPaint.setAntiAlias(true);
-        mDarkRedPaint.setColor(context.getResources().getColor(R.color.darkRed));
+        mDarkRedPaint.setColor(context.getResources().getColor(R.color.red));
 
 
         mDeepGrayPaint = new Paint();
         mDeepGrayPaint.setStyle(Paint.Style.STROKE);
         mDeepGrayPaint.setAntiAlias(true);
-        mDeepGrayPaint.setColor(context.getResources().getColor(R.color.deepGray));
+        mDeepGrayPaint.setColor(context.getResources().getColor(R.color.white));
 
 
         mLightGrayPaint = new Paint();
@@ -132,7 +135,7 @@ public class CompassView extends View {
         mLightGrayPaint.setColor(context.getResources().getColor(R.color.lightGray));
         //上方文字的设置
         mTextPaint = new Paint();
-        mTextPaint.setStyle(Paint.Style.STROKE);
+        mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(35);
         mTextPaint.setColor(context.getResources().getColor(R.color.red));
@@ -145,20 +148,20 @@ public class CompassView extends View {
         mOutSideCircumPaint = new Paint();
         mOutSideCircumPaint.setStyle(Paint.Style.FILL);
         mOutSideCircumPaint.setAntiAlias(true);
-        mOutSideCircumPaint.setColor(context.getResources().getColor(R.color.lightGray));
+        mOutSideCircumPaint.setColor(context.getResources().getColor(R.color.white));
 
         mTextRect = new Rect();
         mOutsideTriangle = new Path();
         mCircumTriangle = new Path();
         //指针指向方向文字设置
         mNorthPaint = new Paint();
-        mNorthPaint.setStyle(Paint.Style.STROKE);
+        mNorthPaint.setStyle(Paint.Style.FILL);
         mNorthPaint.setAntiAlias(true);
         mNorthPaint.setTextSize(30);
         mNorthPaint.setColor(context.getResources().getColor(R.color.red));
         //其他方位的文字设置
         mOthersPaint = new Paint();
-        mOthersPaint.setStyle(Paint.Style.STROKE);
+        mOthersPaint.setStyle(Paint.Style.FILL);
         mOthersPaint.setAntiAlias(true);
         mOthersPaint.setTextSize(23);
         mOthersPaint.setColor(context.getResources().getColor(R.color.white));
@@ -167,13 +170,13 @@ public class CompassView extends View {
         mCenterTextRect = new Rect();
         //中间的度数显示设置
         mCenterPaint = new Paint();
-        mCenterPaint.setStyle(Paint.Style.STROKE);
+        mCenterPaint.setStyle(Paint.Style.FILL);
         mCenterPaint.setAntiAlias(true);
         mCenterPaint.setTextSize(45);
         mCenterPaint.setColor(context.getResources().getColor(R.color.red));
         //其他角度文字设置
         mSamllDegreePaint = new Paint();
-        mSamllDegreePaint.setStyle(Paint.Style.STROKE);
+        mSamllDegreePaint.setStyle(Paint.Style.FILL);
         mSamllDegreePaint.setAntiAlias(true);
         mSamllDegreePaint.setTextSize(16);
         mSamllDegreePaint.setColor(context.getResources().getColor(R.color.white));

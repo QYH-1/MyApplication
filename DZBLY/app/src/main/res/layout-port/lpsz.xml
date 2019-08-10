@@ -43,6 +43,7 @@
                     android:textSize="25dp"
                     android:layout_marginLeft="10dp"
                     android:maxLength="7"
+                    android:background="@drawable/edit_bg"
             />
         </LinearLayout>
         <LinearLayout
@@ -68,6 +69,7 @@
                     android:textSize="25dp"
                     android:layout_marginLeft="10dp"
                     android:maxLength="12"
+                    android:background="@drawable/edit_bg"
             />
         </LinearLayout>
         <Button

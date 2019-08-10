@@ -1,8 +1,6 @@
 package com.HK.dzbly.ui.activity;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -12,12 +10,15 @@ import android.widget.ImageButton;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 
-import java.io.File;
-
 public class MainActivity extends BaseActivity{
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt,setting,data,camera,tools,dzcsy,shutdown;
     private String AUTHORITY = "com.cs.dzl.fileProvider";//文件工具位置
+    private String TAG = MainActivity.class.getSimpleName();//获得类的简称
+
+    public static final String ACTION_REBOOT =
+            "android.intent.action.REBOOT";
+    public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +30,8 @@ public class MainActivity extends BaseActivity{
         setting();//设置的处理事件
         data();//数据管理的处理事件
         setDzcsy();//地质参数仪处理事件
+        setShutdown();//手机关机
+        setTools();//激光测距
     }
 
     /**
@@ -74,14 +77,8 @@ public class MainActivity extends BaseActivity{
         data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);//调用文件浏览器API
-//                intent.setType("*/*");//设置类型，这里是任意类型，任意后缀的可以这样写。
-//                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                startActivityForResult(intent,1);
-                //921497
                 Intent intent = new Intent(MainActivity.this,FileMainActivity.class);
                 startActivity(intent);
-
             }
         });
     }
@@ -92,10 +89,37 @@ public class MainActivity extends BaseActivity{
         shutdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                shutDowm();
             }
         });
     }
+
+    private void shutDowm() {
+//        Log.v(TAG, "shutDowm");
+//           try {
+//            //获得ServiceManager类
+//            Class ServiceManager = Class.forName("android.os.ServiceManager");
+//            //获得ServiceManager的getService方法
+//            Method getService = ServiceManager.getMethod("getService", java.lang.String.class);
+//            //调用getService获取RemoteService
+//            Object oRemoteService = getService.invoke(null, Context.POWER_SERVICE);
+//            //获得IPowerManager.Stub类
+//            Class cStub = Class.forName("android.os.IPowerManager$Stub");
+//            //获得asInterface方法
+//            Method asInterface = cStub.getMethod("asInterface", android.os.IBinder.class);
+//            //调用asInterface方法获取IPowerManager对象
+//            Object oIPowerManager = asInterface.invoke(null, oRemoteService);
+//            //获得shutdown()方法
+//            Method shutdown = oIPowerManager.getClass().getMethod("shutdown", boolean.class, boolean.class);
+//            //调用shutdown()方法
+//            shutdown.invoke(oIPowerManager, false, true);
+//        } catch (Exception e) {
+//            Log.e(TAG, e.toString(), e);
+//        }
+        Intent intent = new Intent(MainActivity.this,testwifi.class);
+        startActivity(intent);
+    }
+
     /**
      * 地质参数仪的处理事件
      */
@@ -108,22 +132,17 @@ public class MainActivity extends BaseActivity{
             }
         });
     }
+
     /**
-     * 打开指定文件夹
+     * 激光测距
      */
-    private void openAssignFolder(String path){
-        File file = new File(path);
-        if(null==file || !file.exists()){
-            return;
-        }
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setDataAndType(Uri.fromFile(file), "file/*");
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-        }
+    private void setTools(){
+        tools.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,Laser_rangingActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -4,5 +4,6 @@
     <!--name：就是你给这个访问路径起个名字-->
     <external-path
             name="external-path"
-            path="CameraDemo" />
+            path="." />
+
 </paths>

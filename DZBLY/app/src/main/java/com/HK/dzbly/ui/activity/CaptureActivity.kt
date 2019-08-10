@@ -14,8 +14,8 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.core.content.FileProvider
-import com.HK.dzbly.utils.DecodeImgTask
-import com.HK.dzbly.utils.FileUtil
+import com.HK.dzbly.utils.drawing.DecodeImgTask
+import com.HK.dzbly.utils.file.FileUtil
 import kotlinx.android.synthetic.main.activity_capture.*
 import java.io.File
 
@@ -23,14 +23,13 @@ import java.io.File
  * @Author：qyh
  * 版本：1.0
  * 创建日期：2019/7/31$
- * 描述：
+ * 描述：相机
  * 修订历史：
  *
  */
 class CaptureActivity : Activity() {
     companion object {
         const val AUTHORITY = "com.cs.dzl.fileProvider"
-
         const val REQUEST_CODE_CAPTURE_SMALL = 1
         const val REQUEST_CODE_CAPTURE_RAW = 2
         const val REQUEST_CODE_CAPTURE = 3
@@ -203,6 +202,7 @@ class CaptureActivity : Activity() {
                         videoView.start()
                         Log.d("tag", "视频uri $uri")
                     }
+
                 }
             }
         } else {

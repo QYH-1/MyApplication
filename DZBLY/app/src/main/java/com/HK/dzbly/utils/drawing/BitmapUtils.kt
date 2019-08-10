@@ -1,10 +1,11 @@
-package com.HK.dzbly.utils
+package com.HK.dzbly.utils.drawing
 
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.util.Log
+import com.HK.dzbly.utils.file.FileUtil
 import okio.Okio
 import java.io.ByteArrayOutputStream
 import kotlin.concurrent.thread
@@ -44,7 +45,8 @@ object BitmapUtils {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
         BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size(), options)
 
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+        options.inSampleSize =
+            calculateInSampleSize(options, reqWidth, reqHeight)
         options.inJustDecodeBounds = false
         return BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size(), options)
     }
@@ -54,7 +56,8 @@ object BitmapUtils {
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(path, options)
 
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+        options.inSampleSize =
+            calculateInSampleSize(options, reqWidth, reqHeight)
         options.inJustDecodeBounds = false
         return BitmapFactory.decodeFile(path, options)
     }
@@ -64,7 +67,8 @@ object BitmapUtils {
         options.inJustDecodeBounds = true
         BitmapFactory.decodeResource(res, resId, options)
 
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
+        options.inSampleSize =
+            calculateInSampleSize(options, reqWidth, reqHeight)
         options.inJustDecodeBounds = false
         return BitmapFactory.decodeResource(res, resId, options)
     }
@@ -94,7 +98,11 @@ object BitmapUtils {
 
                     val rawBitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
                     val resultBitmap = if (isMirror) mirror(rawBitmap) else rawBitmap
-                    Okio.buffer(Okio.sink(picFile)).write(toByteArray(resultBitmap)).close()
+                    Okio.buffer(Okio.sink(picFile)).write(
+                        toByteArray(
+                            resultBitmap
+                        )
+                    ).close()
 
                     onSuccess("${picFile.absolutePath}", "${System.currentTimeMillis() - temp}")
 

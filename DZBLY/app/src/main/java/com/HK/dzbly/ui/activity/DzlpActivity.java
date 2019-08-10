@@ -17,9 +17,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.ordinary_measurement_fragment;
 import com.HK.dzbly.ui.fragment.simple_measurement_fragment;
-import com.HK.dzbly.utils.CompassView;
-import com.HK.dzbly.utils.Elevation;
-import com.HK.dzbly.utils.Rollangle;
+import com.HK.dzbly.utils.drawing.CompassView;
+import com.HK.dzbly.utils.drawing.Elevation;
+import com.HK.dzbly.utils.drawing.Rollangle;
 
 import java.util.Random;
 
@@ -50,8 +50,10 @@ public class DzlpActivity extends FragmentActivity {
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         //锁定屏幕
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        //屏蔽顶部导航栏
+
+        //去掉标题栏（ActionBar实际上是设置在标题栏上的）
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //去掉状态栏(顶部显示时间、电量的部分)，设置全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.dzlp);
 

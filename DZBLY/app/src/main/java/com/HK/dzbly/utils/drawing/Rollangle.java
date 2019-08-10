@@ -1,4 +1,4 @@
-package com.HK.dzbly.utils;
+package com.HK.dzbly.utils.drawing;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -9,11 +9,11 @@ import android.view.animation.OvershootInterpolator;
 
 /**
  * @Author：qyh 版本：1.0
- * 创建日期：2019/7/26$
- * 描述：画仪表盘
+ * 创建日期：2019/7/29$
+ * 描述：画横滚角仪表盘
  * 修订历史：
  */
-public class Elevation extends View {
+public class Rollangle extends View {
     private Paint paint , tmpPaint , textPaint ,  strokePain;
     private RectF rect;
     private int backGroundColor;    //背景色
@@ -24,12 +24,12 @@ public class Elevation extends View {
     private float length ;          //仪表盘半径
     private float r ;
 
-    public Elevation(Context context) {
+    public Rollangle(Context context) {
         super(context);
         init();
     }
 
-    public Elevation(Context context, AttributeSet attrs) {
+    public Rollangle(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -59,7 +59,7 @@ public class Elevation extends View {
         strokePain = new Paint();
     }
 
-    public Elevation(Context context, AttributeSet attrs, int defStyleAttr) {
+    public Rollangle(Context context,AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -100,7 +100,7 @@ public class Elevation extends View {
         paint.setColor(Color.parseColor("#FFFFFF"));
         paint.setShader(null);
         paint.setShadowLayer(5, 0, 0, 0x54000000);
-        rect = new RectF( - (rIndex/ 2 ), - (rIndex / 2), rIndex / 2, rIndex / 2);
+        rect = new RectF( - (rIndex/ 2 ), - (rIndex / 2), rIndex / 2, rIndex /2);
         canvas.drawArc(rect, 0, 360, true, paint);
 
         paint.clearShadowLayer();
@@ -143,7 +143,7 @@ public class Elevation extends View {
         canvas.restore();
         canvas.save();
         canvas.translate(canvas.getWidth()/2  , r + length / 3 /2 );
-        canvas.drawText("仰角" , 0, 4, textPaint);
+        canvas.drawText("横滚角" , 0, 4, textPaint);
     }
 
     public void setBackGroundColor(int color){
@@ -169,28 +169,21 @@ public class Elevation extends View {
 
         float  y = length;
         y = - y;
-        int count = 18; //总刻度数
+        int count = 36; //总刻度数
         paint.setColor(backGroundColor);
 
-        float tempRou = 180 / 18f;
+        float tempRou = 180 / 36f;
 
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(5);
 
         //绘制刻度和百分比
         for (int i = 0 ; i <= count ; i++){
-            int temp;
-            if(i <= 9 ){
-                temp = 9 - i;
-                if (temp % 2 == 0 ) {
-                    canvas.drawText(String.valueOf((temp) * -10), 0, y - 20f, tmpPaint);
-                }
-            } else{
-                temp = i-9;
-                if (temp % 2 == 0 ) {
-                    canvas.drawText(String.valueOf((temp) * 10), 0, y - 20f, tmpPaint);
-                }
+
+            if (i % 4 == 0 ) {
+                canvas.drawText(String.valueOf((i) * 10), 0, y - 20f, tmpPaint);
             }
+
             canvas.drawLine(0f, y , 0, y + length / 15, paint);
 
             canvas.rotate(tempRou,0f,0f);

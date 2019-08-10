@@ -26,6 +26,7 @@ public class ordinary_measurement_fragment extends Fragment {
     private TextView line_laser;//线激光
     private TextView Compass_settings;//罗盘设置
     private int type;//对在说明中的内容进行编号 0为测量方法，1为测量出的结果
+    public static final int FILE_RESULT_CODE = 1;
 
     public ordinary_measurement_fragment() {
     }
@@ -52,6 +53,7 @@ public class ordinary_measurement_fragment extends Fragment {
         setExplain(view);
         //设置罗盘
         setCompass_settings(view);
+        setSave(view);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class ordinary_measurement_fragment extends Fragment {
         explain =view.findViewById(R.id.explain);
         point_lase =view.findViewById(R.id.point_lase);
         line_laser =view.findViewById(R.id.line_laser);
-        save =view.findViewById(R.id.save);
+        save =view.findViewById(R.id.tsave);
         Compass_settings = view.findViewById(R.id.Compass_settings);
     }
     //给定说明中的显示
@@ -98,5 +100,27 @@ public class ordinary_measurement_fragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+    /**
+     * 保存数据
+     */
+    private void setSave(View view) {
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(FILE_RESULT_CODE == requestCode){
+            Bundle bundle = null;
+            if(data!=null&&(bundle=data.getExtras())!=null){
+               // textView.setText("选择文件夹为："+bundle.getString("file"));
+            }
+        }
     }
 }

@@ -2,11 +2,10 @@ package com.example.myfilemanager
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import com.HK.dzbly.R
+import androidx.core.content.FileProvider
 import com.HK.dzbly.adapter.FileInfo
 import com.HK.dzbly.ui.activity.FileMainActivity
 import java.io.File
@@ -16,6 +15,8 @@ import java.io.IOException
 import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 import java.util.*
+
+
 
 /**
  * @Author：qyh
@@ -71,7 +72,7 @@ class FileUtils {
                     ) {
                         file.isHidden//  是否是隐藏文件
                         // 获取文件夹目录结构
-                        item.icon = R.drawable.folder//图标
+                        item.icon = com.HK.dzbly.R.drawable.folder//图标
                         item.bytesize = file.length()
                         item.size = getSize(item.bytesize.toFloat())//大小
                         item.type = FileMainActivity.T_DIR
@@ -91,7 +92,7 @@ class FileUtils {
                         item.type = FileMainActivity.T_FILE
 
                     } else {// 其它
-                        item.icon = R.drawable.mul_file
+                        item.icon = com.HK.dzbly.R.drawable.mul_file
                     }
                     item.name = file.name// 名称
                     item.lastModify = file.lastModified()
@@ -188,64 +189,64 @@ class FileUtils {
 
             var id = 0
             if (end == "asf") {
-                id = R.drawable.asf
+                id = com.HK.dzbly.R.drawable.asf
             } else if (end == "avi") {
-                id = R.drawable.avi
+                id = com.HK.dzbly.R.drawable.avi
             } else if (end == "bmp") {
-                id = R.drawable.bmp
+                id = com.HK.dzbly.R.drawable.bmp
             } else if (end == "doc") {
-                id = R.drawable.doc
+                id = com.HK.dzbly.R.drawable.doc
             } else if (end == "gif") {
-                id = R.drawable.gif
+                id = com.HK.dzbly.R.drawable.gif
             } else if (end == "html") {
-                id = R.drawable.html
+                id = com.HK.dzbly.R.drawable.html
             } else if (end == "apk") {
-                id = R.drawable.iapk
+                id = com.HK.dzbly.R.drawable.iapk
             } else if (end == "ico") {
-                id = R.drawable.ico
+                id = com.HK.dzbly.R.drawable.ico
             } else if (end == "jpg") {
-                id = R.drawable.jpg
+                id = com.HK.dzbly.R.drawable.jpg
             } else if (end == "log") {
-                id = R.drawable.log
+                id = com.HK.dzbly.R.drawable.log
             } else if (end == "mov") {
-                id = R.drawable.mov
+                id = com.HK.dzbly.R.drawable.mov
             } else if (end == "mp3") {
-                id = R.drawable.mp3
+                id = com.HK.dzbly.R.drawable.mp3
             } else if (end == "mp4") {
-                id = R.drawable.mp4
+                id = com.HK.dzbly.R.drawable.mp4
             } else if (end == "mpeg") {
-                id = R.drawable.mpeg
+                id = com.HK.dzbly.R.drawable.mpeg
             } else if (end == "pdf") {
-                id = R.drawable.pdf
+                id = com.HK.dzbly.R.drawable.pdf
             } else if (end == "png") {
-                id = R.drawable.png
+                id = com.HK.dzbly.R.drawable.png
             } else if (end == "ppt") {
-                id = R.drawable.ppt
+                id = com.HK.dzbly.R.drawable.ppt
             } else if (end == "rar") {
-                id = R.drawable.rar
+                id = com.HK.dzbly.R.drawable.rar
             } else if (end == "txt" || end == "dat" || end == "ini"
                     || end == "java") {
-                id = R.drawable.txt
+                id = com.HK.dzbly.R.drawable.txt
             } else if (end == "vob") {
-                id = R.drawable.vob
+                id = com.HK.dzbly.R.drawable.vob
             } else if (end == "wav") {
-                id = R.drawable.wav
+                id = com.HK.dzbly.R.drawable.wav
             } else if (end == "wma") {
-                id = R.drawable.wma
+                id = com.HK.dzbly.R.drawable.wma
             } else if (end == "wmv") {
-                id = R.drawable.wmv
+                id = com.HK.dzbly.R.drawable.wmv
             } else if (end == "xls") {
-                id = R.drawable.xls
+                id = com.HK.dzbly.R.drawable.xls
             } else if (end == "xml") {
-                id = R.drawable.xml
+                id = com.HK.dzbly.R.drawable.xml
             } else if (end == "zip") {
-                id = R.drawable.zip
+                id = com.HK.dzbly.R.drawable.zip
             } else if (end == "3gp" || end == "flv") {
-                id = R.drawable.file_video
+                id = com.HK.dzbly.R.drawable.file_video
             } else if (end == "amr") {
-                id = R.drawable.file_audio
+                id = com.HK.dzbly.R.drawable.file_audio
             } else {
-                id = R.drawable.default_fileicon
+                id = com.HK.dzbly.R.drawable.default_fileicon
             }
             return id
         }
@@ -263,45 +264,66 @@ class FileUtils {
             val intent = Intent()
             // 添加动作(干什么?)
             intent.action = Intent.ACTION_VIEW
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             //取得文件名
             val fileName = aFile.name
+            Log.d("打开文件名:",fileName)
             val end = getFileEXT(fileName).toLowerCase()
+            Log.d("打开文件名后缀:",end)
+            Log.d("打开文件路劲:",aFile.toString())
             if (aFile.exists()) {
                 // 根据不同的文件类型来打开文件
                 if (checkEndsInArray(end, arrayOf("png", "gif", "jpg", "bmp"))) {
                     // 图片
-                    intent.setDataAndType(Uri.fromFile(aFile), "image/*")//MIME TYPE
+                    Log.d("是否找到后缀",(checkEndsInArray(end, arrayOf("png", "gif", "jpg", "bmp"))).toString())
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    Log.d("uriSavedImage",uriSavedImage.toString())
+                    intent.setDataAndType(uriSavedImage, "image/*")//MIME TYPE
+
                 } else if (checkEndsInArray(end, arrayOf("apk"))) {
                     // apk
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/vnd.android.package-archive")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/vnd.android.package-archive")
                 } else if (checkEndsInArray(end, arrayOf("mp3", "amr", "ogg", "mid", "wav"))) {
                     // audio
-                    intent.setDataAndType(Uri.fromFile(aFile), "audio/*")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "audio/*")
                 } else if (checkEndsInArray(end, arrayOf("mp4", "3gp", "mpeg", "mov", "flv"))) {
                     // video
-                    intent.setDataAndType(Uri.fromFile(aFile), "video/*")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "video/*")
                 } else if (checkEndsInArray(end, arrayOf("txt", "ini", "log", "java", "xml", "html"))) {
                     // text
-                    intent.setDataAndType(Uri.fromFile(aFile), "text/*")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "text/*")
                 } else if (checkEndsInArray(end, arrayOf("doc", "docx"))) {
                     // word
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/msword")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/msword")
                 } else if (checkEndsInArray(end, arrayOf("xls", "xlsx"))) {
                     // excel
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/vnd.ms-excel")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/vnd.ms-excel")
                 } else if (checkEndsInArray(end, arrayOf("ppt", "pptx"))) {
                     // ppt
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/vnd.ms-powerpoint")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/vnd.ms-powerpoint")
                 } else if (checkEndsInArray(end, arrayOf("chm"))) {
                     // chm
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/x-chm")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/x-chm")
                 } else {
                     // 其他
-                    intent.setDataAndType(Uri.fromFile(aFile), "application/$end")
+                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    intent.setDataAndType(uriSavedImage, "application/$end")
                 }
                 try {
                     // 发送意图
+                    //Log.d("发送意图",true.toString())
                     context.startActivity(intent)
+
                 } catch (e: Exception) {
                     Toast.makeText(context, "没有找到适合打开此文件的应用", Toast.LENGTH_SHORT).show()
                 }
