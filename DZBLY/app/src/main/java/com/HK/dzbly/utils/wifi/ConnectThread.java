@@ -4,94 +4,105 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import com.HK.dzbly.ui.activity.testActivity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 
 /**
  * @Author：qyh 版本：1.0
- * 创建日期：2019/8/5$
- * 描述：wifi连接线程
+ * 创建日期：2019/8/12$
+ * 描述：连接线程
  * 修订历史：
  */
 public class ConnectThread extends Thread {
-    private final Socket socket;
-    private Handler handler;
+
+    private  Socket socket = null;
+    private Handler handler = null;
     private InputStream inputStream;
     private OutputStream outputStream;
+   // private Thread mThreadClient = null;
+  //  private String data = null;
+    private static String hexString = "0123456789ABCDEF";
+    private String datas = null;
+    private StringBuilder stringBuilder = new StringBuilder();
 
-    public ConnectThread(Socket socket, Handler handler){
-        setName("ConnectThread");
+    public ConnectThread(Socket socket,Handler handler) {
+
         Log.w("AAA","ConnectThread");
         this.socket = socket;
         this.handler = handler;
+
     }
+        @Override
+        public void run() {
+            String sIP = "10.10.100.254";
+            String sPort = "8899"; //找到端口号8899
+            int port = Integer.parseInt(sPort); //String型转换为Int型
+            Log.d("port", String.valueOf(port));
+            Log.d("连接地址", "IP:" + sIP + ":" + port);
+            try {
+                socket = new Socket(sIP, port);
+                try {
+                    //inputStream = socket.getInputStream();
+                    outputStream = socket.getOutputStream();
+                    //获取客户端的IP地址
+                    InetAddress address = InetAddress.getLocalHost();
+                    Log.d("客户端的IP地址", String.valueOf(address));
+                  // byte[] buffer = new byte[1024];
+                   int bytes = 0;
+                    while (bytes<=8){
+                        DataInputStream dis = new DataInputStream(socket.getInputStream());
+                        byte data = dis.readByte();
+                        // Log.d("bytes", String.valueOf(bytes));
+                        // if (bytes > 0) {
+                        Log.d("data", String.valueOf(data));
+                        String n = Integer.toHexString(data);
 
-    @Override
-    public void run() {
-/*        if(activeConnect){
-//            socket.c
-        }*/
-        if(socket==null){
-            return;
-        }
-        handler.sendEmptyMessage(testActivity.DEVICE_CONNECTED);
-        try {
-            //获取数据流
-            inputStream = socket.getInputStream();
-            outputStream = socket.getOutputStream();
+                        Log.d("n", String.valueOf(n));
+                        //拼接字符串
+                        if (n.equals("0")) {
+                            stringBuilder.append(n);
+                            stringBuilder.append(0);
+                        } else {
+                            stringBuilder.append(n);
+                        }
+                        Log.d("stringBuilder", String.valueOf(stringBuilder));
+                        datas = String.valueOf(stringBuilder);
+                        bytes+=2;
+                        Log.d("datas", String.valueOf(datas));
+                        //int i = datas.length();
+                        while (datas.length() ==8){
+                            Message msg =Message.obtain();
+                            msg.what = 1;
+                            Bundle bundle = new Bundle();
+                            bundle.putString("msg", datas);
+                            msg.setData(bundle);
+                            handler.sendMessage(msg);
+                            // if (data != null) {
+                            Log.w("AAA-11", "c:" +datas);
+                            break;
+                        }
 
-            byte[] buffer = new byte[1024];
-            int bytes;
-            while (true){
-                //读取数据
-                bytes = inputStream.read(buffer);
-                if (bytes > 0) {
-                    final byte[] data = new byte[bytes];
-                    System.arraycopy(buffer, 0, data, 0, bytes);
-
-                    Message message = Message.obtain();
-                    message.what = testActivity.GET_MSG;
-                    Bundle bundle = new Bundle();
-                    bundle.putString("MSG",new String(data));
-                    message.setData(bundle);
-                    handler.sendMessage(message);
-
-                    Log.w("AAA","读取到数据:"+new String(data));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
-
     /**
      * 发送数据
      */
-    public void sendData(String msg){
-        Log.w("AAA","发送数据:"+(outputStream==null));
-        if(outputStream!=null){
-            try {
-                outputStream.write(msg.getBytes());
-                Log.w("AAA","发送消息："+msg);
-                Message message = Message.obtain();
-                message.what = testActivity.SEND_MSG_SUCCSEE;
-                Bundle bundle = new Bundle();
-                bundle.putString("MSG",new String(msg));
-                message.setData(bundle);
-                handler.sendMessage(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Message message = Message.obtain();
-                message.what = testActivity.SEND_MSG_ERROR;
-                Bundle bundle = new Bundle();
-                bundle.putString("MSG",new String(msg));
-                message.setData(bundle);
-                handler.sendMessage(message);
-            }
+    public void sendData(String msg) {
+        try {
+            outputStream = socket.getOutputStream();
+            //向服务器端发送消息
+            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream)), true);
+            out.println(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

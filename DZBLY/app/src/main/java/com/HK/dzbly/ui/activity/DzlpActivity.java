@@ -6,11 +6,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,7 +24,9 @@ import com.HK.dzbly.ui.fragment.simple_measurement_fragment;
 import com.HK.dzbly.utils.drawing.CompassView;
 import com.HK.dzbly.utils.drawing.Elevation;
 import com.HK.dzbly.utils.drawing.Rollangle;
+import com.HK.dzbly.utils.wifi.ConnectThread;
 
+import java.net.Socket;
 import java.util.Random;
 
 /**
@@ -43,6 +49,10 @@ public class DzlpActivity extends FragmentActivity {
     private ordinary_measurement_fragment mordinary_measurement_fragment;
     private simple_measurement_fragment msimple_measurement_fragment;
 
+    private ConnectThread connectThread; //获取wifi连接对象
+    private Socket socket;
+    private String data;//wifi传递过来的数据
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +70,9 @@ public class DzlpActivity extends FragmentActivity {
         inint(); //获取控件
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
-        setElevation(1); //设置仰角
-        setRollangle(1); //设置横滚角
+
+        connectThread = new ConnectThread(socket,handler);
+        connectThread.start();
     }
     /**
      * 获取控件
@@ -156,20 +167,87 @@ public class DzlpActivity extends FragmentActivity {
      * 画仰角图示
      * 根据硬件传值取调整指针的具体指向
      */
-    private void setElevation(float x){
-        Random random = new Random();
+    private void setElevation(String x){
+        //Random random = new Random();
         // <!--接受硬件的仰角的值-->
         //获取数据
-        elevation.cgangePer(90 / 180f);
+        int el = 90;
+        if(x.substring(0,1).equals("-")){
+            el = Integer.parseInt(x)+90;
+        }else {
+             el = Math.abs(Integer.parseInt(x));
+
+        }
+        elevation.cgangePer(el / 180f);
     }
     /**
      * 画横滚角图示
      */
-    private void setRollangle(float x){
+    private void setRollangle(String x){
         Random random = new Random();
         // <!--接受硬件的横滚角的值-->
         //获取数据
         float p = 0;
         rollangle.cgangePer(p / 360f);
+    }
+
+    /**
+     * 接收wifi的数据，并对控件进行设置
+     */
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Bundle bundle = new Bundle();
+            bundle = msg.getData();
+            data =  bundle.getString("msg");
+            Log.d("DzlpActivity_data",data);
+            //对wifi获取的数据进行处理
+            String data1 = Concerto(data);
+            Log.d("DzlpActivity_data1",data1);
+            //改变控件的显示
+            setElevation(data1);
+
+
+        }
+    };
+    /**
+     * 处理wifi传递过来的数据
+     */
+    private String Concerto(String data){
+        String integrate = "0";
+        String decimal = "0";
+        String dana = null;
+        Log.d("DzlpActivity_datav",data);
+        String str1 = data.substring(2,3);
+        Log.d("str1",str1);
+
+        String str2 = data.substring(3,6);
+        Log.d("str2",str2);
+        if(str2.substring(0,1).equals("0")){
+            integrate = str2.substring(str2.indexOf("0"));
+        }else {
+            integrate = str2;
+        }
+
+        String str3 = data.substring(6);
+        Log.d("str3",str3);
+        if(str3.substring(0,1).equals("0")){
+            decimal = str3.substring(str3.indexOf("0"));
+        }else {
+            decimal = str3;
+        }
+
+        Log.d("小数部分",decimal);
+        if(str1.equals("1")){
+            dana = integrate+"."+decimal;
+        }else {
+            dana = "-"+integrate+"."+decimal;
+        }
+
+        Log.d("结果",dana);
+
+
+        return dana;
     }
 }
