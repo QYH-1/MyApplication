@@ -4,8 +4,10 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import com.HK.dzbly.R;
 
 /**
  * @Author：qyh 版本：1.0
@@ -23,6 +25,7 @@ public class Elevation extends View {
     private float perOld ;          //变化前指针百分比
     private float length ;          //仪表盘半径
     private float r ;
+    private float edata = 0;            //仰角提示角度
 
     public Elevation(Context context) {
         super(context);
@@ -97,11 +100,14 @@ public class Elevation extends View {
         float rIndex = length ;
 
         //设置文字展示的圆环
-        paint.setColor(Color.parseColor("#FFFFFF"));
-        paint.setShader(null);
-        paint.setShadowLayer(5, 0, 0, 0x54000000);
-        rect = new RectF( - (rIndex/ 2 ), - (rIndex / 2), rIndex / 2, rIndex / 2);
-        canvas.drawArc(rect, 0, 360, true, paint);
+        RadialGradient mInnerShader = new RadialGradient(0, 0, rIndex /2+rIndex /12, Color.parseColor("#323232"),
+                Color.parseColor("#000000"), Shader.TileMode.CLAMP);
+        paint.setShader(mInnerShader);
+        //paint.setShadowLayer(5, 0, 0, 0x54000000);
+        // rect = new RectF( - (rIndex/ 2 ), - (rIndex / 2), rIndex / 2, rIndex /2);
+        //canvas.drawArc(rect, 0, 360, true, paint);
+
+        canvas.drawCircle(0, 0, rIndex /2+rIndex /12, paint);
 
         paint.clearShadowLayer();
 
@@ -130,13 +136,14 @@ public class Elevation extends View {
         //计算偏移量 是的数字和百分号整体居中显示
         swidth =   (swidth - (swidth + 22) / 2);
         //角度
+        textPaint.setTextSize(45);
         canvas.translate( swidth , 0);
-        canvas.drawText("" + _per, 6, -15, textPaint);
+        canvas.drawText("" + edata, 40, -15, textPaint);
         //提示字体大小
-        textPaint.setTextSize(25);
+        textPaint.setTextSize(40);
         textPaint.setTextAlign(Paint.Align.LEFT);
 
-        canvas.drawText("°" , 6, -20, textPaint);
+        canvas.drawText("°" , 42, -20, textPaint);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(Color.parseColor("#FF0000"));
 
@@ -162,7 +169,7 @@ public class Elevation extends View {
 
         tmpPaint = new Paint(paint); //小刻度画笔对象
         tmpPaint.setStrokeWidth(1);
-        tmpPaint.setTextSize(20);
+        tmpPaint.setTextSize(30);
         tmpPaint.setTextAlign(Paint.Align.CENTER);
 
         canvas.rotate(-90,0f,0f);
@@ -260,7 +267,7 @@ public class Elevation extends View {
 
         strokePain = new Paint(paint);
 
-        strokePain.setColor(0x3f979797);
+        strokePain.setColor(Color.parseColor("#D3D3D3"));
         strokePain.setStrokeWidth(10);
         strokePain.setShader(null);
         strokePain.setStyle(Paint.Style.STROKE);
@@ -277,7 +284,7 @@ public class Elevation extends View {
         canvas.drawRect(-length  , (float) (Math.sin(Math.toRadians(10) ) * length /3f * 2f), length  ,  (float) (Math.sin(Math.toRadians(10) ) * length /3f * 2f) , strokePain);
 
         //内部背景色填充
-        paint.setColor(backGroundColor);
+        paint.setColor(getResources().getColor(R.color.lightGray));
         paint.setShader(null);
         rect = new RectF( - (length - length / 3f  - 2), -(length / 3f * 2f - 2), length - length / 3f -2 , length / 3f * 2f - 2);
         canvas.drawArc(rect, 170, 200, true, strokePain);
@@ -288,9 +295,11 @@ public class Elevation extends View {
     }
 
     //使用ValueAnimator实现指针的转动动画效果
-    public void cgangePer(float per ){
+    public void cgangePer(float per,float eada ){
         this.perOld = this.per;
         this.per = per;
+        this.edata = eada;
+        Log.d("E_edata", String.valueOf(edata));
         ValueAnimator va =  ValueAnimator.ofFloat(perOld,per);
         va.setDuration(1000);
         va.setInterpolator(new OvershootInterpolator());

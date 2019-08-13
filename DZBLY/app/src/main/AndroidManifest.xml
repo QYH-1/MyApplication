@@ -79,7 +79,6 @@
                 android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity android:name=".ui.activity.CaptureActivity"/>
         <activity android:name=".ui.activity.FileMainActivity"></activity>
-        <activity android:name=".ui.activity.testwifi"></activity>
         <activity android:name=".ui.activity.wifi"></activity>
 
         <provider

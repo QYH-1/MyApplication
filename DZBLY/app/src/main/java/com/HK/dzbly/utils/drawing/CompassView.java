@@ -137,7 +137,7 @@ public class CompassView extends View {
         mTextPaint = new Paint();
         mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setTextSize(35);
+        mTextPaint.setTextSize(55);
         mTextPaint.setColor(context.getResources().getColor(R.color.red));
 
         mCircumPaint = new Paint();
@@ -157,13 +157,13 @@ public class CompassView extends View {
         mNorthPaint = new Paint();
         mNorthPaint.setStyle(Paint.Style.FILL);
         mNorthPaint.setAntiAlias(true);
-        mNorthPaint.setTextSize(30);
+        mNorthPaint.setTextSize(35);
         mNorthPaint.setColor(context.getResources().getColor(R.color.red));
         //其他方位的文字设置
         mOthersPaint = new Paint();
         mOthersPaint.setStyle(Paint.Style.FILL);
         mOthersPaint.setAntiAlias(true);
-        mOthersPaint.setTextSize(23);
+        mOthersPaint.setTextSize(28);
         mOthersPaint.setColor(context.getResources().getColor(R.color.white));
 
         mPositionRect = new Rect();
@@ -172,13 +172,13 @@ public class CompassView extends View {
         mCenterPaint = new Paint();
         mCenterPaint.setStyle(Paint.Style.FILL);
         mCenterPaint.setAntiAlias(true);
-        mCenterPaint.setTextSize(45);
+        mCenterPaint.setTextSize(55);
         mCenterPaint.setColor(context.getResources().getColor(R.color.red));
         //其他角度文字设置
         mSamllDegreePaint = new Paint();
         mSamllDegreePaint.setStyle(Paint.Style.FILL);
         mSamllDegreePaint.setAntiAlias(true);
-        mSamllDegreePaint.setTextSize(16);
+        mSamllDegreePaint.setTextSize(25);
         mSamllDegreePaint.setColor(context.getResources().getColor(R.color.white));
 
         mSencondRect = new Rect();
@@ -248,7 +248,7 @@ public class CompassView extends View {
     }
 
     private void drawCenterText() {
-        String centerText = String.valueOf((int) val + "°");
+        String centerText = val+"°";
         mCenterPaint.getTextBounds(centerText, 0, centerText.length(), mCenterTextRect);
         int centerTextWidth = mCenterTextRect.width();
         int centerTextHeight = mCenterTextRect.height();
@@ -552,5 +552,8 @@ public class CompassView extends View {
         percentArr[0] = percentX;
         percentArr[1] = percentY;
         return percentArr;
+    }
+    public void CompassViewdata(float val){
+        this.val = val;
     }
 }

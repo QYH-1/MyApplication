@@ -27,7 +27,6 @@ import com.HK.dzbly.utils.drawing.Rollangle;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 
 import java.net.Socket;
-import java.util.Random;
 
 /**
  * @Author：qyh 版本：1.0
@@ -51,6 +50,7 @@ public class DzlpActivity extends FragmentActivity {
 
     private ConnectThread connectThread; //获取wifi连接对象
     private Socket socket;
+  //  private Handler handler;
     private String data;//wifi传递过来的数据
 
     @Override
@@ -73,6 +73,7 @@ public class DzlpActivity extends FragmentActivity {
 
         connectThread = new ConnectThread(socket,handler);
         connectThread.start();
+        Log.d("connectThread","启动成功");
     }
     /**
      * 获取控件
@@ -90,15 +91,16 @@ public class DzlpActivity extends FragmentActivity {
     /**
      * 对指南针进行操作
      */
-    public void Compass(){
+    public void Compass(final float val){
         mSensorEventListener = new SensorEventListener() {
             //重写onSensorChanged方法进行更新
             @Override
             public void onSensorChanged(SensorEvent event) {
                // <!--接受硬件的方位角的值-->
                 //获取当前的方位角
-                val = event.values[0];
+               // val = event.values[0];
                 //通过线程进行view的刷新
+
                 chaosCompassView.setVal(val);
             }
             @Override
@@ -171,24 +173,38 @@ public class DzlpActivity extends FragmentActivity {
         //Random random = new Random();
         // <!--接受硬件的仰角的值-->
         //获取数据
-        int el = 90;
-        if(x.substring(0,1).equals("-")){
-            el = Integer.parseInt(x)+90;
+        float eada = Float.parseFloat(x);
+        float el = 90;
+        if((x.substring(0,1).equals("-"))){
+            el = 90-Math.abs(Float.parseFloat(x));
         }else {
-             el = Math.abs(Integer.parseInt(x));
+             el =Float.parseFloat(x)+90;
 
         }
-        elevation.cgangePer(el / 180f);
+        Log.d("DzlpActivity_el", String.valueOf(el));
+        Log.d("DzlpActivity_eada", String.valueOf(eada));
+        elevation.cgangePer(el / 180f,eada);
     }
     /**
      * 画横滚角图示
      */
     private void setRollangle(String x){
-        Random random = new Random();
+        //Random random = new Random();
         // <!--接受硬件的横滚角的值-->
         //获取数据
-        float p = 0;
-        rollangle.cgangePer(p / 360f);
+
+        float rana =Math.abs(Float.parseFloat(x));
+        float p =Math.abs(Float.parseFloat(x));
+        Log.d("rana111111", String.valueOf(rana));
+
+        rollangle.cgangePer(p / 360f,rana);
+    }
+    /**
+     * 传递指南针数据
+     */
+    private void setChaosCompassView(String x){
+        float val = Float.parseFloat(x);
+        chaosCompassView.CompassViewdata(val);
     }
 
     /**
@@ -201,39 +217,67 @@ public class DzlpActivity extends FragmentActivity {
             Bundle bundle = new Bundle();
             bundle = msg.getData();
             data =  bundle.getString("msg");
+
             Log.d("DzlpActivity_data",data);
             //对wifi获取的数据进行处理
             String data1 = Concerto(data);
             Log.d("DzlpActivity_data1",data1);
             //改变控件的显示
             setElevation(data1);
-
+            setRollangle(data1);
+            Compass(120);
+            //setChaosCompassView(String.valueOf(120));
+//            Timer timer = new Timer();
+//            timer.schedule(new TimerTask(){
+//                @Override
+//                public void run() {
+//                    reflush();
+//                }
+//            },1000);
 
         }
     };
+    private void reflush(){
+//            connectThread.stop();
+//            connectThread = new ConnectThread(socket,handler);
+//            connectThread.start();
+       // finish();
+       // Intent intent = new Intent(this, DzlpActivity.class);
+       // startActivity(intent);
+
+    }
     /**
      * 处理wifi传递过来的数据
      */
     private String Concerto(String data){
-        String integrate = "0";
-        String decimal = "0";
+        String integrate = null;
+        String decimal = null;
         String dana = null;
         Log.d("DzlpActivity_datav",data);
+
+        //接收第三位为符号位
         String str1 = data.substring(2,3);
         Log.d("str1",str1);
 
+        //接收的4、5、6位为整数部分
         String str2 = data.substring(3,6);
         Log.d("str2",str2);
         if(str2.substring(0,1).equals("0")){
-            integrate = str2.substring(str2.indexOf("0"));
+           if(str2.substring(1,2).equals("0")){
+               integrate = str2.substring(2);
+           }else{
+               integrate = str2.substring(1);
+           }
         }else {
             integrate = str2;
         }
-
+        //后两位为小数部分
         String str3 = data.substring(6);
         Log.d("str3",str3);
-        if(str3.substring(0,1).equals("0")){
-            decimal = str3.substring(str3.indexOf("0"));
+        if(str3.substring(0,1).equals("0") && str3.substring(1).equals("0")){
+            decimal = "0";
+        }else if(str3.substring(0,1).equals("0") && !str3.substring(1).equals("0")){
+            decimal = str3.substring(1);
         }else {
             decimal = str3;
         }
