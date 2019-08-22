@@ -20,7 +20,7 @@ import java.net.Socket;
  */
 public class ConnectThread extends Thread {
 
-    private  Socket socket = null;
+    private Socket socket;
     private Handler handler = null;
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -29,40 +29,43 @@ public class ConnectThread extends Thread {
     private String datas = null;
     private StringBuilder stringBuilder = new StringBuilder();
     private int datalength; //数据长度
+    private byte msg = (byte) 0x01;
+    private String sIP = "10.10.100.254";
+    private String sPort = "8899"; //找到端口号8899
+    private int port = Integer.parseInt(sPort); //String型转换为Int型
 
-    private  byte msg = (byte) 0xaa;
+    public ConnectThread(Socket socket, Handler handler) {
 
-
-    public ConnectThread(Socket socket,Handler handler) {
-
-        Log.w("AAA","ConnectThread");
+        Log.w("AAA", "ConnectThread");
         this.socket = socket;
         this.handler = handler;
 
     }
-        @Override
-        public void run() {
-            String sIP = "10.10.100.254";
-            String sPort = "8899"; //找到端口号8899
-            int port = Integer.parseInt(sPort); //String型转换为Int型
-            Log.d("port", String.valueOf(port));
-            Log.d("连接地址", "IP:" + sIP + ":" + port);
-
+    @Override
+    public void run() {
+        //stringBuilder = null;
+       //datas = null;
+        Log.d("port", String.valueOf(port));
+        Log.d("连接地址", "IP:" + sIP + ":" + port);
+        try {
+            socket = new Socket(sIP, port);
             try {
-                socket = new Socket(sIP, port);
-                try {
-                    //向服务器端发送消息
-                    outputStream = socket.getOutputStream();
-                    outputStream.write(msg);
-                    outputStream.flush();
+                //向服务器端发送消息
+                outputStream = socket.getOutputStream();
+                outputStream.write(msg);
+                Log.d("向服务器端发送消息", String.valueOf(msg));
+                outputStream.flush();
 
-                    InetAddress address = InetAddress.getLocalHost();
-                    Log.d("客户端的IP地址", String.valueOf(address));
-                    // byte[] buffer = new byte[1024];
-                    int bytes = 0;
-                    while (bytes<=8){
-                        DataInputStream dis = new DataInputStream(socket.getInputStream());
-                        byte data = dis.readByte();
+                InetAddress address = InetAddress.getLocalHost();
+                Log.d("客户端的IP地址", String.valueOf(address));
+                // byte[] buffer = new byte[1024];
+                //int bytes = 0;
+                while (true) {
+                    DataInputStream dis = new DataInputStream(socket.getInputStream());
+                    //byte data = dis.readByte();
+                    try {
+                        int data = dis.read();
+
                         // Log.d("bytes", String.valueOf(bytes));
                         // if (bytes > 0) {
                         Log.d("data", String.valueOf(data));
@@ -73,15 +76,21 @@ public class ConnectThread extends Thread {
                         if (n.equals("0")) {
                             stringBuilder.append(n);
                             stringBuilder.append(0);
+                        } else if (n.equals("1") || n.equals("2") || n.equals("3") || n.equals("4") || n.equals("5") || n.equals("6") || n.equals("7") || n.equals("8") || n.equals("9")) {
+                            stringBuilder.append(0);
+                            stringBuilder.append(n);
+                        } else if (n.substring(0, 1).equals("-")) {
+                            n = n.substring(1, 3);
+                            stringBuilder.append(n);
                         } else {
                             stringBuilder.append(n);
                         }
                         Log.d("stringBuilder", String.valueOf(stringBuilder));
                         datas = String.valueOf(stringBuilder);
-                        bytes+=2;
+                        // bytes+=2;
                         Log.d("datas", String.valueOf(datas));
 
-                        while (datas.length() ==8){
+                        while (datas.length()%24 ==0 && datas.length() != 0) {
                             Message msg = Message.obtain();
                             msg.what = 1;
                             Bundle bundle = new Bundle();
@@ -89,98 +98,19 @@ public class ConnectThread extends Thread {
                             msg.setData(bundle);
                             handler.sendMessage(msg);
                             // if (data != null) {
-                            Log.w("AAA-11", "c:" +datas);
+                            Log.w("AAA-11", "c:" + datas);
                             break;
                         }
-
+                    } catch (NullPointerException e) {
 
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-    /**
-     * 发送数据
-     */
-    public void sendData(byte msg) {
-        String sIP = "10.10.100.254";
-        String sPort = "8899"; //找到端口号8899
-        int port = Integer.parseInt(sPort); //String型转换为Int型
-        Log.d("port", String.valueOf(port));
-        Log.d("连接地址", "IP:" + sIP + ":" + port);
-            try {
-                socket = new Socket(sIP, port);
-                try {
-                    //向服务器端发送消息
-                    outputStream = socket.getOutputStream();
-                    outputStream.write(msg);
-                    outputStream.flush();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    }
-    public void getData(){
-        String sIP = "10.10.100.254";
-        String sPort = "8899"; //找到端口号8899
-        int port = Integer.parseInt(sPort); //String型转换为Int型
-        try {
-            socket = new Socket(sIP, port);
-            try {
-                //inputStream = socket.getInputStream();
-                //outputStream = socket.getOutputStream();
-                //获取客户端的IP地址
-                InetAddress address = InetAddress.getLocalHost();
-                Log.d("客户端的IP地址", String.valueOf(address));
-                // byte[] buffer = new byte[1024];
-                int bytes = 0;
-                while (bytes<=8){
-                    DataInputStream dis = new DataInputStream(socket.getInputStream());
-                    byte data = dis.readByte();
-                    // Log.d("bytes", String.valueOf(bytes));
-                    // if (bytes > 0) {
-                    Log.d("data", String.valueOf(data));
-                    String n = Integer.toHexString(data);
-
-                    Log.d("n", String.valueOf(n));
-                    //拼接字符串
-                    if (n.equals("0")) {
-                        stringBuilder.append(n);
-                        stringBuilder.append(0);
-                    } else {
-                        stringBuilder.append(n);
-                    }
-                    Log.d("stringBuilder", String.valueOf(stringBuilder));
-                    datas = String.valueOf(stringBuilder);
-                    bytes+=2;
-                    Log.d("datas", String.valueOf(datas));
-                    //int i = datas.length();
-                    while (datas.length() ==8){
-                        Message msg = Message.obtain();
-                        msg.what = 1;
-                        Bundle bundle = new Bundle();
-                        bundle.putString("msg", datas);
-                        msg.setData(bundle);
-                        handler.sendMessage(msg);
-                        // if (data != null) {
-                        Log.w("AAA-12", "c:" +datas);
-                        break;
-                    }
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }

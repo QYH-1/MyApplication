@@ -10,15 +10,15 @@ import com.HK.dzbly.R;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/6$
- * 描述：
+ * 描述：画直线测距图示
  * 修订历史：
  */
 public class Drawtriangle extends View {
 
     private  Paint p = new Paint();//创建画笔
-    private Float Horizontaldistance;//平距
-    private Float Verticaldistance; //垂距
-    private Float Objectdistance; //目标距离
+    private float Horizontaldistance;//平距
+    private float Verticaldistance; //垂距
+    private float Objectdistance; //目标距离
     private float angle;//水平倾角
     private float x;
     private float y;
@@ -101,7 +101,7 @@ public class Drawtriangle extends View {
         canvas.drawTextOnPath("平距  "+Horizontaldistance,path ,0f,0f,p);
     }
 
-    private void initVerticaldistance(Canvas canvas,double x,double y) {
+    private void initVerticaldistance(Canvas canvas,float x,float y) {
         p.setColor(0xff0000ff);
         Path path = new Path();
         p.setAntiAlias(true);
@@ -124,8 +124,8 @@ public class Drawtriangle extends View {
             path.moveTo(width/10*17/2, (float) heitht/14*4);// 起点 A
             path.lineTo(width/10*17/2, (float) (heitht/14*8-y/2));   //B
         }
-
         p.setTextSize(50);
+        Log.w("画垂距","垂距");
         canvas.drawTextOnPath("垂距  "+Verticaldistance,path ,0f,0f,p);
     }
 
@@ -306,11 +306,13 @@ public class Drawtriangle extends View {
     /**
      * 接受fragment传递的数据
      */
-    public void setData(float angle,Float Hdistance,Float Vdistance){
+    public void setData(float angle,float Hdistance,float Vdistance){
         this.angle = angle;
         this.Verticaldistance = Hdistance;
         this.Horizontaldistance = Vdistance;
-        Log.d("angle", String.valueOf(angle));
+        Log.d("DW_angle", String.valueOf(angle));
+        Log.d("DW_Verticaldistance", String.valueOf(angle));
+        Log.d("DW_Horizontaldistance", String.valueOf(angle));
     }
     private void Calculating(){
         if((angle > 45 && angle < 90)||(angle < 0 && angle > -45)){

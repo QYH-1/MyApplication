@@ -19,4 +19,14 @@ public class BaseActivity extends Activity {
         super.onDestroy();
         ActivityCollector.removeActivity(this);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }

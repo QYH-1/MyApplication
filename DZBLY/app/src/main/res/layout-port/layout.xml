@@ -19,14 +19,14 @@
         android:layout_height="68dp"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/icon1"
-        android:layout_marginLeft="100dp"
+        android:layout_marginLeft="50dp"
         android:orientation="vertical">
 
         <EditText
             android:id="@+id/name1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="请输入文件夹名"
+            android:hint="请输入文件名"
             android:textColor="#000"
             android:textSize="16sp"
             android:ellipsize="end"

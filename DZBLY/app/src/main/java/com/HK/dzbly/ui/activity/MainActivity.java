@@ -116,6 +116,7 @@ public class MainActivity extends BaseActivity{
 //        } catch (Exception e) {
 //            Log.e(TAG, e.toString(), e);
 //        }
+        //Intent intent = new Intent(MainActivity.this,Two_pointActivity.class);
         Intent intent = new Intent(MainActivity.this,wifi.class);
         startActivity(intent);
     }

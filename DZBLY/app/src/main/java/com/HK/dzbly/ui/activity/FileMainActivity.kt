@@ -676,7 +676,6 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         }
 
     }
-
     /**
      * 重命名
      */

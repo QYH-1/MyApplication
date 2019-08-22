@@ -1,6 +1,8 @@
 package com.HK.dzbly.ui.activity;
 
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -8,12 +10,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -24,7 +26,9 @@ import com.HK.dzbly.ui.fragment.simple_measurement_fragment;
 import com.HK.dzbly.utils.drawing.CompassView;
 import com.HK.dzbly.utils.drawing.Elevation;
 import com.HK.dzbly.utils.drawing.Rollangle;
+import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
+import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.net.Socket;
 
@@ -52,6 +56,9 @@ public class DzlpActivity extends FragmentActivity {
     private Socket socket;
   //  private Handler handler;
     private String data;//wifi传递过来的数据
+    private SharedPreferences sp; //用来保存数据，传递给fragment进行存储
+    private NetConnection netConnection;//检查网络连接
+    private Concerto concerto;//处理wifi传递过来的数据
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +73,19 @@ public class DzlpActivity extends FragmentActivity {
         //去掉状态栏(顶部显示时间、电量的部分)，设置全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.dzlp);
-
+        sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
+        concerto = new Concerto();
         inint(); //获取控件
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
 
-        connectThread = new ConnectThread(socket,handler);
-        connectThread.start();
-        Log.d("connectThread","启动成功");
+        if (netConnection.checkNetworkConnection(this)) {
+            connectThread = new ConnectThread(socket, handler);
+            connectThread.start();
+            Log.d("connectThread", "启动成功");
+        } else {
+            Toast.makeText(this, "请连接wifi", Toast.LENGTH_SHORT).show();
+        }
     }
     /**
      * 获取控件
@@ -91,17 +103,20 @@ public class DzlpActivity extends FragmentActivity {
     /**
      * 对指南针进行操作
      */
-    public void Compass(final float val){
+    public void Compass(float val){
         mSensorEventListener = new SensorEventListener() {
             //重写onSensorChanged方法进行更新
             @Override
             public void onSensorChanged(SensorEvent event) {
                // <!--接受硬件的方位角的值-->
                 //获取当前的方位角
-               // val = event.values[0];
                 //通过线程进行view的刷新
-
                 chaosCompassView.setVal(val);
+//                SharedPreferences.Editor editor = sp.edit();
+//                editor.putFloat("val",val);
+//                editor.commit();
+                Log.d("val", String.valueOf(val));
+
             }
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -183,6 +198,9 @@ public class DzlpActivity extends FragmentActivity {
         }
         Log.d("DzlpActivity_el", String.valueOf(el));
         Log.d("DzlpActivity_eada", String.valueOf(eada));
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putFloat("eada",eada);
+        editor.commit();
         elevation.cgangePer(el / 180f,eada);
     }
     /**
@@ -196,7 +214,9 @@ public class DzlpActivity extends FragmentActivity {
         float rana =Math.abs(Float.parseFloat(x));
         float p =Math.abs(Float.parseFloat(x));
         Log.d("rana111111", String.valueOf(rana));
-
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putFloat("rana",rana);
+        editor.commit();
         rollangle.cgangePer(p / 360f,rana);
     }
     /**
@@ -205,6 +225,26 @@ public class DzlpActivity extends FragmentActivity {
     private void setChaosCompassView(String x){
         float val = Float.parseFloat(x);
         chaosCompassView.CompassViewdata(val);
+    }
+    /**
+     * 对fragment中ui进行更新
+     */
+    @SuppressLint("ResourceAsColor")
+    private void setFragment(String data ){
+       // TextView textView = getFragmentManager().findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
+        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+        //float rval = val+180;
+        //Log.d("rval", String.valueOf(rval));
+        //String reval = String.valueOf(rval);
+        //String rex = x;
+        //String result =reval+ "°"+"∠"+rex;
+        textView.setText(data);
+        textView.setTextSize(35);
+        textView.setGravity(Gravity.CENTER);
+        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("result",data);
+        editor.commit();
     }
 
     /**
@@ -219,79 +259,69 @@ public class DzlpActivity extends FragmentActivity {
             data =  bundle.getString("msg");
 
             Log.d("DzlpActivity_data",data);
-            //对wifi获取的数据进行处理
-            String data1 = Concerto(data);
-            Log.d("DzlpActivity_data1",data1);
+            String data1 = null;
+            String data2 = null;
+            String data3 = null;
+            String data4 = null;
+            String data5 = null;
+            if(data.length() == 24){
+                //对wifi获取的数据进行处理
+                //俯仰角
+                data1 = concerto.Dataconversion(data.substring(0,5));
+                //横滚角
+                data2 = concerto.Dataconversion(data.substring(6,11));
+                //方位角
+                data3 = concerto.Dataconversion(data.substring(12,17));
+                Log.d("DzlpActivity_data3",data3);
+                //结果显示
+                Log.d("data1", String.valueOf(data1));
+                String t = data3.substring(0,data3.indexOf("."));
+                int t1 = Integer.parseInt(t )+ 180;
+                String tmp = t1+data3.substring(data3.indexOf("."));
+                Log.d("tmp",tmp);
+                float temp = Float.parseFloat(tmp);
+                Log.d("temp", String.valueOf(temp));
+                data5 = String.valueOf(temp);
+                Log.d("data5",data5);
+                data4 = data5 + "∠"+data1;
+
+                Log.d("DzlpActivity_data1",data1);
+                //将最新的数据存储起来
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("setElevation",data1);
+                editor.putString("setRollangle",data2);
+                editor.putString("Compass",data3);
+                editor.putString("setFragment",data4);
+
+            }else{
+                //当wifi传递来的数据不完整或者为空时，将前面最新的数据用于显示
+                data1 = sp.getString("setElevation","0.0");
+                data2 = sp.getString("setRollangle","0.0");
+                data3 = sp.getString("Compass","0.0");
+                data4 = sp.getString("setFragment","");
+            }
             //改变控件的显示
             setElevation(data1);
-            setRollangle(data1);
-            Compass(120);
-            //setChaosCompassView(String.valueOf(120));
-//            Timer timer = new Timer();
+            setRollangle(data2);
+            //Compass(Float.parseFloat(data3));
+            setFragment(data4);
+            setChaosCompassView(data3);
+            //Timer timer = new Timer();
 //            timer.schedule(new TimerTask(){
 //                @Override
 //                public void run() {
 //                    reflush();
 //                }
-//            },1000);
+//            },5000);
 
         }
     };
     private void reflush(){
-//            connectThread.stop();
-//            connectThread = new ConnectThread(socket,handler);
-//            connectThread.start();
-       // finish();
-       // Intent intent = new Intent(this, DzlpActivity.class);
-       // startActivity(intent);
 
-    }
-    /**
-     * 处理wifi传递过来的数据
-     */
-    private String Concerto(String data){
-        String integrate = null;
-        String decimal = null;
-        String dana = null;
-        Log.d("DzlpActivity_datav",data);
-
-        //接收第三位为符号位
-        String str1 = data.substring(2,3);
-        Log.d("str1",str1);
-
-        //接收的4、5、6位为整数部分
-        String str2 = data.substring(3,6);
-        Log.d("str2",str2);
-        if(str2.substring(0,1).equals("0")){
-           if(str2.substring(1,2).equals("0")){
-               integrate = str2.substring(2);
-           }else{
-               integrate = str2.substring(1);
-           }
-        }else {
-            integrate = str2;
-        }
-        //后两位为小数部分
-        String str3 = data.substring(6);
-        Log.d("str3",str3);
-        if(str3.substring(0,1).equals("0") && str3.substring(1).equals("0")){
-            decimal = "0";
-        }else if(str3.substring(0,1).equals("0") && !str3.substring(1).equals("0")){
-            decimal = str3.substring(1);
-        }else {
-            decimal = str3;
-        }
-
-        Log.d("小数部分",decimal);
-        if(str1.equals("1")){
-            dana = integrate+"."+decimal;
-        }else {
-            dana = "-"+integrate+"."+decimal;
-        }
-
-        Log.d("结果",dana);
-
-
-        return dana;
+        connectThread = new ConnectThread(socket,handler);
+        connectThread.start();
+//        Intent intent = new Intent(this, DzlpActivity.class);
+//        startActivity(intent);
+//        finish();
     }
 }

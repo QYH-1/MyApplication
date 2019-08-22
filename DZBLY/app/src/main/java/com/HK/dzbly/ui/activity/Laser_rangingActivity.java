@@ -1,6 +1,7 @@
 package com.HK.dzbly.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -80,14 +81,12 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 if (mlineFragment == null) {
                     mlineFragment =new LineFragment();
                 }
-                fragmentTransaction.replace(R.id.measurement_options, mlineFragment);
+                fragmentTransaction.replace(R.id.measurement_options, mlineFragment).commit();
                 break;
             case 1:
-                if(mtwo_poointFragment ==null){
-                    mtwo_poointFragment = new Two_poointFragment();
-                }
-                fragmentTransaction.replace(R.id.measurement_options,mtwo_poointFragment);
+                Intent intent = new Intent(this,Two_pointActivity.class);
+                startActivity(intent);
+                finish();
         }
-        fragmentTransaction.commit();
     }
 }

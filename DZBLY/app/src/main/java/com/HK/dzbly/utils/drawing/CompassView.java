@@ -103,8 +103,8 @@ public class CompassView extends View {
     }
 
     public void setVal(float val) {
-        this.val = val;
-        invalidate();//进行View的刷新
+        //this.val = val;
+        //invalidate();//进行View的刷新
     }
 
     public CompassView(Context context) {
@@ -555,5 +555,6 @@ public class CompassView extends View {
     }
     public void CompassViewdata(float val){
         this.val = val;
+        invalidate();//进行View的刷新
     }
 }

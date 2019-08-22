@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
     <dist:module dist:instant="true"/>
 
     <application
@@ -80,6 +82,7 @@
         <activity android:name=".ui.activity.CaptureActivity"/>
         <activity android:name=".ui.activity.FileMainActivity"></activity>
         <activity android:name=".ui.activity.wifi"></activity>
+        <activity android:name=".ui.activity.Two_pointActivity"></activity>
 
         <provider
                 android:name="androidx.core.content.FileProvider"

@@ -1,15 +1,26 @@
 package com.HK.dzbly.ui.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.activity.LpszActivity;
+
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 ;
 
@@ -26,8 +37,16 @@ public class ordinary_measurement_fragment extends Fragment {
     private TextView line_laser;//线激光
     private TextView Compass_settings;//罗盘设置
     private int type;//对在说明中的内容进行编号 0为测量方法，1为测量出的结果
-    public static final int FILE_RESULT_CODE = 1;
+    FileOutputStream fileOutputStream = null; //文件输入流
+    SharedPreferences sp =null;  //存储对象
+    private int num = 1; //文件出现次数
+    float val ; //方位角
+    float eada ; //仰角
+    float rana ; //横滚角
+    String result ;//产状信息
 
+    File root = Environment.getExternalStorageDirectory();
+    String path = root.getAbsolutePath()+"/CameraDemo"+"/data";  //文件保存的目录
     public ordinary_measurement_fragment() {
     }
 
@@ -47,6 +66,7 @@ public class ordinary_measurement_fragment extends Fragment {
     }
 
     private void methods(View view) {
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity());//获取了SharePreferences对象
         //获取控件
         inint(view);
         //设置说明
@@ -108,19 +128,85 @@ public class ordinary_measurement_fragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                showDialog();
             }
         });
     }
+    private void showDialog(){
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout,null,false);
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(view).create();
+        TextView desc1 = view.findViewById(R.id.desc1);
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(FILE_RESULT_CODE == requestCode){
-            Bundle bundle = null;
-            if(data!=null&&(bundle=data.getExtras())!=null){
-               // textView.setText("选择文件夹为："+bundle.getString("file"));
-            }
+        //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
+        //获取当前时间
+         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+         desc1.setText(date);
+        new AlertDialog.Builder(getActivity())
+                .setTitle("系统提示")
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                           EditText text = view.findViewById(R.id.name1);
+                           String name = text.getText().toString();
+
+                           SharedPreferences.Editor editor = sp.edit();
+                           val = sp.getFloat("val",0);//获取指南针数据
+                           eada = sp.getFloat("eada",0);//获取仰角数据
+                           rana = sp.getFloat("rana",0);//获取横滚角数据
+                            result = sp.getString("result","");//获取产状信息数据
+
+
+                           Log.d("name",name);
+                           String dname = name+".txt";
+                           Log.d("name1",dname);
+                        try {
+                            //如果文件存在则删除文件
+                            File file = new File(path, dname);
+                            if(file.exists()){
+                                fileOutputStream = new FileOutputStream(file,true);
+                                num = sp.getInt("num"+name,1)+1;
+                                Log.d("num", String.valueOf(num));
+                                editor.putInt("num"+name,num);
+                                editor.commit();
+                                //file.delete();
+                                String str = "\n" +
+                                        "\t编  号："+num+"\n" +
+                                        "\t仰  角："+eada+"  \n" +
+                                        "\t横滚角："+rana+" \t\n" +
+                                        "\t方位角："+val+" \t\n" +
+                                        "\t产状信息："+result+" \t\n" +
+                                        "\t测量时间："+date+"\t\n" +
+                                        "\t\n";
+                                fileOutputStream.write(str.getBytes());
+                                fileOutputStream.close();
+
+                            }else {
+                                fileOutputStream = new FileOutputStream(file);
+                                editor.putInt("num"+name,1);
+                                editor.commit();
+                                String str = "\n" +
+                                        "\t编  号："+num+"<br>\n" +
+                                        "\t仰  角：   <br>\n" +
+                                        "\t横滚角：\t<br>\n" +
+                                        "\t方位角：\t<br>\n" +
+                                        "\t产状信息：\t<br>\n" +
+                                        "\t测量时间：\t<br>\n" +
+                                        "\t\n";
+                                fileOutputStream.write(str.getBytes());
+                                fileOutputStream.close();
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                }).setNegativeButton ("取消", null)
+                .create()
+                .show();
         }
-    }
+
 }
