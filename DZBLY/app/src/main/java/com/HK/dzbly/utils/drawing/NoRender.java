@@ -216,32 +216,6 @@ public class NoRender implements Renderer {
                 Log.d("yyyyyy", String.valueOf(y));
                 Log.d("zzzzzz", String.valueOf(z));
                 //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
-                if(x>0)
-                    xyz[0]=String.valueOf(x).substring(0, 4);
-                else
-                    xyz[0]=String.valueOf(x).substring(0, 5);
-                if(y>0)
-                    xyz[1]=String.valueOf(y).substring(0, 4);
-                else
-                    xyz[1]=String.valueOf(y).substring(0, 5);
-                if(z>0)
-                    xyz[2]=String.valueOf(z).substring(0, 4);
-                else
-                    xyz[2]=String.valueOf(z).substring(0, 5);
-
-                if(x2>0)
-                    xyz[0]=String.valueOf(x2).substring(0, 4);
-                else
-                    xyz[0]=String.valueOf(x2).substring(0, 5);
-                if(y2>0)
-                    xyz[1]=String.valueOf(y2).substring(0, 4);
-                else
-                    xyz[1]=String.valueOf(y2).substring(0, 5);
-                if(z2>0)
-                    xyz[2]=String.valueOf(z2).substring(0, 4);
-                else
-                    xyz[2]=String.valueOf(z2).substring(0, 5);
-
                 Message msg = new Message();
                 msg.what=200;//这是发送给当前类中用来更新立方体的
                 handler.sendEmptyMessage(msg.what);

@@ -33,18 +33,24 @@ public class Concerto {
         }else {
             integrate = str2;
         }
+
         //后两位为小数部分
         String str3 = data.substring(4);
        // Log.d("str3",str3);
-        if(str3.substring(0,1).equals("0") && str3.substring(1).equals("0")){
-            decimal = "0";
-        }else if(str3.substring(0,1).equals("0") && !str3.substring(1).equals("0")){
-            decimal = str3.substring(1);
-        }else {
-            decimal = str3;
-        }
+//        if(str3.substring(0,1).equals("0")){
+//            if(str3.substring(1).equals("0")){
+//                decimal = "00";
+//            }else{
+//                decimal = str3;
+//            }
+//
+//        }else{
+//            decimal = str3;
+//        }
+        decimal = str3;
         Log.d("小数部分",decimal);
-        if(str1.equals("1")){
+
+        if(str1.equals("0")){
             dana = integrate+"."+decimal;
         }else {
             dana = "-"+integrate+"."+decimal;

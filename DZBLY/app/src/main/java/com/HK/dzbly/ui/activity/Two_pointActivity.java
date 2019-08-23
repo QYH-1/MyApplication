@@ -27,6 +27,7 @@ import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.net.Socket;
+import java.text.DecimalFormat;
 
 /**
  * @Author：qyh 版本：1.0
@@ -86,11 +87,15 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         STATE = sp.getInt("STATE",0);
         Log.d("STATE", String.valueOf(STATE));
 
+        connectThread = new ConnectThread(socket, handler);
+        connectThread.start();
+
         Inint();
         setLine_ranging();
         setdistance();
         setLock();
         setTdc();
+        setDistance();
 
     }
     private void Inint(){
@@ -114,10 +119,12 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         reSet.setOnClickListener(this);
         save.setOnClickListener(this);
 
-        if(STATE == 0){
-            lock.setText("锁定点A");
-        }else if(STATE == 1|| STATE ==2){
+        if(STATE%3 == 1){
             lock.setText("锁定点B");
+        }else if(STATE%3 == 2){
+            lock.setText("测量完成");
+        }else{
+            lock.setText("锁定点A");
         }
     }
 
@@ -126,7 +133,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         switch (view.getId()){
             case R.id.reset :
                 SharedPreferences.Editor editor1 = sp.edit();
-                editor1.putInt("STATE",0);
+                editor1.putInt("STATE",1);
                 editor1.commit();
                 Intent intent1 = new Intent(this,Two_pointActivity.class);
                 startActivity(intent1);
@@ -149,86 +156,82 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             @Override
             public void onClick(View view) {
 
-                if(STATE==1){
-                    stringBuilder.delete(0,stringBuilder.length());//清空stringBuilder
+                if(STATE%3 == 1){
+                    //stringBuilder.delete(0,stringBuilder.length());//清空stringBuilder
                     String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
-                    stringBuilder.append("A点距离    ");
-                    stringBuilder.append(ad);
-                    stringBuilder.append("米");
-                    String Adata = stringBuilder.toString();
-                    Log.d("Adata",Adata);
-                    Adistance.setText(Adata);
+                    //stringBuilder.append("A点距离    ");
+                   // stringBuilder.append(ad);
+                    //stringBuilder.append("米");
+//                    String Adata = stringBuilder.toString();
+                   // Log.d("Adata",Adata);
+                   // Adistance.setText("A点距离"+ad+"米");
 
                     lock.setText("锁定点B");
                     Log.d("锁定点BSTATE==1","111111");
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("STATE",2);
+                    editor.putInt("STATE",STATE+1);
                     editor.commit();
-                    if(netConnection.checkNetworkConnection(context)){
-                        connectThread = new ConnectThread(socket, myhandler);
-                        connectThread.start();
-                    }else{
-                        Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
-                    }
+                   // if(netConnection.checkNetworkConnection(context)){
+                        //connectThread = new ConnectThread(socket, myhandler);
+                       // connectThread.start();
+                   // }else{
+                      //  Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
+                   // }
 
                     Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
                     startActivity(intent2);
                     finish();
-                }else if(STATE ==2){
+                }else if(STATE%3 == 2){
                     lock.setText("测量完成");
                     Log.d("锁定点BSTATE==2","111111");
-
-                    stringBuilder.delete(0,stringBuilder.length());//清空stringBuilder
-                    String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
-                    stringBuilder.append("A点距离    ");
-                    stringBuilder.append(ad);
-                    String Adata = stringBuilder.toString();
-                    Log.d("Adata",Adata);
-                    Adistance.setText(Adata);
-
-                    String bd = String.valueOf(sp.getFloat("bRdistance",0.00f));
-                    String Bdata = "B点距离    "+bd+"米";
-                    Log.d("Bdata",Bdata);
-                    Bdistance.setText(Bdata);
-
-                    aRdistance = sp.getFloat("aRdistance",0.00f);
-                    aAzimuth = sp.getFloat("aAzimuth",0.00f);
-                    abangle = sp.getFloat("abangle",0.00f);
-                    bRdistance = sp.getFloat("bRdistance",0.00f);
-                    bAzimuth = sp.getFloat("bAzimuth",0.00f);
-                    bangle = sp.getFloat("bangle",0.00f);
-                    //计算两点间的距离
-                    Ax = (float) (aRdistance * Math.cos(abangle)* Math.sin(aAzimuth));
-                    Ay = (float) (aRdistance * Math.sin(abangle));
-                    Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth));
-                    Bx = (float) (bRdistance * Math.cos(bangle)* Math.sin(bAzimuth));
-                    By = (float) (bRdistance * Math.sin(bangle));
-                    Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
-                    abdistance = (float) Math.abs(Math.sqrt((Ax-Bx) * (Ax-Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
-                    String ABdata = "AB两点的距离  "+abdistance+"米";
-                    Log.d("ABdata",ABdata);
-                    ABdistance.setText(ABdata);
+//
+//                    String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
+//                    Adistance.setText("A点距离    "+ad+"米");
+//                    String bd = String.valueOf(sp.getFloat("bRdistance",0.00f));
+//                    String Bdata = "B点距离    "+bd+"米";
+//                    Log.d("Bdata",Bdata);
+//                    Bdistance.setText(Bdata);
+//
+//                    aRdistance = sp.getFloat("aRdistance",0.00f);
+//                    aAzimuth = sp.getFloat("aAzimuth",0.00f);
+//                    abangle = sp.getFloat("abangle",0.00f);
+//                    bRdistance = sp.getFloat("bRdistance",0.00f);
+//                    bAzimuth = sp.getFloat("bAzimuth",0.00f);
+//                    bangle = sp.getFloat("bangle",0.00f);
+//                    //计算两点间的距离
+//                    Ax = (float) (aRdistance * Math.cos(abangle)* Math.sin(aAzimuth));
+//                    Ay = (float) (aRdistance * Math.sin(abangle));
+//                    Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth));
+//                    Bx = (float) (bRdistance * Math.cos(bangle)* Math.sin(bAzimuth));
+//                    By = (float) (bRdistance * Math.sin(bangle));
+//                    Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
+//                    abdistance = (float) Math.abs(Math.sqrt((Ax-Bx) * (Ax-Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
+//                    String ABdata = "AB两点的距离  "+abdistance+"米";
+//                    Log.d("ABdata",ABdata);
+//                    ABdistance.setText(ABdata);
 
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("STATE",2);
+                    editor.putInt("STATE",STATE+1);
                     editor.commit();
+
+                    connectThread = new ConnectThread(socket, handler);
+                    connectThread.start();
+
                     Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
                     startActivity(intent2);
                     finish();
                 }else {
                     lock.setText("锁定点A");
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("STATE",1);
+                    editor.putInt("STATE",STATE+1);
                     editor.commit();
 
-                        if(netConnection.checkNetworkConnection(context)){
-                            connectThread = new ConnectThread(socket, handler);
+                       // if(netConnection.checkNetworkConnection(context)){
+                            connectThread = new ConnectThread(socket, myhandler);
                             connectThread.start();
-                        }else{
-                            Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
-                        }
-
-
+                       // }else{
+                      //      Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
+                       // }
 
                     Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
                     startActivity(intent2);
@@ -251,8 +254,8 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 Toast.makeText(Two_pointActivity.this,"网络错误！请检查网络连接",Toast.LENGTH_SHORT).show();
             }
             aRdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));
-            aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,17)));
-            abangle = Float.parseFloat(concerto.Dataconversion(data.substring(0,5)));
+            aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,18)));
+            abangle = Float.parseFloat(concerto.Dataconversion(data.substring(0,6)));
 
 
             SharedPreferences.Editor editor = sp.edit();
@@ -275,8 +278,8 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 Toast.makeText(Two_pointActivity.this,"网络错误！请检查网络连接",Toast.LENGTH_SHORT).show();
             }
             bRdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));
-            bAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,17)));
-            bangle = Float.parseFloat(concerto.Dataconversion(data.substring(0,5)));
+            bAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,18)));
+            bangle = Float.parseFloat(concerto.Dataconversion(data.substring(0,6)));
 
             SharedPreferences.Editor editor = sp.edit();
             editor.putFloat("bRdistance",bRdistance);
@@ -301,7 +304,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
      * 向画三维坐标示意图传递数据
      */
     private void setTdc(){
-        if(STATE ==1){
+        if(STATE%3 ==1){
             aRdistance = sp.getFloat("aRdistance",0.00001f);
             aAzimuth = sp.getFloat("aAzimuth",0.00001f);
             abangle = sp.getFloat("abangle",0.00001f);
@@ -313,7 +316,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             fontRenderer = new FontRenderer(drawlineHandler,this);
             fontRenderer.getData(Ax,Ay,Az);
             glView.setRenderer(fontRenderer);
-        }else if(STATE == 2){
+        }else if(STATE%3 == 2){
             aRdistance = sp.getFloat("aRdistance",0.00001f);
             aAzimuth = sp.getFloat("aAzimuth",0.00001f);
             abangle = sp.getFloat("abangle",0.00001f);
@@ -335,6 +338,47 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             noRender =  new NoRender(drawlineHandler,this);
             glView.setRenderer(noRender);
        }
+    }
+    //用于控制数据的显示
+    private void setDistance(){
+        DecimalFormat df = new DecimalFormat("#.00");
+        if(STATE%3 ==1){
+            String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
+            Adistance.setText("A点距离"+ad+"米");
+            Bdistance.setText("B点距离    0.00米");
+            ABdistance.setText("AB两点距离0.00米");
+
+        }else if(STATE%3 == 2){
+            aRdistance = sp.getFloat("aRdistance",0.00f);
+            aAzimuth = sp.getFloat("aAzimuth",0.00f);
+            abangle = sp.getFloat("abangle",0.00f);
+            bRdistance = sp.getFloat("bRdistance",0.00f);
+            bAzimuth = sp.getFloat("bAzimuth",0.00f);
+            bangle = sp.getFloat("bangle",0.00f);
+            //计算两点间的距离
+            Ax = (float) (aRdistance * Math.cos(abangle)* Math.sin(aAzimuth));
+            Ay = (float) (aRdistance * Math.sin(abangle));
+            Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth));
+            Bx = (float) (bRdistance * Math.cos(bangle)* Math.sin(bAzimuth));
+            By = (float) (bRdistance * Math.sin(bangle));
+            Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
+            abdistance = (float) Math.abs(Math.sqrt((Ax-Bx) * (Ax-Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
+
+            String ABdata = "AB两点的距离  "+abdistance+"米";
+            String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
+            String bd = String.valueOf(sp.getFloat("bRdistance",0.00f));;
+            String Bdata = "B点距离    "+bd+"米";
+            Log.d("Bdata",Bdata);
+
+            Adistance.setText("A点距离"+ad+"米");
+            Bdistance.setText(Bdata);
+            ABdistance.setText(ABdata);
+        }else{
+            Adistance.setText("A点距离    0.000米");
+            Bdistance.setText("B点距离    0.000米");
+            ABdistance.setText("AB两点距离0.000米");
+        }
+
     }
     //改变显示两点间的距离
     private void setdistance(){

@@ -74,6 +74,7 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
         Including_length = view.findViewById(R.id.Including_length);
         reset = view.findViewById(R.id.reset);
         lock = view.findViewById(R.id.lock);
+        drawtriangle = view.findViewById(R.id.drawtriangle);
         //单选按钮，判断是否包含仪器长度
         nIncluding_length_length.setChecked(true);
         Initial_length.setOnCheckedChangeListener(this);
@@ -124,8 +125,10 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
             editor.putFloat("Verticaldistance",Verticaldistance);
             editor.putFloat("Horizontaldistance",Horizontaldistance);
             editor.commit();
-
+           // Log.w("angle",getType(angle));
+            //drawtriangle = new Drawtriangle(getActivity());
             drawtriangle.setData(angle,Verticaldistance,Horizontaldistance);
+
         }
     };
     /**

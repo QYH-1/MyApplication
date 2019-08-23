@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import com.HK.dzbly.R;
 
+import java.text.DecimalFormat;
+
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/6$
@@ -306,13 +308,23 @@ public class Drawtriangle extends View {
     /**
      * 接受fragment传递的数据
      */
-    public void setData(float angle,float Hdistance,float Vdistance){
-        this.angle = angle;
-        this.Verticaldistance = Hdistance;
-        this.Horizontaldistance = Vdistance;
+    public void setData(float angle,float valance,float haldane ){
+        DecimalFormat df = new DecimalFormat("#.00");
+        String angle1 = String.valueOf(angle);
+        String valance1 = String.valueOf(valance);
+        String haldane1 = String.valueOf(haldane);
+
+        this.angle = Float.parseFloat(angle1.substring(0,angle1.indexOf(".")+2));
+        this.Verticaldistance = Float.parseFloat(df.format(Double.parseDouble(valance1)));
+        this.Horizontaldistance = Float.parseFloat(df.format(Double.parseDouble(haldane1)));
+        float Odistance = (float) Math.sqrt(Verticaldistance * Verticaldistance + Horizontaldistance * Horizontaldistance);
+        String ODistance = String.valueOf(Odistance);
+        this.Objectdistance = Float.parseFloat(df.format(Double.parseDouble(ODistance)));
         Log.d("DW_angle", String.valueOf(angle));
-        Log.d("DW_Verticaldistance", String.valueOf(angle));
-        Log.d("DW_Horizontaldistance", String.valueOf(angle));
+        Log.d("DW_Verticaldistance", String.valueOf(valance));
+        Log.d("DW_Horizontaldistance", String.valueOf(haldane));
+
+        invalidate();//进行View的刷新
     }
     private void Calculating(){
         if((angle > 45 && angle < 90)||(angle < 0 && angle > -45)){

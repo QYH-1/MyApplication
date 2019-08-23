@@ -269,9 +269,9 @@ public class DzlpActivity extends FragmentActivity {
                 //俯仰角
                 data1 = concerto.Dataconversion(data.substring(0,5));
                 //横滚角
-                data2 = concerto.Dataconversion(data.substring(6,11));
+                data2 = concerto.Dataconversion(data.substring(6,12));
                 //方位角
-                data3 = concerto.Dataconversion(data.substring(12,17));
+                data3 = concerto.Dataconversion(data.substring(12,18));
                 Log.d("DzlpActivity_data3",data3);
                 //结果显示
                 Log.d("data1", String.valueOf(data1));

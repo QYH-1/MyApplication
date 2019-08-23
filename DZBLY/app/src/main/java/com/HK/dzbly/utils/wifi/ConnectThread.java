@@ -44,11 +44,13 @@ public class ConnectThread extends Thread {
     @Override
     public void run() {
         //stringBuilder = null;
-       //datas = null;
+        //datas = null;
         Log.d("port", String.valueOf(port));
         Log.d("连接地址", "IP:" + sIP + ":" + port);
         try {
             socket = new Socket(sIP, port);
+            //stringBuilder = null;
+            //datas = null;
             try {
                 //向服务器端发送消息
                 outputStream = socket.getOutputStream();
@@ -99,6 +101,8 @@ public class ConnectThread extends Thread {
                             handler.sendMessage(msg);
                             // if (data != null) {
                             Log.w("AAA-11", "c:" + datas);
+                            datas = null;
+                            stringBuilder = null;
                             break;
                         }
                     } catch (NullPointerException e) {
