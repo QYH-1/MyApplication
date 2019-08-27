@@ -1,22 +1,23 @@
 package com.HK.dzbly.ui.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import com.HK.dzbly.R;
 import com.HK.dzbly.utils.drawing.FontRenderer;
@@ -26,8 +27,14 @@ import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @Author：qyh 版本：1.0
@@ -75,6 +82,10 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private Concerto concerto;//处理wifi的数据
     private Socket socket;
     private StringBuilder stringBuilder;
+    FileOutputStream fileOutputStream = null; //文件输入流
+    File root = Environment.getExternalStorageDirectory();
+    String path = root.getAbsolutePath()+"/CameraDemo"+"/data";  //文件保存的目录
+    private int num = 1; //文件出现次数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +149,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 Intent intent1 = new Intent(this,Two_pointActivity.class);
                 startActivity(intent1);
                 finish();
-            case R.id.Save: ;
+            case R.id.Save:
+                showDialog();
+
         }
     }
     private void setLine_ranging(){
@@ -157,26 +170,11 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             public void onClick(View view) {
 
                 if(STATE%3 == 1){
-                    //stringBuilder.delete(0,stringBuilder.length());//清空stringBuilder
-                    String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
-                    //stringBuilder.append("A点距离    ");
-                   // stringBuilder.append(ad);
-                    //stringBuilder.append("米");
-//                    String Adata = stringBuilder.toString();
-                   // Log.d("Adata",Adata);
-                   // Adistance.setText("A点距离"+ad+"米");
-
                     lock.setText("锁定点B");
                     Log.d("锁定点BSTATE==1","111111");
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE",STATE+1);
                     editor.commit();
-                   // if(netConnection.checkNetworkConnection(context)){
-                        //connectThread = new ConnectThread(socket, myhandler);
-                       // connectThread.start();
-                   // }else{
-                      //  Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
-                   // }
 
                     Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
                     startActivity(intent2);
@@ -184,31 +182,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 }else if(STATE%3 == 2){
                     lock.setText("测量完成");
                     Log.d("锁定点BSTATE==2","111111");
-//
-//                    String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
-//                    Adistance.setText("A点距离    "+ad+"米");
-//                    String bd = String.valueOf(sp.getFloat("bRdistance",0.00f));
-//                    String Bdata = "B点距离    "+bd+"米";
-//                    Log.d("Bdata",Bdata);
-//                    Bdistance.setText(Bdata);
-//
-//                    aRdistance = sp.getFloat("aRdistance",0.00f);
-//                    aAzimuth = sp.getFloat("aAzimuth",0.00f);
-//                    abangle = sp.getFloat("abangle",0.00f);
-//                    bRdistance = sp.getFloat("bRdistance",0.00f);
-//                    bAzimuth = sp.getFloat("bAzimuth",0.00f);
-//                    bangle = sp.getFloat("bangle",0.00f);
-//                    //计算两点间的距离
-//                    Ax = (float) (aRdistance * Math.cos(abangle)* Math.sin(aAzimuth));
-//                    Ay = (float) (aRdistance * Math.sin(abangle));
-//                    Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth));
-//                    Bx = (float) (bRdistance * Math.cos(bangle)* Math.sin(bAzimuth));
-//                    By = (float) (bRdistance * Math.sin(bangle));
-//                    Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
-//                    abdistance = (float) Math.abs(Math.sqrt((Ax-Bx) * (Ax-Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
-//                    String ABdata = "AB两点的距离  "+abdistance+"米";
-//                    Log.d("ABdata",ABdata);
-//                    ABdistance.setText(ABdata);
 
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE",STATE+1);
@@ -368,9 +341,15 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             String ad = String.valueOf(sp.getFloat("aRdistance",0.00f));
             String bd = String.valueOf(sp.getFloat("bRdistance",0.00f));;
             String Bdata = "B点距离    "+bd+"米";
-            Log.d("Bdata",Bdata);
-
-            Adistance.setText("A点距离"+ad+"米");
+            String Adata = "A点距离"+ad+"米";
+            //存储距离数据
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("Adata",Adata);
+            editor.putString("Bdata",Bdata);
+            editor.putString("ABdata",ABdata);
+            editor.commit();
+            //通过Txtview显示数据
+            Adistance.setText(Adata);
             Bdistance.setText(Bdata);
             ABdistance.setText(ABdata);
         }else{
@@ -384,19 +363,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private void setdistance(){
 
     }
-    //计算两点间的距离
-//    private void CalculationDistance(){
-//        //获取A点的坐标
-//        Ax = (float) (aRdistance * Math.cos(abangle)* Math.sin(aAzimuth));
-//        Ay = (float) (aRdistance * Math.sin(abangle));
-//        Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth));
-//        //获取B点的坐标
-//        Bx = (float) (bRdistance * Math.cos(bangle)* Math.sin(bAzimuth));
-//        By = (float) (bRdistance * Math.sin(bangle));
-//        Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
-//
-//        abdistance = (float) Math.abs(Math.sqrt((Ax-Bx) * (Ax-Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
-//    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -410,6 +376,77 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         glView.onPause();
         Log.w("glView","glView");
     }
+    //保存数据
+    private void showDialog(){
+        final View view = LayoutInflater.from(this).inflate(R.layout.layout,null,false);
+        final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
+        TextView desc1 = view.findViewById(R.id.desc1);
 
+        //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
+        //获取当前时间
+        final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        desc1.setText(date);
+        new AlertDialog.Builder(this)
+                .setTitle("系统提示")
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        EditText text = view.findViewById(R.id.name1);
+                        String name = text.getText().toString();
+
+                        SharedPreferences.Editor editor = sp.edit();
+                        String Adata = sp.getString("Adata","0.00米");
+                        String Bdata = sp.getString("Bdata","0.00米");
+                        String ABdata = sp.getString("ABdata","0.00米");
+
+
+                        Log.d("name",name);
+                        String dname = name+".txt";
+                        Log.d("name1",dname);
+                        try {
+                            //如果文件存在则删除文件
+                            File file = new File(path, dname);
+                            if(file.exists()){
+                                fileOutputStream = new FileOutputStream(file,true);
+                                num = sp.getInt("num"+name,1)+1;
+                                Log.d("num", String.valueOf(num));
+                                editor.putInt("num"+name,num);
+                                editor.commit();
+                                //file.delete();
+                                String str = "\n" +
+                                        "\t编  号："+num+"\n" +
+                                        "\t"+Adata+"\t\n" +
+                                        "\t"+Bdata+"\t\n" +
+                                        "\t"+ABdata+"\t\n" +
+                                        "\t\n";
+                                fileOutputStream.write(str.getBytes());
+                                fileOutputStream.close();
+
+                            }else {
+                                fileOutputStream = new FileOutputStream(file);
+                                editor.putInt("num"+name,1);
+                                editor.commit();
+                                String str = "\n" +
+                                        "\t编  号："+num+"\n" +
+                                        "\t"+Adata+"\t\n" +
+                                        "\t"+Bdata+"\t\n" +
+                                        "\t"+ABdata+"\t\n" +
+                                        "\t\n";
+                                fileOutputStream.write(str.getBytes());
+                                fileOutputStream.close();
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                }).setNegativeButton ("取消", null)
+                .create()
+                .show();
+    }
 
 }

@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 
 public class MainActivity extends BaseActivity{
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt,setting,data,camera,tools,dzcsy,shutdown;
+    private TextView setting1,data1,camera1,jgcj,dzcsy1;
     private String AUTHORITY = "com.cs.dzl.fileProvider";//文件工具位置
     private String TAG = MainActivity.class.getSimpleName();//获得类的简称
 
@@ -43,14 +45,29 @@ public class MainActivity extends BaseActivity{
         data =findViewById(R.id.data_management);//数据管理
         camera =findViewById(R.id.camera);//相机
         tools =findViewById(R.id.tools);//工具
-        dzcsy =findViewById(R.id.dzcsy);//地质参数仪
         shutdown =findViewById(R.id.shutdown);//关机
+        dzcsy =findViewById(R.id.dzcsy);//地质参数仪
+
+        setting1 = findViewById(R.id.setting1);
+        data1 =findViewById(R.id.data_management1);//数据管理
+        camera1 =findViewById(R.id.camera1);//相机
+        jgcj =findViewById(R.id.jgcj);//工具
+        dzcsy1 =findViewById(R.id.dzcsy1);//地质参数仪
+
+
     }
     /**
      * 相机的处理事件
      */
     public void camera(){
         camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,CaptureActivity.class);
+                startActivity(intent);
+            }
+        });
+        camera1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,CaptureActivity.class);
@@ -69,12 +86,25 @@ public class MainActivity extends BaseActivity{
                 Intent intent = new Intent(Settings.ACTION_SETTINGS);startActivity(intent); // 打开系统设置界面
             }
         });
+        setting1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Settings.ACTION_SETTINGS);startActivity(intent); // 打开系统设置界面
+            }
+        });
     }
     /**
      * 数据管理的事件
      */
     public void data(){
         data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,FileMainActivity.class);
+                startActivity(intent);
+            }
+        });
+        data1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,FileMainActivity.class);
@@ -95,27 +125,6 @@ public class MainActivity extends BaseActivity{
     }
 
     private void shutDowm() {
-//        Log.v(TAG, "shutDowm");
-//           try {
-//            //获得ServiceManager类
-//            Class ServiceManager = Class.forName("android.os.ServiceManager");
-//            //获得ServiceManager的getService方法
-//            Method getService = ServiceManager.getMethod("getService", java.lang.String.class);
-//            //调用getService获取RemoteService
-//            Object oRemoteService = getService.invoke(null, Context.POWER_SERVICE);
-//            //获得IPowerManager.Stub类
-//            Class cStub = Class.forName("android.os.IPowerManager$Stub");
-//            //获得asInterface方法
-//            Method asInterface = cStub.getMethod("asInterface", android.os.IBinder.class);
-//            //调用asInterface方法获取IPowerManager对象
-//            Object oIPowerManager = asInterface.invoke(null, oRemoteService);
-//            //获得shutdown()方法
-//            Method shutdown = oIPowerManager.getClass().getMethod("shutdown", boolean.class, boolean.class);
-//            //调用shutdown()方法
-//            shutdown.invoke(oIPowerManager, false, true);
-//        } catch (Exception e) {
-//            Log.e(TAG, e.toString(), e);
-//        }
         Intent intent = new Intent(MainActivity.this,Two_pointActivity.class);
       //  Intent intent = new Intent(MainActivity.this,wifi.class);
         startActivity(intent);
@@ -132,6 +141,13 @@ public class MainActivity extends BaseActivity{
                 startActivity(intent);
             }
         });
+        dzcsy1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,DzlpActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -139,6 +155,13 @@ public class MainActivity extends BaseActivity{
      */
     private void setTools(){
         tools.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,Laser_rangingActivity.class);
+                startActivity(intent);
+            }
+        });
+        jgcj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,Laser_rangingActivity.class);

@@ -14,30 +14,75 @@
             android:orientation="horizontal"
             android:gravity="center_horizontal"
     >
-        <ImageButton
-                android:id="@+id/setting"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_settings_applications_black_24dp"
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
-        <ImageButton
-                android:id="@+id/camera"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_camera_alt_black_24dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/sz1"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:layout_marginTop="6dp"
+                    android:id="@+id/setting1"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设    置"
+            />
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
-        <ImageButton
-                android:id="@+id/tools"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_business_center_black_24dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/camara1"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:layout_marginTop="6dp"
+                    android:id="@+id/camera1"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="照 相 机"
+            />
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/tools"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/ic_business_center_black_24dp"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:layout_marginTop="6dp"
+                    android:id="@+id/jgcj"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="激光测距"
+            />
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
             android:layout_width="match_parent"
@@ -45,30 +90,74 @@
             android:layout_weight="1"
             android:orientation="horizontal"
     >
-        <ImageButton
-                android:id="@+id/data-management"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_collections_black_24dp"
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
-        <ImageButton
-                android:id="@+id/dzcsy"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_camera_alt_black_24dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/data-management"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/we2"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:layout_marginTop="6dp"
+                    android:id="@+id/data-management1"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文件管理"
+            />
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
-        <ImageButton
-                android:id="@+id/shutdown"
-                android:layout_width="wrap_content"
-                android:layout_height="51dp"
-                android:src="@drawable/ic_power_settings_new_black_24dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/dzcsy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/ic_camera_alt_black_24dp"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:id="@+id/dzcsy1"
+                    android:clickable="true"
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="地质编录"
+            />
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:background="#00000000"
-        />
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <ImageButton
+                    android:id="@+id/shutdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="51dp"
+                    android:src="@drawable/ic_power_settings_new_black_24dp"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+            />
+            <TextView
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="测试"
+            />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
