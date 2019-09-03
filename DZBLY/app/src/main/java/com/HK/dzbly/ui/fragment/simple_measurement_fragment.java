@@ -1,6 +1,7 @@
 package com.HK.dzbly.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.HK.dzbly.R;
+import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.LpszActivity;
 
 import java.io.File;
@@ -37,6 +39,7 @@ public class simple_measurement_fragment extends Fragment {
     private TextView msave;//保存
     private int type;//说明文本显示类型
     private TextView Compass_settings;//罗盘设置
+    private DBhelper dBhelper;
 
     FileOutputStream fileOutputStream = null; //文件输入流
     SharedPreferences sp =null;  //存储对象
@@ -141,6 +144,7 @@ public class simple_measurement_fragment extends Fragment {
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
         new AlertDialog.Builder(getActivity())
                 .setTitle("系统提示")
@@ -156,7 +160,15 @@ public class simple_measurement_fragment extends Fragment {
                         eada = sp.getFloat("eada",0);//获取仰角数据
                         rana = sp.getFloat("rana",0);//获取横滚角数据
                         result = sp.getString("result","");//获取产状信息数据
-
+                        //将数据存储到数据库中
+                        ContentValues cv = new ContentValues();
+                        cv.put("Dname",name);
+                        cv.put("Dval",val);
+                        cv.put("Drollangle",rana);
+                        cv.put("Delevation",eada);
+                        cv.put("type","dzbl");
+                        cv.put("Dresult",result);
+                        dBhelper.Insert(getContext(),dBhelper.DZBLY_TABLE,cv);
 
                         Log.d("name",name);
                         String dname = name+".txt";
@@ -202,8 +214,6 @@ public class simple_measurement_fragment extends Fragment {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
-
                     }
                 }).setNegativeButton ("取消", null)
                 .create()

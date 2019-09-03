@@ -53,6 +53,14 @@ class CaptureActivity : Activity() {
         btnCaptureAndClip.setOnClickListener { gotoCaptureCrop() }   //拍照 + 裁切
         btnAlbumAndClip.setOnClickListener { gotoGallery() }   //打开系统相册
         btnCaptureVideo.setOnClickListener { gotoCaptureVideo() }   //录视频 + 播放
+        btnCapturesave.setOnClickListener { gotoCapturesave() } //保存数据
+
+    }
+    /**
+     * 保存数据
+     */
+    private fun gotoCapturesave(){
+
     }
     /**
      * 拍照(返回原始图)

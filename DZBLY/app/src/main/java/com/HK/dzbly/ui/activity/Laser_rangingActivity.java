@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.LineFragment;
-import com.HK.dzbly.ui.fragment.Two_poointFragment;
 
 
 /**
@@ -26,7 +25,6 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     private TextView twopoint_ranging; //两点测距
     private TextView section_ranging; //断面测距
     private LineFragment mlineFragment; //创建直线测距fragment对象
-    private Two_poointFragment mtwo_poointFragment; //创建两点测距fragment对象
     private static boolean enableExit = false;
 
     @Override
@@ -42,7 +40,6 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
 
         inintView();
         selectFragment(0);
-
 
     }
 
@@ -69,9 +66,11 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 break;
             case R.id.twopoint_ranging :
                 selectFragment(1);
+                break;
+            case R.id.section_ranging:
+                selectFragment(2);
         }
     }
-
     @SuppressLint("ResourceAsColor")
     private void selectFragment(int position) {
         FragmentManager manager = getSupportFragmentManager();
@@ -87,6 +86,12 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 Intent intent = new Intent(this,Two_pointActivity.class);
                 startActivity(intent);
                 finish();
+                break;
+            case 2:
+                Intent intent1 = new Intent(Laser_rangingActivity.this,SectionsurveyActivity.class);
+                startActivity(intent1);
+                finish();
+                break;
         }
     }
 }

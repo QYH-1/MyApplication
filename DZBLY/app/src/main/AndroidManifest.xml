@@ -83,6 +83,9 @@
         <activity android:name=".ui.activity.FileMainActivity"></activity>
         <activity android:name=".ui.activity.wifi"></activity>
         <activity android:name=".ui.activity.Two_pointActivity"></activity>
+        <activity android:name=".ui.activity.DatadisplayActivity"></activity>
+        <activity android:name=".ui.activity.testActivity"></activity>
+        <activity android:name=".ui.activity.SectionsurveyActivity"></activity>
 
         <provider
                 android:name="androidx.core.content.FileProvider"

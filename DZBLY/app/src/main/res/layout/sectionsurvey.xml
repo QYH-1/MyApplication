@@ -7,14 +7,15 @@
 
     <HorizontalScrollView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:scrollbars="none"
     >
         <LinearLayout
                 android:id="@+id/ranging_method"
                 android:layout_width="wrap_content"
                 android:orientation="horizontal"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/black"
         >
             <TextView
@@ -56,7 +57,7 @@
                     android:background="@drawable/boderwhite"
                     android:clickable="true"
                     android:text="断面测距"
-                    android:textColor="@color/white"
+                    android:textColor="@color/red"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
@@ -91,7 +92,7 @@
             <TextView
                     android:id="@+id/tv_clear_base_call_activity"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
@@ -106,56 +107,71 @@
     <android.opengl.GLSurfaceView
             android:id="@+id/glView"
             android:layout_width="wrap_content"
-            android:layout_height="580dp"
+            android:layout_height="0dp"
+            android:layout_weight="12"
     />
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/boder"
+    <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none"
     >
-        <RadioGroup
-                android:id="@+id/Initial_length"
-                android:layout_width="0dp"
+        <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:orientation="horizontal"
                 android:background="@drawable/boder"
-                android:gravity="center"
-                android:layout_weight="4"
-                android:orientation="horizontal">
-            <RadioButton
-                    android:id="@+id/nIncluding_length_length"
+        >
+            <RadioGroup
+                    android:id="@+id/Initial_length"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="不含仪器长度"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/boder"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                <RadioButton
+                        android:id="@+id/nIncluding_length_length"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="不含仪器长度"
+                />
+                <RadioButton
+                        android:id="@+id/Including_length"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="含仪器长度  "
+                />
+            </RadioGroup>
+            <TextView
+                    android:id="@+id/start"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text=" 开 始 "
+                    android:textColor="@color/black"
+                    android:clickable="true"
+                    android:background="@drawable/boder"
             />
-            <RadioButton
-                    android:id="@+id/Including_length"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="含仪器长度"
+            <TextView
+                    android:id="@+id/stop"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:text=" 停 止 "
+                    android:textColor="@color/black"
+                    android:background="@drawable/boder"
             />
-        </RadioGroup>
-        <TextView
-                android:id="@+id/reset"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="重置"
-                android:textColor="@color/black"
-                android:clickable="true"
-                android:background="@drawable/boder"
-        />
-        <TextView
-                android:id="@+id/lock"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="锁定点A"
-                android:clickable="true"
-                android:textColor="@color/black"
-                android:background="@drawable/boder"
-        />
-    </LinearLayout>
+            <TextView
+                    android:id="@+id/Save"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:background="@drawable/boder"
+                    android:textColor="@color/black"
+                    android:text=" 保存 "
+            />
+        </LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

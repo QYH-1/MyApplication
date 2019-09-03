@@ -1,9 +1,11 @@
 package com.HK.dzbly.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,6 +19,7 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.HK.dzbly.R;
+import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.Laser_rangingActivity;
 import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
@@ -57,6 +60,8 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private Socket socket;
     SharedPreferences sp = null;
     private String Objectdistance;//目标距离
+    public static String DATA_TABLE = "DATA";//照片和视频数据存储的表
+    private static final String DATABASE_NAME = "cqhk.db"; //数据库名称
     private int num = 1; //文件出现次数
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
@@ -177,6 +182,7 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
         new AlertDialog.Builder(getActivity())
                 .setTitle("系统提示")
@@ -187,9 +193,26 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                         EditText text = view.findViewById(R.id.name1);
                         String name = text.getText().toString();
 
+                        Log.d("name",name);
+
                         SharedPreferences.Editor editor = sp.edit();
                         String Odistance = sp.getString("Objectdistance",Objectdistance);
+                        //创建一个DatabaseHelper对象
+                        DBhelper dbHelper2 = new DBhelper(getActivity(), "cqhk.db");
+                        //取得一个只读的数据库对象
+                        SQLiteDatabase db1 = dbHelper2.getReadableDatabase();
+                        //当表不存在时，创建表否则直接存储
+                        if(!dbHelper2.IsTableExist(DATA_TABLE)){
+                            dbHelper2.CreateTable(getContext(),DATA_TABLE);
+                        }
+                        //将数据存储到数据库中
+                        ContentValues cv = new ContentValues();
+                        cv.put("name",name);
+                        cv.put("type","line");
+                        cv.put("distance","11");
+                        dbHelper2.Insert(getContext(),"DATA",cv);
 
+                        Log.i("----","---------");
                         Log.d("name",name);
                         String dname = name+".txt";
                         Log.d("name1",dname);

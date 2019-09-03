@@ -42,7 +42,7 @@
                     android:background="@drawable/boderwhite"
                     android:clickable="true"
                     android:text="两点测距"
-                    android:textColor="@color/white"
+                    android:textColor="@color/red"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
@@ -110,12 +110,6 @@
             android:layout_height="0dp"
             android:layout_weight="7"
     />
-    <!--<android.opengl.GLSurfaceView-->
-            <!--android:id="@+id/glView1"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="6"-->
-    <!--/>-->
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -177,7 +171,7 @@
                         android:id="@+id/Including_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="含仪器长度"
+                        android:text="含仪器长度  "
                 />
             </RadioGroup>
             <TextView
@@ -185,7 +179,7 @@
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="重置"
+                    android:text=" 重 置 "
                     android:textColor="@color/black"
                     android:clickable="true"
                     android:background="@drawable/boder"
@@ -207,7 +201,7 @@
                     android:clickable="true"
                     android:background="@drawable/boder"
                     android:textColor="@color/black"
-                    android:text="保存"
+                    android:text=" 保存 "
             />
         </LinearLayout>
     </HorizontalScrollView>

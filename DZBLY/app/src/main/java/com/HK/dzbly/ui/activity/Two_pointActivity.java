@@ -2,10 +2,7 @@ package com.HK.dzbly.ui.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import com.HK.dzbly.R;
+import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.utils.drawing.FontRenderer;
 import com.HK.dzbly.utils.drawing.NoRender;
 import com.HK.dzbly.utils.drawing.Threedimensional_coordinates;
@@ -49,7 +47,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     NoRender noRender;
     private Handler drawlineHandler;
     private GLSurfaceView glView;
-    private TextView line_ranging;//直线测距
+    private TextView line_ranging,section_ranging;//测距
     private RadioButton nIncluding_length_length; //不包含仪器长度
     private RadioButton Including_length; //包含仪器长度
     private RadioGroup Initial_length;
@@ -82,6 +80,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private Concerto concerto;//处理wifi的数据
     private Socket socket;
     private StringBuilder stringBuilder;
+    private DBhelper dBhelper;
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
     String path = root.getAbsolutePath()+"/CameraDemo"+"/data";  //文件保存的目录
@@ -111,8 +110,8 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     }
     private void Inint(){
         glView = (GLSurfaceView) findViewById(R.id.glView);
-       // glView1 = findViewById(R.id.glView1);
         line_ranging = findViewById(R.id.line_ranging);
+        section_ranging = findViewById(R.id.section_ranging);
         Adistance = findViewById(R.id.Adistance);
         Bdistance = findViewById(R.id.Bdistance);
         ABdistance = findViewById(R.id.ABdistance);
@@ -127,6 +126,8 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         nIncluding_length_length.setChecked(true);
         Initial_length.setOnCheckedChangeListener(this);
         line_ranging.setOnClickListener(this);
+        section_ranging.setOnClickListener(this);
+
         reSet.setOnClickListener(this);
         save.setOnClickListener(this);
 
@@ -149,9 +150,15 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 Intent intent1 = new Intent(this,Two_pointActivity.class);
                 startActivity(intent1);
                 finish();
+                break;
             case R.id.Save:
                 showDialog();
-
+                break;
+            case R.id.section_ranging:
+                Intent intent2= new Intent(this,SectionsurveyActivity.class);
+                startActivity(intent2);
+                finish();
+                break;
         }
     }
     private void setLine_ranging(){
@@ -198,19 +205,12 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE",STATE+1);
                     editor.commit();
-
-                       // if(netConnection.checkNetworkConnection(context)){
-                            connectThread = new ConnectThread(socket, myhandler);
-                            connectThread.start();
-                       // }else{
-                      //      Toast.makeText(Two_pointActivity.this,"请连接wifi",Toast.LENGTH_SHORT).show();
-                       // }
-
+                    connectThread = new ConnectThread(socket, myhandler);
+                    connectThread.start();
                     Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
                     startActivity(intent2);
                     finish();
                 }
-
             }
         });
     }
@@ -385,6 +385,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
         new AlertDialog.Builder(this)
                 .setTitle("系统提示")
@@ -399,7 +400,20 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                         String Adata = sp.getString("Adata","0.00米");
                         String Bdata = sp.getString("Bdata","0.00米");
                         String ABdata = sp.getString("ABdata","0.00米");
+                        Log.d("name",name);
+                        //当表不存在时，创建表否则直接存储
+                        //dBhelper.DeleteTable(context,"NEWWORDS_BOOK");
+                        DBhelper dbHelper2 = new DBhelper(Two_pointActivity.this, "cqhk.db");
 
+                        if(!dbHelper2.IsTableExist(dBhelper.DATA_TABLE)){
+                            dbHelper2.CreateTable(context,dBhelper.DATA_TABLE);
+                        }
+                        //将数据存储到数据库中
+                        ContentValues cv = new ContentValues();
+                        cv.put("name",name);
+                        cv.put("type","twopoint");
+                        cv.put("distance","11");
+                        dbHelper2.Insert(context,"DATA",cv);
 
                         Log.d("name",name);
                         String dname = name+".txt";
@@ -441,7 +455,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
 
                     }
                 }).setNegativeButton ("取消", null)
