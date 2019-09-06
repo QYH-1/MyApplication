@@ -18,7 +18,7 @@ public class DBhelper extends SQLiteOpenHelper {
     public static String DZBLY_TABLE = "DZBLY";//地质编录仪数据存储表
     public static String DATA_TABLE = "DATA";//照片和视频数据存储的表
     public static final String db_name = "cqhk.db"; //数据库名称
-    public static final String DB_NAME = "/data/data/com.HK.dzbly/database/cqhk.db"; //数据库的存储地址
+    public static final String DB_NAME = "/data/data/com.HK.dzbly/databases/cqhk.db"; //数据库的存储地址
 
     //带全部参数的构造函数，此构造函数必不可少
     public DBhelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -32,7 +32,6 @@ public class DBhelper extends SQLiteOpenHelper {
 
     //带三个参数的构造函数，调用的是带所有参数的构造函数
     public DBhelper(Context context, String name, int version) {
-
         this(context, name, null, version);
     }
 
@@ -42,15 +41,13 @@ public class DBhelper extends SQLiteOpenHelper {
         Log.w("create a Database", "create a Database");
         //创建数据库表sql语句 并 执行
         String sql = "CREATE TABLE IF NOT EXISTS DZBLY(Did INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "[CreatedTime] TimeStamp NOT NULL DEFAULT (datetime('now','localtime')),Dname text not null,Dval text ,Drollangle text,Delevation text,type text not null,Dresult text)";
+                "[CreatedTime] TimeStamp NOT NULL DEFAULT (datetime('now','localtime')),name text not null,val text ,rollAngle text,elevation text,type text not null,result text)";
         db.execSQL(sql);
     }
-
     //根据传参创建表
     public void CreateTable(Context context, String table) {
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_NAME, null);
-       // String sql = "CREATE TABLE " + table + " (id INTEGER PRIMARY KEY AUTOINCREMENT,time date  not null,name text not null,type text not null,distance text" + ");";
-        String sql = "CREATE TABLE " + table + " (id INTEGER PRIMARY KEY AUTOINCREMENT,[CreatedTime] TimeStamp NOT NULL DEFAULT (datetime('now','localtime')),name text not null,type text not null,distance text" + ");";
+        String sql = "CREATE TABLE " + table + " (type text not null,[CreatedTime] TimeStamp NOT NULL DEFAULT (datetime('now','localtime')),name text PRIMARY KEY" + ");";
         try {
             db.execSQL(sql);
         } catch (Exception e) {
@@ -68,7 +65,7 @@ public class DBhelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.getStackTrace();
         }
-        Log.i("插入数据","数据插入成功");
+        Log.i("插入数据", "数据插入成功");
         db.close();
     }
 
@@ -80,7 +77,6 @@ public class DBhelper extends SQLiteOpenHelper {
         String sql = "drop table " + table;
         try {
             db.execSQL(sql);
-            Log.i("wordroid=", sql);
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -92,12 +88,12 @@ public class DBhelper extends SQLiteOpenHelper {
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(
                 DB_NAME, null);
         boolean isTableExist = true;
-        Cursor cursor = db.rawQuery("SELECT count(*) FROM" + table + "", null);
-        int learned=0;
-        if(cursor.moveToFirst()){
-            learned= cursor.getInt(0);
+        Cursor cursor = db.rawQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='"+table+"'", null);
+        int learned = 0;
+        if (cursor.moveToFirst()) {
+            learned = cursor.getInt(0);
         }
-        if (learned== 0) {
+        if (learned == 0) {
             isTableExist = false;
         }
         cursor.close();

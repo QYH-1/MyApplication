@@ -79,7 +79,7 @@ public class DzlpActivity extends FragmentActivity {
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
 
-        if (netConnection.checkNetworkConnection(this)) {
+        if (netConnection.isNetworkConnected(this)) {
             connectThread = new ConnectThread(socket, handler);
             connectThread.start();
             Log.d("connectThread", "启动成功");
@@ -233,11 +233,6 @@ public class DzlpActivity extends FragmentActivity {
     private void setFragment(String data ){
        // TextView textView = getFragmentManager().findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
         TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
-        //float rval = val+180;
-        //Log.d("rval", String.valueOf(rval));
-        //String reval = String.valueOf(rval);
-        //String rex = x;
-        //String result =reval+ "°"+"∠"+rex;
         textView.setText(data);
         textView.setTextSize(35);
         textView.setGravity(Gravity.CENTER);

@@ -35,7 +35,7 @@ public class FontRenderer implements Renderer {
     FloatBuffer lineVerticesBuffer;
     FloatBuffer xyzVerticesBuffer;
 
-    FloatBuffer poointVerticesBuffer;
+    FloatBuffer pointVerticesBuffer;
 
     ByteBuffer lineFacetsBuffer;
     ByteBuffer xiangliangFacetsBuffer;
@@ -48,24 +48,10 @@ public class FontRenderer implements Renderer {
 
 
     void updateXYZ(){  //2.1创建各种数组
-        //纹理坐标系
-
-
         // 定义立方体的8个顶点                                                       
         lineVertices = new float[] {
                 // 上顶面正方形的四个顶点
                 x1, y1, z1,//0
-               // x2,y2,z2//1
-                //x, 0,z,//1
-                //  0,0,z,//2
-                // 0,y,z,//3
-
-                // 下底面正方形的四个顶点
-                //x,y,0,//4
-                //x,0,0,//5
-                //0,0,0//2原点
-                // 0,y,0,//7 
-
 
         };
         //画特殊点
@@ -193,7 +179,7 @@ public class FontRenderer implements Renderer {
         lineVerticesBuffer = floatBufferUtil(lineVertices);
         xyzVerticesBuffer = floatBufferUtil(xyzVertices);
         //绘制两个点
-        poointVerticesBuffer = floatBufferUtil(pointFacets);
+        pointVerticesBuffer = floatBufferUtil(pointFacets);
         // 将直线的数组包装成ByteBuffer
         xiangliangFacetsBuffer = ByteBuffer.wrap(xiangliangFacets);
         XFacetsBuffer = ByteBuffer.wrap(XFacets);
@@ -221,25 +207,25 @@ public class FontRenderer implements Renderer {
                 //x=(float) (Math.random()*(-2)+1);
                 //y=(float) (Math.random()*(-2)+1);
                 // z=(float) (Math.random()*(-2)+1);
-                x = x1;
-                y = y1;
-                z = z1;
-                Log.d("xxxxxx", String.valueOf(x));
-                Log.d("yyyyyy", String.valueOf(y));
-                Log.d("zzzzzz", String.valueOf(z));
-                //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
-                if(x>0)
-                    xyz[0]=String.valueOf(x).substring(0, 4);
-                else
-                    xyz[0]=String.valueOf(x).substring(0, 5);
-                if(y>0)
-                    xyz[1]=String.valueOf(y).substring(0, 4);
-                else
-                    xyz[1]=String.valueOf(y).substring(0, 5);
-                if(z>0)
-                    xyz[2]=String.valueOf(z).substring(0, 4);
-                else
-                    xyz[2]=String.valueOf(z).substring(0, 5);
+//                x = x1;
+//                y = y1;
+//                z = z1;
+//                Log.d("xxxxxx", String.valueOf(x));
+//                Log.d("yyyyyy", String.valueOf(y));
+//                Log.d("zzzzzz", String.valueOf(z));
+//                //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
+//                if(x>0)
+//                    xyz[0]=String.valueOf(x).substring(0, 4);
+//                else
+//                    xyz[0]=String.valueOf(x).substring(0, 5);
+//                if(y>0)
+//                    xyz[1]=String.valueOf(y).substring(0, 4);
+//                else
+//                    xyz[1]=String.valueOf(y).substring(0, 5);
+//                if(z>0)
+//                    xyz[2]=String.valueOf(z).substring(0, 4);
+//                else
+//                    xyz[2]=String.valueOf(z).substring(0, 5);
 
                 Message msg = new Message();
                 msg.what=200;//这是发送给当前类中用来更新立方体的
@@ -255,7 +241,7 @@ public class FontRenderer implements Renderer {
 
             }
         };
-        timer.schedule(task, 0, 7000);
+       // timer.schedule(task, 0, 7000);
     }
 
     //2.3 实现接口里的三个方法
@@ -330,30 +316,12 @@ public class FontRenderer implements Renderer {
         // 沿着X轴旋转
         //gl.glRotatef(0f, 0.1f, 0f, 0f);
         gl.glLineWidth(2.0f);
-        // 设置顶点的位置数据 因为所有的数据都在次数组中，所以长方体和向量的只要设置这一次就好
-        //Log.d("lineVerticesBuffer", String.valueOf(lineVerticesBuffer));
-//        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer); //2.3.3.3
-//        // 设置顶点的颜色数据
-//        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f); // 2.3.3.4
-//        //gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, 18);//这里不用二维，用三维的画法，注意是GL_LINES三维中画线             
-//        gl.glDrawElements(GL10.GL_LINES, lineFacetsBuffer.remaining(),//2.3.3.5
-//                GL10.GL_UNSIGNED_BYTE, lineFacetsBuffer);
 
         // --------------------绘制点---------------------
-        gl.glVertexPointer(3,GL10.GL_FLOAT,0,poointVerticesBuffer);
+        gl.glVertexPointer(3,GL10.GL_FLOAT,0,pointVerticesBuffer);
         gl.glColor4f(1f, 0f, 0f, 0f);
         gl.glPointSize(10f);
         gl.glDrawArrays(GL10.GL_POINTS,0,2);
-
-
-        // --------------------绘制向量---------------------
-        //绘制向量
-        gl.glLineWidth(6.0f);//直线宽度 5倍于其他线
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer);//向量
-        gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);//向量
-        gl.glDrawElements(GL10.GL_LINES, xiangliangFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, xiangliangFacetsBuffer);//向量
 
         // --------------------绘制X坐标---------------------
         //绘制x坐标
@@ -367,16 +335,12 @@ public class FontRenderer implements Renderer {
 
         // --------------------绘制Y坐标---------------------
         //绘制Y坐标
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferY);//Y
         // 设置顶点的颜色数据
         gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
         gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
                 GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
         // --------------------绘制Z坐标---------------------
         //绘制Z坐标
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferZ);//Y
         // 设置顶点的颜色数据
         gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
         gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),

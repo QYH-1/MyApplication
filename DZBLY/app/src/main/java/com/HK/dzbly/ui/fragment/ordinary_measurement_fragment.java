@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -170,20 +171,34 @@ public class ordinary_measurement_fragment extends Fragment {
                         result = sp.getString("result", "");//获取产状信息数据
                         //将数据存储到数据库中
                         dBhelper = new DBhelper(getContext(),dBhelper.db_name,null,1);
+                        //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
+                        String sqlNumber = sp.getString("sqlNumber","0");
+                        Log.d("sqlNumber",sqlNumber);
+                        if(sqlNumber.equals("0")){
+                            SQLiteDatabase db3 = dBhelper.getWritableDatabase();
+                            editor.putString("sqlNumber","1");
+                        }else{
+                            editor.putString("sqlNumber","1");
+                            editor.commit();
+                        }
+//                        if(!dBhelper.IsTableExist(dBhelper.DZBLY_TABLE)){
+//                            dBhelper.CreateTable(getContext(),dBhelper.DZBLY_TABLE);
+//                        }
                         ContentValues cv = new ContentValues();
-                        cv.put("Dname",1);
-                        cv.put("Dval",1);
-                        cv.put("Drollangle",1);
-                        cv.put("Delevation",1);
-                        cv.put("type","dzbl");
-                        cv.put("Dresult",1);
+                        cv.put("name",name);
+                        cv.put("val","1");
+                        cv.put("rollAngle","1");
+                        cv.put("elevation","1");
+                        cv.put("type","dZbl");
+                        cv.put("result","1");
+
                         dBhelper.Insert(getContext(),dBhelper.DZBLY_TABLE,cv);
 
                         Log.d("name", name);
                         String dname = name + ".txt";
                         Log.d("name1", dname);
                         try {
-                            //如果文件存在则删除文件
+                            //查看当前文件是否存在
                             File file = new File(path, dname);
                             if(file.exists()){
                                 fileOutputStream = new FileOutputStream(file,true);

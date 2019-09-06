@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Html;
@@ -161,13 +162,24 @@ public class simple_measurement_fragment extends Fragment {
                         rana = sp.getFloat("rana",0);//获取横滚角数据
                         result = sp.getString("result","");//获取产状信息数据
                         //将数据存储到数据库中
+                        dBhelper = new DBhelper(getContext(),dBhelper.db_name,null,1);
+                        //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
+                        String sqlNumber = sp.getString("sqlNumber","0");
+                        Log.d("sqlNumber",sqlNumber);
+                        if(sqlNumber.equals("0")){
+                            SQLiteDatabase db3 = dBhelper.getWritableDatabase();
+                            editor.putString("sqlNumber","1");
+                        }else{
+                            editor.putString("sqlNumber","1");
+                            editor.commit();
+                        }
                         ContentValues cv = new ContentValues();
-                        cv.put("Dname",name);
-                        cv.put("Dval",val);
-                        cv.put("Drollangle",rana);
-                        cv.put("Delevation",eada);
-                        cv.put("type","dzbl");
-                        cv.put("Dresult",result);
+                        cv.put("name",name);
+                        cv.put("val","1");
+                        cv.put("rollAngle","1");
+                        cv.put("elevation","1");
+                        cv.put("type","dZbl");
+                        cv.put("result","1");
                         dBhelper.Insert(getContext(),dBhelper.DZBLY_TABLE,cv);
 
                         Log.d("name",name);

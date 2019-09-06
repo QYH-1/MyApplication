@@ -20,7 +20,7 @@ import java.util.TimerTask;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/14$
- * 描述：三维坐标系
+ * 描述：三维坐标系两个点
  * 修订历史：
  */
 public class Threedimensional_coordinates implements Renderer {
@@ -609,27 +609,5 @@ public class Threedimensional_coordinates implements Renderer {
         this.x2 = x2;
         this.y2 = y2;
         this.z2 = z2;
-    }
-    /**
-     * android中绘制字体，使用画布canvas
-     */
-    public void initFontBitmap(){
-        String font = "需要渲染的文字测试！";
-        bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        //背景颜色
-        canvas.drawColor(Color.LTGRAY);
-        Paint p = new Paint();
-        //字体设置
-        String fontType = "宋体";
-        Typeface typeface = Typeface.create(fontType, Typeface.BOLD);
-        //消除锯齿
-        p.setAntiAlias(true);
-        //字体为红色
-        p.setColor(Color.WHITE);
-        p.setTypeface(typeface);
-        p.setTextSize(20);
-        //绘制字体
-        canvas.drawText(font, 0, 1, p);
     }
 }

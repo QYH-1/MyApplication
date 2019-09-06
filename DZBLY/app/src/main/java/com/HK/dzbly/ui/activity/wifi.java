@@ -37,7 +37,7 @@ public class wifi extends BaseActivity {
         String b = concerto.Dataconversion(a);
         Log.d("b", b);
         Log.d("调用工具类", "调用成功");
-        if (netConnection.checkNetworkConnection(this)) {
+        if (netConnection.isNetworkConnected(this)) {
             connectThread = new ConnectThread(socket, handler);
             connectThread.start();
         } else {

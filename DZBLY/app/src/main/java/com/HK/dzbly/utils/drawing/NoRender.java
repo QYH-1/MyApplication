@@ -35,15 +35,12 @@ public class NoRender implements Renderer {
     FloatBuffer lineVerticesBuffer;
     FloatBuffer xyzVerticesBuffer;
 
-    FloatBuffer poointVerticesBuffer;
+    FloatBuffer pointVerticesBuffer;
 
-    ByteBuffer lineFacetsBuffer;
     ByteBuffer xiangliangFacetsBuffer;
     ByteBuffer XFacetsBuffer;
     ByteBuffer YFacetsBuffer;
     ByteBuffer ZFacetsBuffer;
-    ByteBuffer AFacetsBuffer;
-
     float[] lineVertices;
 
 
@@ -182,7 +179,7 @@ public class NoRender implements Renderer {
         lineVerticesBuffer = floatBufferUtil(lineVertices);
         xyzVerticesBuffer = floatBufferUtil(xyzVertices);
         //绘制两个点
-        poointVerticesBuffer = floatBufferUtil(pointFacets);
+        pointVerticesBuffer = floatBufferUtil(pointFacets);
         // 将直线的数组包装成ByteBuffer
         xiangliangFacetsBuffer = ByteBuffer.wrap(xiangliangFacets);
         XFacetsBuffer = ByteBuffer.wrap(XFacets);
@@ -209,12 +206,12 @@ public class NoRender implements Renderer {
                 //x=(float) (Math.random()*(-2)+1);
                 //y=(float) (Math.random()*(-2)+1);
                 // z=(float) (Math.random()*(-2)+1);
-                x = x1;
-                y = y1;
-                z = z1;
-                Log.d("xxxxxx", String.valueOf(x));
-                Log.d("yyyyyy", String.valueOf(y));
-                Log.d("zzzzzz", String.valueOf(z));
+//                x = x1;
+//                y = y1;
+//                z = z1;
+//                Log.d("xxxxxx", String.valueOf(x));
+//                Log.d("yyyyyy", String.valueOf(y));
+//                Log.d("zzzzzz", String.valueOf(z));
                 //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
                 Message msg = new Message();
                 msg.what=200;//这是发送给当前类中用来更新立方体的
@@ -315,7 +312,7 @@ public class NoRender implements Renderer {
 //                GL10.GL_UNSIGNED_BYTE, lineFacetsBuffer);
 
         // --------------------绘制点---------------------
-        gl.glVertexPointer(3,GL10.GL_FLOAT,0,poointVerticesBuffer);
+        gl.glVertexPointer(3,GL10.GL_FLOAT,0,pointVerticesBuffer);
         gl.glColor4f(1f, 0f, 0f, 0f);
         gl.glPointSize(10f);
         gl.glDrawArrays(GL10.GL_POINTS,0,2);

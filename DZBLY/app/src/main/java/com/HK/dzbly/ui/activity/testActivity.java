@@ -48,19 +48,18 @@ public class testActivity extends Activity {
 //                db3.insert("user", null, values);
 //                Log.d("插入数据","插入成功");
                 DBhelper dbHelper2 = new DBhelper(testActivity.this, "cqhk.db");
+               //SQLiteDatabase db3 = dbHelper2.getWritableDatabase();
+//                ContentValues cv = new ContentValues();
+//                cv.put("Dname","第二");
+//                cv.put("Dval","22");
+//                cv.put("Drollangle","22");
+//                cv.put("Delevation","22");
+//                cv.put("type","dzbl");
+//                cv.put("Dresult","11");
+//                dbHelper2.Insert(context,"DZBLY",cv);
 
-                // dbHelper2.DeleteTable(context,"PLAN");
-//                dbHelper2.CreateTable(context, "NEWWORDS_BOOK");//调用方法创建，当前单词书的表
-               // dbHelper2.DeleteTable(context,"NEWWORDS_BOOK");
-                dbHelper2.DeleteTable(context,"NEWWORDS_BOOK");
-               // dbHelper2.CreateTable(context,"DATA");
-              //  String date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-               // ContentValues cv = new ContentValues();
-               // cv.put("time",date1);
-               // cv.put("name","第二");
-               // cv.put("type","line");
-              //  cv.put("distance","11");
-               // dbHelper2.Insert(context,"DATA",cv);
+                dbHelper2.DeleteTable(context,"File");
+//                dbHelper2.Insert(context,"DATA",cv);
 
 //                dbHelper2.DeleteTable(context,"book");
 //                dbHelper2.DeleteTable(context,"BOOKS");

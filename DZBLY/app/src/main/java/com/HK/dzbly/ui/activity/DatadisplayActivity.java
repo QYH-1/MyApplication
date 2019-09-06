@@ -12,10 +12,11 @@ import androidx.fragment.app.FragmentTransaction;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.DataFragment;
 import com.HK.dzbly.ui.fragment.DatashowFragment;
+import com.HK.dzbly.ui.fragment.VideoFragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author：qyh 版本：1.0
@@ -29,9 +30,11 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
     private List<String> data = new ArrayList<String>(); //用来存储测量数据类别
     private List<String> tdata = new ArrayList<String>(); //用来存储时间数据类别
     private DatashowFragment df;//获取fragment对象
+    private VideoFragment videoFragment;
     private DataFragment dataFragment;
     private String ditem = null;
     private String titem = null;
+    private String type = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,6 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
                 df.setArguments(bundle);//数据传递到fragment中
                 FragmentManager manager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = manager.beginTransaction();
-
                 fragmentTransaction.replace(R.id.dataShow, df);
                 fragmentTransaction.commit();
                 kz.setText("查看");
@@ -132,8 +134,8 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
     }
     //实现接口，实现回调
     @Override
-    public void process(HashMap<String, Object> str) {
-        HashMap<String, Object> rdata = null;
+    public void process(Map<String, Object> str) {
+        Map<String, Object> rdata = null;
         if (str != null) {
             rdata = str;
             Log.i("rdata", String.valueOf(rdata));
@@ -142,13 +144,23 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         String dataTime = String.valueOf(rdata.get("time"));
 
         dataFragment = new DataFragment();
+        videoFragment = new VideoFragment();
         Bundle bundle = new Bundle();
         bundle.putString("dataName",dataName);
         bundle.putString("dataTime",dataTime);
-        dataFragment.setArguments(bundle);//数据传递到fragment中
+        bundle.putString("ditem",ditem);
+        String data = dataName.substring(dataName.indexOf(".")+1);
+        Log.i("----data",data);
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.dataShow, dataFragment);
+        if(data.equals("mp4")){
+            videoFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.dataShow, videoFragment);
+        }else {
+            dataFragment.setArguments(bundle);//数据传递到fragment中
+            fragmentTransaction.replace(R.id.dataShow, dataFragment);
+        }
         fragmentTransaction.commit();
         kz.setText("返回");
     }

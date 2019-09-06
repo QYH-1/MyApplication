@@ -3,6 +3,7 @@ package com.HK.dzbly.ui.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
+import android.database.sqlite.SQLiteDatabase;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,7 +38,7 @@ import java.util.Date;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/15$
- * 描述：
+ * 描述：两点测距
  * 修订历史：
  */
 public class Two_pointActivity extends Activity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -64,12 +65,12 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private float bRdistance;  //点到仪器距离
     private float bAzimuth;//方位角
     private float bangle; //俯仰角
-    private float Ax;
-    private float Ay;
-    private float Az;
-    private float Bx;
-    private float By;
-    private float Bz;
+    private float Ax = 0.00000001f;
+    private float Ay = 0.00000001f;
+    private float Az = 0.00000001f;
+    private float Bx = 0.00000001f;
+    private float By = 0.00000001f;
+    private float Bz = 0.00000001f;
     private float adistance; //A点距离
     private float bdistance; //B点距离
     private float abdistance; //AB两点的距离
@@ -85,6 +86,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     File root = Environment.getExternalStorageDirectory();
     String path = root.getAbsolutePath()+"/CameraDemo"+"/data";  //文件保存的目录
     private int num = 1; //文件出现次数
+    private boolean RECORD_VARIABLE = true; //接收标志置（true为正常接收 flase为非正常接收）
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,23 +94,26 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
         setContentView(R.layout.three_dimensional);
-
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
         STATE = sp.getInt("STATE",0);
+
         Log.d("STATE", String.valueOf(STATE));
-
-        connectThread = new ConnectThread(socket, handler);
-        connectThread.start();
-
-        Inint();
-        setLine_ranging();
-        setdistance();
-        setLock();
-        setTdc();
-        setDistance();
-
+        netConnection = new NetConnection();
+        boolean ts = netConnection.isNetworkConnected(Two_pointActivity.this);
+        Log.d("ts", String.valueOf(ts));
+        if(netConnection.isNetworkConnected(Two_pointActivity.this)){
+            connectThread = new ConnectThread(socket, handler);
+            connectThread.start();
+            inInt();
+            setLine_ranging();
+            setLock();
+            setTdc();
+            setDistance();
+        }else {
+            Toast.makeText(Two_pointActivity.this,"WIFI没有连接",Toast.LENGTH_SHORT).show();
+        }
     }
-    private void Inint(){
+    private void inInt(){
         glView = (GLSurfaceView) findViewById(R.id.glView);
         line_ranging = findViewById(R.id.line_ranging);
         section_ranging = findViewById(R.id.section_ranging);
@@ -144,9 +149,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.reset :
-                SharedPreferences.Editor editor1 = sp.edit();
-                editor1.putInt("STATE",1);
-                editor1.commit();
+//                SharedPreferences.Editor editor1 = sp.edit();
+//                editor1.putInt("STATE",1);
+//                editor1.commit();
                 Intent intent1 = new Intent(this,Two_pointActivity.class);
                 startActivity(intent1);
                 finish();
@@ -177,15 +182,22 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             public void onClick(View view) {
 
                 if(STATE%3 == 1){
+                    lock.setClickable(false);
                     lock.setText("锁定点B");
                     Log.d("锁定点BSTATE==1","111111");
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("STATE",STATE+1);
-                    editor.commit();
+                    Log.i("RECORD_VARIABLE-B", String.valueOf(RECORD_VARIABLE));
+                    if(RECORD_VARIABLE){
+                        lock.setClickable(true);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("STATE",STATE+1);
+                        editor.commit();
+                        Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
+                        startActivity(intent2);
+                        finish();
+                    }else {
+                        lock.setClickable(false);
+                    }
 
-                    Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
-                    startActivity(intent2);
-                    finish();
                 }else if(STATE%3 == 2){
                     lock.setText("测量完成");
                     Log.d("锁定点BSTATE==2","111111");
@@ -193,23 +205,38 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE",STATE+1);
                     editor.commit();
+                    if (netConnection.isNetworkConnected(Two_pointActivity.this)){
+                        connectThread = new ConnectThread(socket, handler);
+                        connectThread.start();
 
-                    connectThread = new ConnectThread(socket, handler);
-                    connectThread.start();
+                        Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
+                        startActivity(intent2);
+                        finish();
+                    }else {
+                        Toast.makeText(Two_pointActivity.this,"WIFI没有连接",Toast.LENGTH_SHORT).show();
+                    }
 
-                    Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
-                    startActivity(intent2);
-                    finish();
                 }else {
+                    lock.setClickable(false);
                     lock.setText("锁定点A");
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("STATE",STATE+1);
-                    editor.commit();
-                    connectThread = new ConnectThread(socket, myhandler);
-                    connectThread.start();
-                    Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
-                    startActivity(intent2);
-                    finish();
+                    //当没有正常接收wifi的数据时
+                    Log.i("RECORD_VARIABLE-A", String.valueOf(RECORD_VARIABLE));
+                    if(netConnection.isNetworkConnected(Two_pointActivity.this)){
+                        connectThread = new ConnectThread(socket, myhandler);
+                        connectThread.start();
+                        if(RECORD_VARIABLE){
+                            lock.setClickable(true);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putInt("STATE",STATE+1);
+                            editor.commit();
+
+                            Intent intent2 = new Intent(Two_pointActivity.this,Two_pointActivity.class);
+                            startActivity(intent2);
+                            finish();
+                        }
+                    }else {
+                        Toast.makeText(Two_pointActivity.this,"WIFI没有连接",Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -225,6 +252,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             Log.d("TWO_wifi_data1", data);
             if(data.length()<24){
                 Toast.makeText(Two_pointActivity.this,"网络错误！请检查网络连接",Toast.LENGTH_SHORT).show();
+                RECORD_VARIABLE = false;
             }
             aRdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));
             aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,18)));
@@ -246,9 +274,11 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             Bundle bundle = new Bundle();
             bundle = msg.getData();
             String data = bundle.getString("msg");
-            Log.d("TWO_wifi_data1", data);
+            Log.d("TWO_wifi_data2", data);
+            //当接收wifi的数据不是24位，就提示信息并将接收标志置为false
             if(data.length()<24){
                 Toast.makeText(Two_pointActivity.this,"网络错误！请检查网络连接",Toast.LENGTH_SHORT).show();
+                RECORD_VARIABLE = false;
             }
             bRdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));
             bAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12,18)));
@@ -359,21 +389,17 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         }
 
     }
-    //改变显示两点间的距离
-    private void setdistance(){
-
-    }
     @Override
     protected void onResume() {
         super.onResume();
-        glView.onResume();
+        //glView.onResume();
         Log.w("glView1","glView1");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        glView.onPause();
+        //glView.onPause();
         Log.w("glView","glView");
     }
     //保存数据
@@ -401,19 +427,27 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                         String Bdata = sp.getString("Bdata","0.00米");
                         String ABdata = sp.getString("ABdata","0.00米");
                         Log.d("name",name);
-                        //当表不存在时，创建表否则直接存储
-                        //dBhelper.DeleteTable(context,"NEWWORDS_BOOK");
-                        DBhelper dbHelper2 = new DBhelper(Two_pointActivity.this, "cqhk.db");
 
-                        if(!dbHelper2.IsTableExist(dBhelper.DATA_TABLE)){
-                            dbHelper2.CreateTable(context,dBhelper.DATA_TABLE);
+                        DBhelper dbHelper2 = new DBhelper(Two_pointActivity.this, "cqhk.db");
+                        //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
+                        String sqlNumber = sp.getString("sqlNumber","0");
+                        Log.d("sqlNumber",sqlNumber);
+                        if(sqlNumber.equals("0")){
+                            SQLiteDatabase db3 = dBhelper.getWritableDatabase();
+                            editor.putString("sqlNumber","1");
+                        }else{
+                            editor.putString("sqlNumber","1");
+                            editor.commit();
                         }
                         //将数据存储到数据库中
                         ContentValues cv = new ContentValues();
                         cv.put("name",name);
-                        cv.put("type","twopoint");
-                        cv.put("distance","11");
-                        dbHelper2.Insert(context,"DATA",cv);
+                        cv.put("val","");
+                        cv.put("rollAngle","");
+                        cv.put("elevation","");
+                        cv.put("type","twoPoint");
+                        cv.put("result","111");
+                        dbHelper2.Insert(context,"DZBLY",cv);
 
                         Log.d("name",name);
                         String dname = name+".txt";
