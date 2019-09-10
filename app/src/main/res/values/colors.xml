@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="black">#0F0F0F</color>
+    <color name="colorwrite">#E6E6E6</color>
+
+    <color name="text_gray">#D3D3D3</color>
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_yellow">#FFC800</color>
+    <color name="text_topbar">#694E42</color>
+    <color name="div_white">#E5E5E5</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="bg_white">#FFFFFF</color>
+    <color name="bg_topbar">#FCFCFC</color>
+    <color name="gray">#F4F4F4</color>
+    <color name="app_color_theme_4">#76EE00</color>
+    <color name="orange">#EE9A49</color>
+    <color name="blue">#436EEE</color>
+    <color name="darkcyan">#29bea0</color>
+    <color name="whitesmoke">#eeeeee</color>
+    <color name="red">#FF0000</color>
+    <color name="darkRed">#702216</color>
+    <color name="lightGray">#323232</color>
+    <color name="deepGray">#8B8B8B</color>
+    <color name="white">#fff</color>
+    <color name="ocbg">#237EAD</color>
+    <color name="Light_blue">#7EC0EE</color>
+
+    <color name="inside_progress">#ff6c4d70</color>
+    <color name="external_progress">#9C27B0</color>
+    <color name="bottom_velocimeter">#e515171d</color>
+    <color name="internal_velocimeter">#ffb4b4b4</color>
+    <color name="needle">#6200EA</color>
+    <color name="digital_number">#ffdcefff</color>
+
+</resources>
