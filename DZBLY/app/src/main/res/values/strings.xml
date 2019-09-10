@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name"></string>
+    <string name="welcome">开机欢迎界面</string>
+    <string name="DEVICE_CONNECTING">1</string> <!--有设备正在连接热点-->
+    <string name="DEVICE_CONNECTED">2</string>  <!--有设备连上热点-->
+    <string name="SEND_MSG_SUCCSEE">3</string>  <!--发送消息成功-->
+    <string name="SEND_MSG_ERROR">4</string>    <!--发送消息失败-->
+    <string name="GET_MSG">6</string>      <!--获取新消息-->
+
+    <string name="create_hostspot">创建WIFI热点</string>
+    <string name="close_hostspot">关闭WIFI热点</string>
+    <string name="send_data">发送数据</string>
+    <string name="search">搜索WIFI</string>
+
+
+</resources>

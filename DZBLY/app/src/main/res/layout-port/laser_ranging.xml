@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:scrollbars="none"
+                >
+                <LinearLayout
+                        android:id="@+id/ranging_method"
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_height="match_parent"
+                        android:background="@color/black"
+                        >
+                        <TextView
+                                android:id="@+id/line_ranging"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:text="直线测距"
+                                android:background="@drawable/boderwhite"
+                                android:textColor="@color/red"
+                                android:clickable="true"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+                        <TextView
+                                android:id="@+id/twopoint_ranging"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/boderwhite"
+                                android:clickable="true"
+                                android:text="两点测距"
+                                android:textColor="@color/white"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+
+                        <TextView
+                                android:id="@+id/section_ranging"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/boderwhite"
+                                android:clickable="true"
+                                android:text="断面测距"
+                                android:textColor="@color/white"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+                        <TextView
+                                android:id="@+id/tv_agora_log_activity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/boderwhite"
+                                android:clickable="true"
+                                android:text="Agora"
+                                android:textColor="@drawable/textcolor_selector"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+                        <TextView
+                                android:id="@+id/tv_other_log_activity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/boderwhite"
+                                android:clickable="true"
+                                android:text="Other"
+                                android:textColor="@drawable/textcolor_selector"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+
+                        <TextView
+                                android:id="@+id/tv_clear_base_call_activity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/boderwhite"
+                                android:clickable="true"
+                                android:text="Clear"
+                                android:textColor="@drawable/textcolor_selector"
+                                android:textSize="20sp"
+                                android:textStyle="bold"/>
+                </LinearLayout>
+        </HorizontalScrollView>
+        <FrameLayout
+                android:id="@+id/measurement_options"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="13"
+                >
+        </FrameLayout>
+</LinearLayout>
