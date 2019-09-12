@@ -3,6 +3,7 @@ package com.HK.dzbly.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,15 +16,25 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
+import com.HK.dzbly.utils.auxiliary.Data_normalization;
+import com.HK.dzbly.utils.auxiliary.planar_equation;
+import com.HK.dzbly.utils.drawing.PlaneDrawing;
 import com.HK.dzbly.utils.drawing.dynamicDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * @Author：qyh 版本：1.0
@@ -46,10 +57,15 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private float Rdistance;  //点到仪器距离
     private float Azimuth;//方位角
     private float angle; //俯仰角
-    private float x, y, z;
-    private float[][] coordinateSet = new float[100][3]; //设置二维数组保存坐标数据
+    private double x, y, z;
+    //private double[][] coordinateSet = null; //设置二维数组保存坐标数据
     private SharedPreferences sp = null;
     private dynamicDrawing dynamicDrawing;//画图对象
+    private PlaneDrawing planeDrawing;
+    private Handler drawlineHandler;
+    private GLSurfaceView glView;
+    private List<Map<String,Object>> dataList = new ArrayList<>();
+    private List<Map<String,Object>> mlist = new ArrayList<>(); //用于保存所有的从wifi接受的点
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +75,13 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         setContentView(R.layout.sectionsurvey);
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
 
+        setCoordinateSet();
         inInt();
+        dataList = getPointData(mlist);
+        Log.d("dataList", String.valueOf(dataList));
+        planeDrawing =  new PlaneDrawing(drawlineHandler,this);
+        planeDrawing.getData(dataList);
+        glView.setRenderer(planeDrawing);
     }
 
     private void inInt() {
@@ -71,7 +93,8 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         Measurement = findViewById(R.id.measurement);
         reset = findViewById(R.id.reset);
         save = findViewById(R.id.Save);
-        dynamicDrawing = findViewById(R.id.drawingView);
+        //dynamicDrawing = findViewById(R.id.drawingView);
+        glView = (GLSurfaceView) findViewById(R.id.glView1);
 
         line_ranging.setOnClickListener(this);
         twopoint_ranging.setOnClickListener(this);
@@ -95,9 +118,12 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 finish();
                 break;
             case R.id.measurement:
-                //getPointsData();
                 //调用画图
-               // dynamicDrawing.setData(coordinateSet);
+//                dataList = getPointData(mlist);
+//                Log.d("dataList", String.valueOf(dataList));
+//                planeDrawing =  new PlaneDrawing(drawlineHandler,this);
+//                planeDrawing.getData(dataList);
+//                glView.setRenderer(planeDrawing);
                 break;
             case R.id.reset:
 
@@ -139,13 +165,60 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
             Azimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
             angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
             //根据距离和角度求出空间点的坐标
-            x = (float) (Rdistance * Math.cos(angle) * Math.sin(Azimuth));
-            y = (float) (Rdistance * Math.sin(angle));
-            z = (float) (Rdistance * Math.cos(angle) * Math.cos(Azimuth));
-            //将数据存入到数组中
-            coordinateSet[coordinateSet.length + 1][1] = x;
-            coordinateSet[coordinateSet.length + 1][2] = y;
-            coordinateSet[coordinateSet.length + 1][3] = z;
+            x = Rdistance * Math.cos(angle) * Math.sin(Azimuth);
+            y = Rdistance * Math.sin(angle);
+            z = Rdistance * Math.cos(angle) * Math.cos(Azimuth);
+            //将数据存入到list中
+            Map<String,Object> mmap = new HashMap<>();//保存wifi传递过来点的具体坐标
+            mmap.put("x",x);
+            mmap.put("y",y);
+            mmap.put("z",z);
+            mlist.add(mmap);
         }
     };
+
+    /**
+     * 用于测试的数据,向数组中添加数据
+     */
+    private void setCoordinateSet() {
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            Map<String,Object> mmap = new HashMap<>();//保存wifi传递过来点的具体坐标
+            for (int j = 0; j < 3; j++) {
+                if(j ==0){
+                    mmap.put("x",random.nextInt(10));
+                }else if(j ==1){
+                    mmap.put("y",random.nextInt(10));
+                }else mmap.put("z",random.nextInt(10));
+            }
+            mlist.add(mmap);
+        }
+        Log.i("mlist", String.valueOf(mlist));
+    }
+
+    /**
+     * 返回所有投影点，用List<Map<String,Object>>形式返回
+     * @param data
+     * @return
+     */
+    private List<Map<String,Object>> getPointData(List<Map<String,Object>> data){
+        List<Map<String,Object>> list = new ArrayList<>();
+        double[] datax = new double[data.size()];
+        double[] datay = new double[data.size()];
+        double[] dataz = new double[data.size()];
+        //得到对应的坐标的数组
+        for (int i= 0;i < data.size();i++){
+            datax[i] = Double.valueOf(data.get(i).get("x").toString()) ;
+            datay[i] = Double.valueOf(data.get(i).get("y").toString());
+            dataz[i] = Double.valueOf(data.get(i).get("z").toString());
+        }
+        //获取计算对象
+        planar_equation pe = new planar_equation();
+        //得到所有的投影点
+        list = pe.Get_equation(datax,datay,dataz);
+
+        Log.d("SecActivity-list", String.valueOf(list));
+        return list;
+    }
+
 }

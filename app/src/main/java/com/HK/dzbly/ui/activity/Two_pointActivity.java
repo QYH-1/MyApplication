@@ -43,9 +43,9 @@ import java.util.Date;
  */
 public class Two_pointActivity extends Activity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
     private Threedimensional_coordinates tdc;
-    Threedimensional_coordinates myRender;
-    FontRenderer fontRenderer;
-    NoRender noRender;
+    private Threedimensional_coordinates myRender;
+    private FontRenderer fontRenderer;
+    private NoRender noRender;
     private Handler drawlineHandler;
     private GLSurfaceView glView;
     private TextView line_ranging,section_ranging;//测距
@@ -71,8 +71,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private float Bx = 0.00000001f;
     private float By = 0.00000001f;
     private float Bz = 0.00000001f;
-    private float adistance; //A点距离
-    private float bdistance; //B点距离
     private float abdistance; //AB两点的距离
     private int STATE = 0;//用来判断当前锁定的状态
     private SharedPreferences sp = null;

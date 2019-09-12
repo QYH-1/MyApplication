@@ -28,7 +28,7 @@ public class NoRender implements Renderer {
     Handler handler,handler2;
     private Timer timer = new Timer();
     private TimerTask task;
-    private float x1 = 0f,y1 = 0f,z1 = 0f,x2 = 0f,y2 = 0f,z2 = 0f;
+    private float x1 = 0f,y1 = 0f,z1 = 0f;
     private final Context mContext;
 
     // 定义Open GL ES绘制所需要的Buffer对象
@@ -391,8 +391,5 @@ public class NoRender implements Renderer {
         this.x1 = x1;
         this.y1 = y1;
         this.z1 = z1;
-        this.x2 = x2;
-        this.y2 = y2;
-        this.z2 = z2;
     }
 }
