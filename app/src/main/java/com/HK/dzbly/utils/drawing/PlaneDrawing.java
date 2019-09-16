@@ -3,7 +3,6 @@ package com.HK.dzbly.utils.drawing;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +19,12 @@ import java.util.TimerTask;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+/**
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/9/16
+ * 描述：动态画断面测量的图形
+ * 修订历史：
+ */
 public class PlaneDrawing implements GLSurfaceView.Renderer {
     private float[] datax = new float[100];
     private float[] datay = new float[100];
@@ -30,8 +35,6 @@ public class PlaneDrawing implements GLSurfaceView.Renderer {
     private TimerTask task;
     private final Context mContext;
     private int length;
-    private int mWidth;
-    private int mHeight;
 
     // 定义Open GL ES绘制所需要的Buffer对象
     FloatBuffer lineVerticesBuffer;
@@ -279,30 +282,30 @@ public class PlaneDrawing implements GLSurfaceView.Renderer {
 
         // --------------------绘制X坐标---------------------
         //绘制x坐标
-        gl.glLineWidth(3.0f);//直线宽度
-        //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
-        // 设置顶点的颜色数据
-        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
-        gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
+//        gl.glLineWidth(3.0f);//直线宽度
+//        //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
+//        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
+//        // 设置顶点的颜色数据
+//        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
+//        gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
+//                GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
 
         // --------------------绘制Y坐标---------------------
         //绘制Y坐标
         //无需再设置点了，都是用的上面的数组中的
         // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferY);//Y
         // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
-        gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
+//        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
+//        gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
+//                GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
         // --------------------绘制Z坐标---------------------
         //绘制Z坐标
         //无需再设置点了，都是用的上面的数组中的
         // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferZ);//Y
         // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
-        gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
+//        gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
+//        gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
+//                GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
 
         // 绘制结束
         gl.glFinish();//2.3.3.6
@@ -349,7 +352,7 @@ public class PlaneDrawing implements GLSurfaceView.Renderer {
             } else if (i % 3 == 1) {
                 lineVertices1[i] = Float.valueOf(dataList.get(i / 3).get("yp").toString());
             } else
-               //lineVertices1[i] = Float.valueOf(dataList.get(i / 3).get("zp").toString());
+                //lineVertices1[i] = Float.valueOf(dataList.get(i / 3).get("zp").toString());
                 lineVertices1[i] = 0;
         }
         //将值传递给全局变量

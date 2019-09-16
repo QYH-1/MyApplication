@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 实现空间散点坐标到空间一个平面的坐标转换
- * 首先根据空间散点坐标拟合出一个平面，再将点投影到这个平面中去
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/9/16
+ * 描述：实现空间散点坐标到空间一个平面的坐标转换；首先根据空间散点坐标拟合出一个平面，再将点投影到这个平面中去
+ * 修订历史：
  */
 public class planar_equation {
     /**
@@ -119,13 +121,13 @@ public class planar_equation {
             listTemp.add(pMap);
         }
         Log.i("plan_equation-listTemp", String.valueOf(listTemp));
+
         //返回得到的投影面上的坐标
-        //坐标归一化
         Data_normalization dn = new Data_normalization();
         double[] dx = new double[datax.length];
         double[] dy = new double[datax.length];
         double[] dz = new double[datax.length];
-        //得到x,y,z的坐标数组
+        //得到在投影面上的x,y,z的坐标数组
         for (int i = 0; i < datax.length; i++) {
             dx[i] = Double.parseDouble(listTemp.get(i).get("xp").toString());
         }
@@ -135,11 +137,26 @@ public class planar_equation {
         for (int i = 0; i < dataz.length; i++) {
             dz[i] = Double.parseDouble(listTemp.get(i).get("zp").toString());
         }
+        //通过凸包算法得到在凸包上的点
+        List<Map<String, Object>> pointList = new ArrayList<>();
+        GiftWrap m = new GiftWrap();
+        pointList = m.go(dx, dy, dz);
+        Log.i("pointList", String.valueOf(pointList));
+        //定义数组接受凸包算法得到的坐标的集合
+        double[] detox = new double[pointList.size()]; //x
+        double[] decoy = new double[pointList.size()]; //y
+        double[] deco = new double[pointList.size()]; //z
 
-        double[] dxTemp = dn.normalization(dx);
-        double[] dyTemp = dn.normalization(dy);
-        double[] dzTemp = dn.normalization(dz);
-        for (int i = 0; i < datax.length; i++) {
+        for (int i = 0; i < pointList.size(); i++) {
+            detox[i] = Double.valueOf(pointList.get(i).get("x").toString());
+            decoy[i] = Double.valueOf(pointList.get(i).get("y").toString());
+            deco[i] = Double.valueOf(pointList.get(i).get("z").toString());
+        }
+        //将得到的凸包坐标进行归一化
+        double[] dxTemp = dn.normalization(detox);
+        double[] dyTemp = dn.normalization(decoy);
+        double[] dzTemp = dn.normalization(deco);
+        for (int i = 0; i < pointList.size(); i++) {
             Map<String, Object> pMap = new HashMap<String, Object>();
             //将数据存储在list中
             pMap.put("xp", dxTemp[i]);
@@ -150,5 +167,4 @@ public class planar_equation {
         Log.i("planar_equation-list", String.valueOf(list));
         return list;
     }
-
 }

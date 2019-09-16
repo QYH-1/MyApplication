@@ -140,7 +140,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void shutDowm() {
-        Intent intent = new Intent(MainActivity.this, SectionsurveyActivity.class);
+        Intent intent = new Intent(MainActivity.this, DatadisplayActivity.class);
         //  Intent intent = new Intent(MainActivity.this,wifi.class);
         startActivity(intent);
     }

@@ -147,9 +147,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.reset :
-//                SharedPreferences.Editor editor1 = sp.edit();
-//                editor1.putInt("STATE",1);
-//                editor1.commit();
+                SharedPreferences.Editor editor1 = sp.edit();
+                editor1.putInt("STATE",1);
+                editor1.commit();
                 Intent intent1 = new Intent(this,Two_pointActivity.class);
                 startActivity(intent1);
                 finish();

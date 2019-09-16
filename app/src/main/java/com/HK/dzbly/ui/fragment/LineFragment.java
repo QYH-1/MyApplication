@@ -16,8 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.Laser_rangingActivity;
@@ -50,22 +52,21 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private float Horizontaldistance;//接收wifi传递的平距
     private RadioButton nIncluding_length_length; //不包含仪器长度
     private RadioButton Including_length; //包含仪器长度
+    private RadioGroup Initial_length;
     private TextView reset;//重置
     private TextView lock;//锁定
     private TextView save; //保存
-    private RadioGroup Initial_length;
     private ConnectThread connectThread;//wifi连接
     private NetConnection netConnection;//wifi连接检查
     private Concerto concerto;//wifi的数据处理
     private Socket socket;
-    SharedPreferences sp = null;
     private String Objectdistance;//目标距离
-    //public static String DATA_TABLE = "DATA";//照片和视频数据存储的表
     private static final String DATABASE_NAME = "cqhk.db"; //数据库名称
     private int num = 1; //文件出现次数
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
     String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+    SharedPreferences sp = null;
 
 
     public LineFragment() {
@@ -100,7 +101,6 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
         reset.setOnClickListener(this);
         lock.setOnClickListener(this);
         save.setOnClickListener(this);
-        // line_ranging.setTextColor(getActivity().getResources().getColor(R.color.red));
     }
 
     /**
@@ -208,23 +208,23 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                         //创建一个DatabaseHelper对象
                         DBhelper dBhelper = new DBhelper(getActivity(), "cqhk.db");
                         //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
-                        String sqlNumber = sp.getString("sqlNumber","0");
-                        Log.d("sqlNumber",sqlNumber);
-                        if(sqlNumber.equals("0")){
+                        String sqlNumber = sp.getString("sqlNumber", "0");
+                        Log.d("sqlNumber", sqlNumber);
+                        if (sqlNumber.equals("0")) {
                             SQLiteDatabase db3 = dBhelper.getWritableDatabase();
-                            editor.putString("sqlNumber","1");
-                        }else{
-                            editor.putString("sqlNumber","1");
+                            editor.putString("sqlNumber", "1");
+                        } else {
+                            editor.putString("sqlNumber", "1");
                             editor.commit();
                         }
                         //将数据存储到数据库中
                         ContentValues cv = new ContentValues();
-                        cv.put("name",name);
-                        cv.put("val","");
-                        cv.put("rollAngle","");
-                        cv.put("elevation","");
-                        cv.put("type","line");
-                        cv.put("result","111");
+                        cv.put("name", name);
+                        cv.put("val", "");
+                        cv.put("rollAngle", "");
+                        cv.put("elevation", "");
+                        cv.put("type", "line");
+                        cv.put("result", "111");
                         dBhelper.Insert(getContext(), "DZBLY", cv);
 
                         Log.i("----", "---------");

@@ -3,8 +3,12 @@ package com.HK.dzbly.utils.auxiliary;
 import java.text.DecimalFormat;
 
 /**
- * 通过矩阵计算得到方程式的系数
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/9/16
+ * 描述：通过矩阵计算得到方程式的系数
+ * 修订历史：
  */
+
 public class CalculationEquations {
     static DecimalFormat df = new DecimalFormat("0.##");
 

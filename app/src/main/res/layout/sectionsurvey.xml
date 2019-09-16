@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -105,11 +104,21 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <android.opengl.GLSurfaceView
-            android:id="@+id/glView1"
+    <!--    <android.opengl.GLSurfaceView-->
+    <!--            android:id="@+id/glView1"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="0dp"-->
+    <!--            android:layout_weight="12" />-->
+    <com.HK.dzbly.utils.drawing.dynamicDrawing
+            android:id="@+id/drawingView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="12" />
+            android:layout_weight="11"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginRight="30dp"/>
+    />
 
     <HorizontalScrollView
             android:layout_width="wrap_content"

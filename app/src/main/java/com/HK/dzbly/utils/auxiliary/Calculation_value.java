@@ -1,7 +1,10 @@
 package com.HK.dzbly.utils.auxiliary;
 
 /**
- * 实现具体的计算方法，得到对应的数据
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/9/16
+ * 描述：实现具体的计算方法，得到对应的数据
+ * 修订历史：
  */
 public class Calculation_value implements Calculation {
     @Override
