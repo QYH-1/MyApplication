@@ -3,7 +3,7 @@ package com.HK.dzbly.model;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/9/16
- * 描述：
+ * 描述： 坐标点
  * 修订历史：
  */
 public class Point implements Comparable {

@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -32,17 +29,14 @@ import androidx.annotation.NonNull;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
-import com.HK.dzbly.utils.auxiliary.Data_normalization;
 import com.HK.dzbly.utils.auxiliary.Screenshot;
 import com.HK.dzbly.utils.auxiliary.planar_equation;
-import com.HK.dzbly.utils.drawing.PlaneDrawing;
 import com.HK.dzbly.utils.drawing.dynamicDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -78,14 +72,12 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private double x, y, z;
     private SharedPreferences sp = null;
     private dynamicDrawing dynamicDrawing;  //画图对象
-    // private PlaneDrawing planeDrawing;
     private Handler drawlineHandler;
-    private GLSurfaceView glView;
     private List<Map<String, Object>> dataList = new ArrayList<>();
     private List<Map<String, Object>> mlist = new ArrayList<>(); //用于保存所有的从wifi接受的点
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath()+"/CameraDemo"+"/capture";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/capture";  //文件保存的目录
     private int num = 1; //文件出现次数
     private Context context;
     private Screenshot screenshot;
@@ -112,7 +104,6 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         reset = findViewById(R.id.reset);
         save = findViewById(R.id.Save);
         dynamicDrawing = findViewById(R.id.drawingView);
-        //glView = (GLSurfaceView) findViewById(R.id.glView1);
 
         nIncluding_length_length.setChecked(true);
         line_ranging.setOnClickListener(this);
@@ -155,7 +146,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 dynamicDrawing.setData(dataList);
                 break;
             case R.id.reset:
-                Intent intent2 = new Intent(SectionsurveyActivity.this,SectionsurveyActivity.class);
+                Intent intent2 = new Intent(SectionsurveyActivity.this, SectionsurveyActivity.class);
                 startActivity(intent2);
                 finish();
             case R.id.Save:
@@ -253,8 +244,8 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     }
 
     //保存数据
-    private void showDialog(){
-        final View view = LayoutInflater.from(this).inflate(R.layout.layout,null,false);
+    private void showDialog() {
+        final View view = LayoutInflater.from(this).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
 
@@ -275,33 +266,33 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                         try {
                             // 通过bitmap保存当前截图
                             screenshot = new Screenshot();
-                            Bitmap bd=screenshot.myShot(SectionsurveyActivity.this);
-                            screenshot.saveToSD(bd,path,name);
+                            Bitmap bd = screenshot.myShot(SectionsurveyActivity.this);
+                            screenshot.saveToSD(bd, path, name);
                             //将数据存入数据库
                             DBhelper dbHelper = new DBhelper(SectionsurveyActivity.this, "cqhk.db");
                             SharedPreferences.Editor editor = sp.edit();
                             //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
-                            String sqlNumber = sp.getString("sqlNumber","0");
-                            Log.d("sqlNumber",sqlNumber);
-                            if(sqlNumber.equals("0")){
+                            String sqlNumber = sp.getString("sqlNumber", "0");
+                            Log.d("sqlNumber", sqlNumber);
+                            if (sqlNumber.equals("0")) {
                                 SQLiteDatabase db3 = dbHelper.getWritableDatabase();
-                                editor.putString("sqlNumber","1");
-                            }else{
-                                editor.putString("sqlNumber","1");
+                                editor.putString("sqlNumber", "1");
+                            } else {
+                                editor.putString("sqlNumber", "1");
                                 editor.commit();
                             }
                             if (!dbHelper.IsTableExist("File")) {
                                 dbHelper.CreateTable(SectionsurveyActivity.this, "File");
                             }
                             ContentValues cv = new ContentValues();
-                            cv.put("name", name+".jpg");
+                            cv.put("name", name + ".jpg");
                             cv.put("type", "jpg");
                             dbHelper.Insert(SectionsurveyActivity.this, "File", cv);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }).setNegativeButton ("取消", null)
+                }).setNegativeButton("取消", null)
                 .create()
                 .show();
     }

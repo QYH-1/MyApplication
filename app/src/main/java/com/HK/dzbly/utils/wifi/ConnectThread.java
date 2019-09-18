@@ -1,5 +1,6 @@
 package com.HK.dzbly.utils.wifi;
 
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,42 +16,39 @@ import java.net.Socket;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/12$
- * 描述：连接线程
+ * 描述：wifi连接线程
  * 修订历史：
  */
 public class ConnectThread extends Thread {
 
-    private Socket socket;
-    private Handler handler = null;
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private Socket socket;   //通信socket
+    private Handler handler;    //用来更新UI等(发送信息给主线程)
+    private OutputStream outputStream;  //数据输出流
+    //如果WIFI没有打开，则打开WIFI
+    private static final int WIFI_CONNECT_TIMEOUT = 20; //连接WIFI的超时时间
 
     private static String hexString = "0123456789ABCDEF";
     private String datas = null;
     private StringBuilder stringBuilder = new StringBuilder();
-    private int datalength; //数据长度
     private byte msg = (byte) 0x01;
     private String sIP = "10.10.100.254";
     private String sPort = "8899"; //找到端口号8899
     private int port = Integer.parseInt(sPort); //String型转换为Int型
 
     public ConnectThread(Socket socket, Handler handler) {
-
         Log.w("AAA", "ConnectThread");
         this.socket = socket;
         this.handler = handler;
 
     }
+
     @Override
     public void run() {
-        //stringBuilder = null;
-        //datas = null;
         Log.d("port", String.valueOf(port));
         Log.d("连接地址", "IP:" + sIP + ":" + port);
         try {
+            //创建与热点通信的socket
             socket = new Socket(sIP, port);
-            //stringBuilder = null;
-            //datas = null;
             try {
                 //向服务器端发送消息
                 outputStream = socket.getOutputStream();
@@ -60,19 +58,14 @@ public class ConnectThread extends Thread {
 
                 InetAddress address = InetAddress.getLocalHost();
                 Log.d("客户端的IP地址", String.valueOf(address));
-                // byte[] buffer = new byte[1024];
-                //int bytes = 0;
                 while (true) {
                     DataInputStream dis = new DataInputStream(socket.getInputStream());
-                    //byte data = dis.readByte();
                     try {
+                        //接受wifi的数据
                         int data = dis.read();
-
-                        // Log.d("bytes", String.valueOf(bytes));
-                        // if (bytes > 0) {
                         Log.d("data", String.valueOf(data));
+                        //将十六进制的数转换为二进制
                         String n = Integer.toHexString(data);
-
                         Log.d("n", String.valueOf(n));
                         //拼接字符串
                         if (n.equals("0")) {
@@ -89,18 +82,17 @@ public class ConnectThread extends Thread {
                         }
                         Log.d("stringBuilder", String.valueOf(stringBuilder));
                         datas = String.valueOf(stringBuilder);
-                        // bytes+=2;
                         Log.d("datas", String.valueOf(datas));
-
-                        while (datas.length()%24 ==0 && datas.length() != 0) {
+                        //当接受的wifi的数据为24位的整数倍时，通过handler向界面传递数据
+                        while (datas.length() % 24 == 0 && datas.length() != 0) {
                             Message msg = Message.obtain();
                             msg.what = 1;
                             Bundle bundle = new Bundle();
                             bundle.putString("msg", datas);
                             msg.setData(bundle);
                             handler.sendMessage(msg);
-                            // if (data != null) {
                             Log.w("AAA-11", "c:" + datas);
+                            //当数据传递后将接受变量置为空，方便下次接受
                             datas = null;
                             stringBuilder = null;
                             break;
@@ -117,5 +109,4 @@ public class ConnectThread extends Thread {
             e.printStackTrace();
         }
     }
-
 }

@@ -1,162 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/colorwrite"
-              android:orientation="vertical"
-              android:gravity="center"
->
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorwrite"
+        android:gravity="center"
+        android:orientation="vertical">
+
     <LinearLayout
-            android:layout_marginTop="200dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="200dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
             android:gravity="center_horizontal"
-    >
+            android:orientation="horizontal">
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/setting"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/sz1"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/management" />
+
             <TextView
-                    android:layout_marginTop="6dp"
                     android:id="@+id/setting1"
-                    android:clickable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="设    置"
-            />
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:text="@string/SETING" />
         </LinearLayout>
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/camera"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/camara1"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/scanners_cameras" />
+
             <TextView
-                    android:layout_marginTop="6dp"
                     android:id="@+id/camera1"
-                    android:clickable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="照 相 机"
-            />
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:text="@string/camera" />
         </LinearLayout>
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/tools"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/ic_business_center_black_24dp"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/laser2" />
+
             <TextView
-                    android:layout_marginTop="6dp"
                     android:id="@+id/jgcj"
-                    android:clickable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="激光测距"
-            />
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:text="@string/Laser_ranging" />
         </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
-    >
+            android:orientation="horizontal">
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/data-management"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/we2"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/we2" />
+
             <TextView
-                    android:layout_marginTop="6dp"
-                    android:id="@+id/data-management1"
-                    android:clickable="true"
+                    android:id="@+id/data_management1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="文件管理"
-            />
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:text="@string/File_management" />
         </LinearLayout>
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/dzcsy"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/ic_camera_alt_black_24dp"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/control_panel" />
+
             <TextView
                     android:id="@+id/dzcsy1"
-                    android:clickable="true"
-                    android:layout_marginTop="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
 
-                    android:text="地质编录"
-            />
+                    android:text="@string/geological_record" />
         </LinearLayout>
+
         <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
             <ImageButton
                     android:id="@+id/shutdown"
                     android:layout_width="wrap_content"
                     android:layout_height="51dp"
-                    android:src="@drawable/ic_power_settings_new_black_24dp"
                     android:layout_weight="1"
                     android:background="#00000000"
-            />
+                    android:src="@drawable/control" />
+
             <TextView
-                    android:layout_marginTop="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="测试"
-            />
+                    android:layout_marginTop="6dp"
+                    android:text="@string/View_data" />
         </LinearLayout>
     </LinearLayout>
 

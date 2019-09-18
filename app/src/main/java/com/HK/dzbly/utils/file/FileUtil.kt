@@ -10,11 +10,12 @@ import java.util.*
  * 版本：1.0
  * 创建日期：2019/7/31$
  * 描述：
- * 修订历史：
+ * 修订历史：创建文件夹，
  *
  */
 object FileUtil {
-    private val rootFolderPath = Environment.getExternalStorageDirectory().absolutePath + File.separator + "CameraDemo"
+    private val rootFolderPath =
+        Environment.getExternalStorageDirectory().absolutePath + File.separator + "CameraDemo"
 
     fun createImageFile(isCrop: Boolean = false): File? {
         return try {

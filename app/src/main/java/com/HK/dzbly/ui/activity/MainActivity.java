@@ -11,13 +11,19 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/7/24$
+ * 描述：主界面
+ * 修订历史：
+ */
 public class MainActivity extends BaseActivity {
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt, setting, data, camera, tools, dzcsy, shutdown;
@@ -184,6 +190,7 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
     //遍历文件
     public List<String> getFilesAllName(String path) {
         File file = new File(path);

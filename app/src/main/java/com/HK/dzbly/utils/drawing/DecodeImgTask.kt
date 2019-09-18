@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference
  * @Author：qyh
  * 版本：1.0
  * 创建日期：2019/7/31$
- * 描述：
+ * 描述：在现实缩略图时的工具类
  * 修订历史：
  *
  */
@@ -36,4 +36,4 @@ class DecodeImgTask(imageView: ImageView) : AsyncTask<String, Int, Bitmap?>() {
         }
         super.onPostExecute(bitmap)
     }
-    }
+}

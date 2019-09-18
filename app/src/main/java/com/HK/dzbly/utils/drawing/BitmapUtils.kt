@@ -14,7 +14,7 @@ import kotlin.concurrent.thread
  * @Author：qyh
  * 版本：1.0
  * 创建日期：2019/7/31$
- * 描述：
+ * 描述：相机实现工具
  * 修订历史：
  *
  */
@@ -62,7 +62,12 @@ object BitmapUtils {
         return BitmapFactory.decodeFile(path, options)
     }
 
-    fun decodeBitmapFromResource(res: Resources, resId: Int, reqWidth: Int, reqHeight: Int): Bitmap {
+    fun decodeBitmapFromResource(
+        res: Resources,
+        resId: Int,
+        reqWidth: Int,
+        reqHeight: Int
+    ): Bitmap {
         var options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeResource(res, resId, options)
@@ -73,7 +78,11 @@ object BitmapUtils {
         return BitmapFactory.decodeResource(res, resId, options)
     }
 
-    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int
+    ): Int {
         val rawWidth = options.outWidth
         val rawHeight = options.outHeight
         var inSampleSize = 1
@@ -89,7 +98,12 @@ object BitmapUtils {
         return inSampleSize
     }
 
-    fun savePic(data: ByteArray?, isMirror: Boolean = false, onSuccess: (savedPath: String, time: String) -> Unit, onFailed: (msg: String) -> Unit) {
+    fun savePic(
+        data: ByteArray?,
+        isMirror: Boolean = false,
+        onSuccess: (savedPath: String, time: String) -> Unit,
+        onFailed: (msg: String) -> Unit
+    ) {
         thread {
             try {
                 val temp = System.currentTimeMillis()
@@ -106,7 +120,10 @@ object BitmapUtils {
 
                     onSuccess("${picFile.absolutePath}", "${System.currentTimeMillis() - temp}")
 
-                    Log.d("11","图片已保存! 耗时：${System.currentTimeMillis() - temp}    路径：  ${picFile.absolutePath}")
+                    Log.d(
+                        "11",
+                        "图片已保存! 耗时：${System.currentTimeMillis() - temp}    路径：  ${picFile.absolutePath}"
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

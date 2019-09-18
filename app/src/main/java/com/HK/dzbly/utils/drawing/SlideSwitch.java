@@ -43,28 +43,20 @@ public class SlideSwitch extends View {
     public boolean onTouchEvent(MotionEvent event) {
         // TODO Auto-generated method stub
         curX = event.getX();
-        if(event.getAction() == MotionEvent.ACTION_UP)
-        {
-            if(curX > viewWidth / 4)
-            {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (curX > viewWidth / 4) {
                 curX = lineEnd;
-                if(false == isOn)
-                {
+                if (false == isOn) {
                     //只有状态发生改变才调用回调函数， 下同
-                    if(null != onStateChangedListener)
-                    {
+                    if (null != onStateChangedListener) {
                         onStateChangedListener.onStateChanged(true);
                     }
                     isOn = true;
                 }
-            }
-            else
-            {
+            } else {
                 curX = lineStart;
-                if(true == isOn)
-                {
-                    if(null != onStateChangedListener)
-                    {
+                if (true == isOn) {
+                    if (null != onStateChangedListener) {
                         onStateChangedListener.onStateChanged(false);
                     }
                     isOn = false;
@@ -97,8 +89,8 @@ public class SlideSwitch extends View {
         super.onDraw(canvas);
 
         /*限制滑动范围*/
-        curX = curX > lineEnd?lineEnd:curX;
-        curX = curX < lineStart?lineStart:curX;
+        curX = curX > lineEnd ? lineEnd : curX;
+        curX = curX < lineStart ? lineStart : curX;
 
         /*划线*/
         mPaint.setStyle(Paint.Style.STROKE);
@@ -119,18 +111,17 @@ public class SlideSwitch extends View {
         canvas.drawCircle(lineStart, centerY, lineWidth / 2, mPaint);
         /*圆形滑块*/
         mPaint.setColor(Color.LTGRAY);
-        canvas.drawCircle(curX, centerY, radius , mPaint);
+        canvas.drawCircle(curX, centerY, radius, mPaint);
 
     }
+
     /*设置开关状态改变监听器*/
-    public void setOnStateChangedListener(OnStateChangedListener o)
-    {
+    public void setOnStateChangedListener(OnStateChangedListener o) {
         this.onStateChangedListener = o;
     }
 
     /*内部接口，开关状态改变监听器*/
-    public interface OnStateChangedListener
-    {
+    public interface OnStateChangedListener {
         public void onStateChanged(boolean state);
     }
 }

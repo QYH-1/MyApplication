@@ -17,18 +17,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-
 /**
  * @Author：qyh
  * 版本：1.0
  * 创建日期：2019/8/1$
- * 描述：工具类
+ * 描述：文件管理器工具类
  * 修订历史：
  *
  */
 class FileUtils {
     var pathFile = ""
     var adapter: FileAdapter? = null
+
     companion object {
         lateinit var nameData: String
         var KEY = ""//全局搜索的关键
@@ -55,10 +55,10 @@ class FileUtils {
             var files: Array<File>? = null// 声明了一个文件对象数组
             if (pfile.exists()) {// 判断路径是否存在
                 files = pfile.listFiles()// 该文件对象下所属的所有文件和文件夹列表
-            }else{//如果没有这个文件目录。那么这里去创建
+            } else {//如果没有这个文件目录。那么这里去创建
                 pfile.mkdirs()
-                Log.e("name",pfile.absolutePath)
-                files=pfile.listFiles()
+                Log.e("name", pfile.absolutePath)
+                files = pfile.listFiles()
             }
 
             if (files != null && files.size > 0) {// 非空验证
@@ -68,7 +68,7 @@ class FileUtils {
                         continue// 跳过隐藏文件
                     }
                     if (file.isDirectory// 文件夹
-                            && file.canRead()//是否可读
+                        && file.canRead()//是否可读
                     ) {
                         file.isHidden//  是否是隐藏文件
                         // 获取文件夹目录结构
@@ -80,7 +80,7 @@ class FileUtils {
                     } else if (file.isFile) {// 文件
                         Log.i("spl", file.name)
                         nameData = file.name
-                        Log.i("nameData",nameData)
+                        Log.i("nameData", nameData)
                         val ext = getFileEXT(file.name)
                         Log.i("spl", "ext=$ext")
 
@@ -112,6 +112,7 @@ class FileUtils {
         fun getnameData(): String {
             return nameData
         }
+
         /**
          * 格式转换应用大小 单位"B,KB,MB,GB"
          */
@@ -225,7 +226,8 @@ class FileUtils {
             } else if (end == "rar") {
                 id = com.HK.dzbly.R.drawable.rar
             } else if (end == "txt" || end == "dat" || end == "ini"
-                    || end == "java") {
+                || end == "java"
+            ) {
                 id = com.HK.dzbly.R.drawable.txt
             } else if (end == "vob") {
                 id = com.HK.dzbly.R.drawable.vob
@@ -269,54 +271,71 @@ class FileUtils {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             //取得文件名
             val fileName = aFile.name
-            Log.d("打开文件名:",fileName)
+            Log.d("打开文件名:", fileName)
             val end = getFileEXT(fileName).toLowerCase()
-            Log.d("打开文件名后缀:",end)
-            Log.d("打开文件路劲:",aFile.toString())
+            Log.d("打开文件名后缀:", end)
+            Log.d("打开文件路劲:", aFile.toString())
             if (aFile.exists()) {
                 // 根据不同的文件类型来打开文件
                 if (checkEndsInArray(end, arrayOf("png", "gif", "jpg", "bmp"))) {
                     // 图片
-                    Log.d("是否找到后缀",(checkEndsInArray(end, arrayOf("png", "gif", "jpg", "bmp"))).toString())
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
-                    Log.d("uriSavedImage",uriSavedImage.toString())
+                    Log.d(
+                        "是否找到后缀",
+                        (checkEndsInArray(end, arrayOf("png", "gif", "jpg", "bmp"))).toString()
+                    )
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    Log.d("uriSavedImage", uriSavedImage.toString())
                     intent.setDataAndType(uriSavedImage, "image/*")//MIME TYPE
 
                 } else if (checkEndsInArray(end, arrayOf("apk"))) {
                     // apk
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/vnd.android.package-archive")
                 } else if (checkEndsInArray(end, arrayOf("mp3", "amr", "ogg", "mid", "wav"))) {
                     // audio
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "audio/*")
                 } else if (checkEndsInArray(end, arrayOf("mp4", "3gp", "mpeg", "mov", "flv"))) {
                     // video
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "video/*")
-                } else if (checkEndsInArray(end, arrayOf("txt", "ini", "log", "java", "xml", "html"))) {
+                } else if (checkEndsInArray(
+                        end,
+                        arrayOf("txt", "ini", "log", "java", "xml", "html")
+                    )
+                ) {
                     // text
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "text/*")
                 } else if (checkEndsInArray(end, arrayOf("doc", "docx"))) {
                     // word
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/msword")
                 } else if (checkEndsInArray(end, arrayOf("xls", "xlsx"))) {
                     // excel
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/vnd.ms-excel")
                 } else if (checkEndsInArray(end, arrayOf("ppt", "pptx"))) {
                     // ppt
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/vnd.ms-powerpoint")
                 } else if (checkEndsInArray(end, arrayOf("chm"))) {
                     // chm
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/x-chm")
                 } else {
                     // 其他
-                    val uriSavedImage = FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
+                    val uriSavedImage =
+                        FileProvider.getUriForFile(context, "com.cs.dzl.fileProvider", aFile)
                     intent.setDataAndType(uriSavedImage, "application/$end")
                 }
                 try {

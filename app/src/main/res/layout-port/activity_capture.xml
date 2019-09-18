@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:scrollbars="vertical"
-            tools:ignore="MissingDefaultResource">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:scrollbars="vertical"
+        tools:ignore="MissingDefaultResource">
 
 
     <LinearLayout
@@ -13,44 +13,47 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical">
+
         <Button
                 android:id="@+id/btnCaptureRaw"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_bottom_camera_bg"
-                android:text="拍照" />
+                android:text="@string/Photograph" />
 
         <Button
                 android:id="@+id/btnCaptureAndClip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_bottom_camera_bg"
                 android:layout_marginTop="10dp"
-                android:text="拍照+裁切" />
+                android:background="@drawable/btn_bottom_camera_bg"
+                android:text="@string/Photograph_cut" />
 
         <Button
                 android:id="@+id/btnAlbumAndClip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_bottom_camera_bg"
                 android:layout_marginTop="10dp"
-                android:text="打开相册" />
+                android:background="@drawable/btn_bottom_camera_bg"
+                android:text="@string/Open_photo_album" />
+
         <Button
                 android:id="@+id/btnCaptureVideo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_bottom_camera_bg"
                 android:layout_marginTop="10dp"
-                android:text="录视频" />
+                android:background="@drawable/btn_bottom_camera_bg"
+                android:text="@string/Record_video" />
 
         <ImageView
                 android:id="@+id/ivResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
                 android:layout_marginTop="40dp"
+                android:layout_marginBottom="30dp"
                 android:scaleType="center" />
+
         <VideoView
                 android:id="@+id/videoView"
                 android:layout_width="match_parent"
@@ -58,13 +61,14 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="30dp"
                 android:visibility="gone" />
+
         <Button
                 android:id="@+id/btnCapturesave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_bottom_camera_bg"
                 android:layout_marginBottom="10dp"
-                android:text="保  存" />
+                android:background="@drawable/btn_bottom_camera_bg"
+                android:text="@string/Save" />
     </LinearLayout>
 
 

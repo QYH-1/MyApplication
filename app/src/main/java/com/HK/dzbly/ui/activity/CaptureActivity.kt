@@ -48,23 +48,26 @@ class CaptureActivity : Activity() {
         const val REQUEST_CODE_CAPTURE_CROP = 4
         const val REQUEST_CODE_ALBUM = 5
         const val REQUEST_CODE_VIDEO = 6
-        var  type = 0
+        var type = 0
         var imgUri: Uri? = null
         var imageFile: File? = null
         var imageCropFile: File? = null
         var vidoFile: File? = null
         var vidoUri: Uri? = null
         internal var sp: SharedPreferences? = null  //存储对象
-        internal lateinit var imageOldPath : String //当前文件地址
-        internal lateinit var imageNewPath : String //新的文件地址
-        internal lateinit var videoOldPath : String //当前文件地址
-        internal lateinit var videoNewPath : String //新的文件地址
+        internal lateinit var imageOldPath: String //当前文件地址
+        internal lateinit var imageNewPath: String //新的文件地址
+        internal lateinit var videoOldPath: String //当前文件地址
+        internal lateinit var videoNewPath: String //新的文件地址
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)//隐藏标题栏
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)//隐藏状态栏
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )//隐藏状态栏
         setContentView(com.HK.dzbly.R.layout.activity_capture)
         sp = PreferenceManager.getDefaultSharedPreferences(this)//获取了SharePreferences对象
         btnCaptureRaw.setOnClickListener { gotoCaptureRaw() }        //拍照(返回原始图)
@@ -92,14 +95,14 @@ class CaptureActivity : Activity() {
             .setPositiveButton("确定") { dialogInterface, i ->
                 val text = view.findViewById<EditText>(R.id.name1)
                 val name = text.text.toString()
-                if(type ==1){
+                if (type == 1) {
                     imageOldPath = imageFile.toString()
                     var newImageFile = imageOldPath.substring(0, imageOldPath.indexOf("I"))
-                    imageNewPath = newImageFile+name+".jpg"
-                    val imageName = name+".jpg"
+                    imageNewPath = newImageFile + name + ".jpg"
+                    val imageName = name + ".jpg"
 
                     val file1 = File(imageNewPath)
-                    if(file1.exists()){
+                    if (file1.exists()) {
                         Toast.makeText(this, "该名称已存在，请重新输入", Toast.LENGTH_SHORT).show()
                     }
                     //将数据存入数据库
@@ -125,11 +128,11 @@ class CaptureActivity : Activity() {
 
                     var file = File(imageOldPath)
                     file.renameTo(File(imageNewPath))
-                }else if (type == 2){
+                } else if (type == 2) {
                     videoOldPath = vidoFile.toString()
                     var newVideoFile = videoOldPath.substring(0, videoOldPath.indexOf("V"))
-                    videoNewPath = newVideoFile +name+".mp4"
-                    var videoName = name+".mp4"
+                    videoNewPath = newVideoFile + name + ".mp4"
+                    var videoName = name + ".mp4"
                     //将数据存入数据库
                     val dbHelper = DBhelper(this, "cqhk.db")
                     val editor = sp?.edit()
@@ -155,13 +158,12 @@ class CaptureActivity : Activity() {
                 }
 
 
-
-
             }.setNegativeButton("取消", null)
             .create()
             .show()
 
     }
+
     /**
      * 拍照(返回原始图)
      */
@@ -252,7 +254,10 @@ class CaptureActivity : Activity() {
 
     //打开系统相册
     private fun gotoGallery() {
-        var intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        var intent = Intent(
+            Intent.ACTION_PICK,
+            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
         startActivityForResult(intent, REQUEST_CODE_ALBUM)
     }
 
@@ -292,7 +297,11 @@ class CaptureActivity : Activity() {
 
                 REQUEST_CODE_CAPTURE -> { //拍照成功后，裁剪
                     val sourceUri =
-                        FileProvider.getUriForFile(this, AUTHORITY, imageFile!!) //通过FileProvider创建一个content类型的Uri
+                        FileProvider.getUriForFile(
+                            this,
+                            AUTHORITY,
+                            imageFile!!
+                        ) //通过FileProvider创建一个content类型的Uri
                     gotoCrop(sourceUri)
                 }
 

@@ -1,32 +1,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              tools:ignore="MissingDefaultResource"
-              android:orientation="vertical">
-        <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="12">
+
+        <com.HK.dzbly.utils.drawing.Drawtriangle
+                android:id="@+id/drawtriangle"
                 android:layout_width="wrap_content"
-                android:layout_weight="12"
-                android:layout_height="0dp">
-            <com.HK.dzbly.utils.drawing.Drawtriangle
-                    android:id="@+id/drawtriangle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:hardwareAccelerated="false"
-            />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:hardwareAccelerated="false" />
+    </LinearLayout>
+
     <HorizontalScrollView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:scrollbars="none"
-    >
+            android:scrollbars="none">
+
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
                 android:background="@drawable/boder"
-        >
+                android:orientation="horizontal">
+
             <RadioGroup
                     android:id="@+id/Initial_length"
                     android:layout_width="wrap_content"
@@ -34,49 +36,49 @@
                     android:background="@drawable/boder"
                     android:gravity="center"
                     android:orientation="horizontal">
+
                 <RadioButton
                         android:id="@+id/nIncluding_length_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="不含仪器长度"
-                />
+                        android:text="@string/Doesnot_include_instrument_length" />
+
                 <RadioButton
                         android:id="@+id/Including_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="含仪器长度  "
-                />
+                        android:text="@string/include_instrument_length" />
             </RadioGroup>
+
             <TextView
                     android:id="@+id/reset"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text=" 重 置 "
-                    android:textColor="@color/black"
-                    android:clickable="true"
                     android:background="@drawable/boder"
-            />
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/reset"
+                    android:textColor="@color/black" />
+
             <TextView
                     android:id="@+id/lock"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:clickable="true"
-                    android:text=" 锁 定 "
-                    android:textColor="@color/black"
                     android:background="@drawable/boder"
-            />
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/lock"
+                    android:textColor="@color/black" />
+
             <TextView
                     android:id="@+id/Save"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:clickable="true"
                     android:background="@drawable/boder"
-                    android:textColor="@color/black"
-                    android:text=" 保 存 "
-            />
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/Save"
+                    android:textColor="@color/black" />
         </LinearLayout>
     </HorizontalScrollView>
 </LinearLayout>

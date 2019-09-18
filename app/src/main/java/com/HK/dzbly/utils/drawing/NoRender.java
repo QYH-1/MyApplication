@@ -10,6 +10,7 @@ import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -23,12 +24,12 @@ import java.util.TimerTask;
  * 修订历史：
  */
 public class NoRender implements Renderer {
-    float x=-0.5f,y=-0.5f,z=-0.5f;
-    private float r=0;
-    Handler handler,handler2;
+    float x = -0.5f, y = -0.5f, z = -0.5f;
+    private float r = 0;
+    Handler handler, handler2;
     private Timer timer = new Timer();
     private TimerTask task;
-    private float x1 = 0f,y1 = 0f,z1 = 0f;
+    private float x1 = 0f, y1 = 0f, z1 = 0f;
     private final Context mContext;
 
     // 定义Open GL ES绘制所需要的Buffer对象
@@ -44,12 +45,12 @@ public class NoRender implements Renderer {
     float[] lineVertices;
 
 
-    void updateXYZ(){  //2.1创建各种数组
+    void updateXYZ() {  //2.1创建各种数组
         //纹理坐标系
 
 
         // 定义立方体的8个顶点                                                       
-        lineVertices = new float[] {
+        lineVertices = new float[]{
                 // 上顶面正方形的四个顶点
                 x1, y1, z1,//0
                 // x2,y2,z2//1
@@ -67,113 +68,113 @@ public class NoRender implements Renderer {
         };
         //画特殊点
         float[] pointFacets = new float[]{
-               // x1, y1, z1,//0
+                // x1, y1, z1,//0
                 //x2,y2,z2//1
         };
         //定义XYZ坐标和显示的字
-        float xyzVertices[]=new float[]{
-                -2.0f ,0f, 0f,//0 x起点，画坐标轴的
-                2.0f ,0f, 0f,//1 X轴的终点
-                1.8f,0.1f,0f,//2 X轴箭头1
-                1.8f,-0.1f,0f,//3 X轴箭头2
+        float xyzVertices[] = new float[]{
+                -2.0f, 0f, 0f,//0 x起点，画坐标轴的
+                2.0f, 0f, 0f,//1 X轴的终点
+                1.8f, 0.1f, 0f,//2 X轴箭头1
+                1.8f, -0.1f, 0f,//3 X轴箭头2
 
-                0f ,-2.4f , 0f,//4 Y轴起点
-                0f ,2.0f , 0f,//5 Y轴终点
-                0.1f ,1.8f ,0f,//6 Y轴箭头1
-                -0.1f ,1.8f ,0f,//7 Y轴箭头2
+                0f, -2.4f, 0f,//4 Y轴起点
+                0f, 2.0f, 0f,//5 Y轴终点
+                0.1f, 1.8f, 0f,//6 Y轴箭头1
+                -0.1f, 1.8f, 0f,//7 Y轴箭头2
 
-                0f ,0f ,-2.0f,//8 Z轴起点
-                0f ,0f ,2.0f,//9 Z轴终点
-                0f ,0.1f ,1.8f,//10 Z轴箭头1
-                0f ,-0.1f ,1.8f,//11 Z轴箭头2
+                0f, 0f, -2.0f,//8 Z轴起点
+                0f, 0f, 2.0f,//9 Z轴终点
+                0f, 0.1f, 1.8f,//10 Z轴箭头1
+                0f, -0.1f, 1.8f,//11 Z轴箭头2
 
-                2.1f,0f,0f,//12 绘制字X
-                2.15f,0.1f,0f,//13
-                2.05f,0.1f,0f,//14
-                2.05f,-0.1f,0f,//15
-                2.15f,-0.1f,0f,//16
+                2.1f, 0f, 0f,//12 绘制字X
+                2.15f, 0.1f, 0f,//13
+                2.05f, 0.1f, 0f,//14
+                2.05f, -0.1f, 0f,//15
+                2.15f, -0.1f, 0f,//16
 
-                0f,2.3f,0f,//17 绘制字Y
-                0f,2.1f,0f,//18
-                0.05f,2.5f,0f,//19
-                -0.05f,2.5f,0f,//20
+                0f, 2.3f, 0f,//17 绘制字Y
+                0f, 2.1f, 0f,//18
+                0.05f, 2.5f, 0f,//19
+                -0.05f, 2.5f, 0f,//20
 
-                -0.05f ,0.05f ,2.05f,//21  绘制字Z
-                0.05f,0.05f,2.05f,//22
-                -0.05f,-0.05f,2.05f,//23
-                0.05f,-0.05f,2.05f,//24
+                -0.05f, 0.05f, 2.05f,//21  绘制字Z
+                0.05f, 0.05f, 2.05f,//22
+                -0.05f, -0.05f, 2.05f,//23
+                0.05f, -0.05f, 2.05f,//24
 
                 //刻度X轴刻度
-                1.0f,0f,0f,//25
-                1.0f,0.1f,0f,//26
-                -1.0f,0f,0f,//27
-                -1.0f,0.1f,0f,//28
+                1.0f, 0f, 0f,//25
+                1.0f, 0.1f, 0f,//26
+                -1.0f, 0f, 0f,//27
+                -1.0f, 0.1f, 0f,//28
 
                 //刻度y轴刻度
-                0f,1.0f,0f,//29
-                -0.1f,1.0f,0f,//30
-                0f,-1.0f,0f,//31
-                -0.1f,-1.0f,0f,//32
+                0f, 1.0f, 0f,//29
+                -0.1f, 1.0f, 0f,//30
+                0f, -1.0f, 0f,//31
+                -0.1f, -1.0f, 0f,//32
                 //刻度Z轴刻度
-                0f,0f,1.0f,//33
-                0f,0.1f,1.0f,//34
-                0f,0f,-1.0f,//35
-                0f,0.1f,-1.0f,//36
+                0f, 0f, 1.0f,//33
+                0f, 0.1f, 1.0f,//34
+                0f, 0f, -1.0f,//35
+                0f, 0.1f, -1.0f,//36
 
         };
         //向量从原点6指向长方体的0点  
-        byte[] xiangliangFacets = new byte[] {
+        byte[] xiangliangFacets = new byte[]{
                 //2,0,//2,0
                 //2,1 //2,1
         };
 
         //X坐标及其箭头  
-        byte[] XFacets = new byte[] {
+        byte[] XFacets = new byte[]{
                 //起终点
-                0,1,
+                0, 1,
                 //箭头
-                1,2,
-                1,3,
+                1, 2,
+                1, 3,
                 //X
-                12,13,
-                12,14,
-                12,15,
-                12,16,
+                12, 13,
+                12, 14,
+                12, 15,
+                12, 16,
                 //X坐标
-                25,26,
-                27,28
+                25, 26,
+                27, 28
 
         };
         //Y坐标及其箭头  
-        byte[] YFacets = new byte[] {
+        byte[] YFacets = new byte[]{
                 //起终点
-                4,5,
+                4, 5,
                 //箭头
-                5,6,
-                5,7,
+                5, 6,
+                5, 7,
                 //字Y
-                17,18,
-                17,19,
-                17,20,
+                17, 18,
+                17, 19,
+                17, 20,
                 //Y轴刻度
-                29,30,
-                31,32
+                29, 30,
+                31, 32
 
         };
         //Z坐标及其箭头  
-        byte[] ZFacets = new byte[] {
+        byte[] ZFacets = new byte[]{
                 //起终点
-                8,9,
+                8, 9,
                 //箭头
-                9,10,
-                9,11,
+                9, 10,
+                9, 11,
                 //字Z
-                21,22,
-                22,23,
-                23,24,
+                21, 22,
+                22, 23,
+                23, 24,
                 //Z轴刻度
-                33,34,
-                35,36
+                33, 34,
+                35, 36
         };
         // 将立方体的顶点位置数据数组包装成FloatBuffer;
         lineVerticesBuffer = floatBufferUtil(lineVertices);
@@ -186,20 +187,21 @@ public class NoRender implements Renderer {
         YFacetsBuffer = ByteBuffer.wrap(YFacets);
         ZFacetsBuffer = ByteBuffer.wrap(ZFacets);
     }
+
     //构造函数带了参数，是因为不同类间传递参数，将接受方的handler实例传递过来
     @SuppressLint("HandlerLeak")
     public NoRender(Handler handler_zjk, Context context) {
         this.mContext = context;
-        handler2=handler_zjk;//实际上handler2就是接收方的实例了，巧妙的转换方法实现不同类间handler传递数据
-        handler = new Handler(){
+        handler2 = handler_zjk;//实际上handler2就是接收方的实例了，巧妙的转换方法实现不同类间handler传递数据
+        handler = new Handler() {
             public void handleMessage(Message msg) {
-                if(msg.what==200)//这是接收本类中定时器发送过来的信号用来更新正方体
+                if (msg.what == 200)//这是接收本类中定时器发送过来的信号用来更新正方体
                     updateXYZ();// 2.2
             }
 
         };
         //定时器任务中发送了两个信号，给本类中发送了一个，给activity类中发了一个
-        task = new TimerTask(){
+        task = new TimerTask() {
             public void run() {
                 String[] xyz = new String[5];//发送给activity用的
                 //2s生成xyz的随机数
@@ -214,10 +216,10 @@ public class NoRender implements Renderer {
 //                Log.d("zzzzzz", String.valueOf(z));
                 //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
                 Message msg = new Message();
-                msg.what=200;//这是发送给当前类中用来更新立方体的
+                msg.what = 200;//这是发送给当前类中用来更新立方体的
                 handler.sendEmptyMessage(msg.what);
 
-                msg.what=0x123;//这是发送给activity类中用来更新文本框中XYZ值得
+                msg.what = 0x123;//这是发送给activity类中用来更新文本框中XYZ值得
                 Bundle bundle = new Bundle();//对数据包装后用MSG发送
                 //要发送的是一个字符串数组，第一个参数是指定数据的名，当接收数据时可以用这个名来选择获取哪个数据，很方便，第二个参数是发送的数组
                 bundle.putStringArray("xyz", xyz);
@@ -241,10 +243,10 @@ public class NoRender implements Renderer {
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
         gl.glClearColor(0, 0, 0, 0);
         //设置清理屏幕的颜色
-        gl.glClearColor(0,0,0,1);
+        gl.glClearColor(0, 0, 0, 1);
         // 设置阴影平滑模式
         gl.glShadeModel(GL10.GL_SMOOTH);
-        Log.d("onSurfaceCreated","onSurfaceCreated");
+        Log.d("onSurfaceCreated", "onSurfaceCreated");
         // 启用深度测试
         gl.glEnable(GL10.GL_DEPTH_TEST);
         // 设置深度测试的类型
@@ -312,10 +314,10 @@ public class NoRender implements Renderer {
 //                GL10.GL_UNSIGNED_BYTE, lineFacetsBuffer);
 
         // --------------------绘制点---------------------
-        gl.glVertexPointer(3,GL10.GL_FLOAT,0,pointVerticesBuffer);
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, pointVerticesBuffer);
         gl.glColor4f(1f, 0f, 0f, 0f);
         gl.glPointSize(10f);
-        gl.glDrawArrays(GL10.GL_POINTS,0,2);
+        gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
 
 
         // --------------------绘制向量---------------------
@@ -364,9 +366,9 @@ public class NoRender implements Renderer {
 
 
     }
+
     // 定义一个工具方法，将float[]数组转换为OpenGL ES所需的FloatBuffer
-    private FloatBuffer floatBufferUtil(float[] arr)
-    {
+    private FloatBuffer floatBufferUtil(float[] arr) {
         FloatBuffer mBuffer = null;
         // 初始化ByteBuffer，长度为arr数组的长度*4，因为一个int占4个字节
         ByteBuffer qbb = ByteBuffer.allocateDirect(arr.length * 4);
@@ -380,6 +382,7 @@ public class NoRender implements Renderer {
 
     /**
      * 接收activity传递过来的数据
+     *
      * @param x1
      * @param y1
      * @param z1
@@ -387,7 +390,7 @@ public class NoRender implements Renderer {
      * @param y2
      * @param z2
      */
-    public void getData(float x1,float y1,float z1,float x2,float y2,float z2){
+    public void getData(float x1, float y1, float z1, float x2, float y2, float z2) {
         this.x1 = x1;
         this.y1 = y1;
         this.z1 = z1;

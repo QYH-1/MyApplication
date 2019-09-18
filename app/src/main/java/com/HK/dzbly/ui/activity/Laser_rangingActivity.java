@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.LineFragment;
 
@@ -35,7 +37,7 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
         //锁定屏幕
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
         setContentView(R.layout.laser_ranging);
 
         inintView();
@@ -46,7 +48,7 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     /**
      * 获取控件和点击事件
      */
-    private void inintView(){
+    private void inintView() {
         line_ranging = findViewById(R.id.line_ranging);
         twopoint_ranging = findViewById(R.id.twopoint_ranging);
         section_ranging = findViewById(R.id.section_ranging);
@@ -60,35 +62,36 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     @SuppressLint("ResourceAsColor")
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.line_ranging :
+        switch (view.getId()) {
+            case R.id.line_ranging:
                 selectFragment(0);
                 break;
-            case R.id.twopoint_ranging :
+            case R.id.twopoint_ranging:
                 selectFragment(1);
                 break;
             case R.id.section_ranging:
                 selectFragment(2);
         }
     }
+
     @SuppressLint("ResourceAsColor")
     private void selectFragment(int position) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = manager.beginTransaction();
-        switch (position){
+        switch (position) {
             case 0:
                 if (mlineFragment == null) {
-                    mlineFragment =new LineFragment();
+                    mlineFragment = new LineFragment();
                 }
                 fragmentTransaction.replace(R.id.measurement_options, mlineFragment).commit();
                 break;
             case 1:
-                Intent intent = new Intent(this,Two_pointActivity.class);
+                Intent intent = new Intent(this, Two_pointActivity.class);
                 startActivity(intent);
                 finish();
                 break;
             case 2:
-                Intent intent1 = new Intent(Laser_rangingActivity.this,SectionsurveyActivity.class);
+                Intent intent1 = new Intent(Laser_rangingActivity.this, SectionsurveyActivity.class);
                 startActivity(intent1);
                 finish();
                 break;

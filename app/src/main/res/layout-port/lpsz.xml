@@ -1,96 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/blue"
-              android:gravity="center"
->
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue"
+        android:gravity="center">
+
     <LinearLayout
             android:layout_width="350dp"
             android:layout_height="500dp"
             android:background="@color/Light_blue"
-            android:orientation="vertical"
-    >
+            android:orientation="vertical">
+
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="罗盘高级设置"
-                android:textColor="@color/white"
-                android:textSize="35sp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="80dp"
-        />
+                android:text="@string/Compass_advanced_settings"
+                android:textColor="@color/white"
+                android:textSize="35sp" />
+
         <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="30dp"
-        >
+                android:orientation="horizontal">
+
             <TextView
-                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="地磁判断阀值设置"
-                    android:textColor="@color/white"
-                    android:textSize="25dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
-            />
+                    android:text="@string/The_geomagnetic_judgment_threshold_setting"
+                    android:textColor="@color/white"
+                    android:textSize="25dp" />
+
             <EditText
                     android:id="@+id/threshold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="阀值"
-                    android:textSize="25dp"
                     android:layout_marginLeft="10dp"
-                    android:maxLength="7"
                     android:background="@drawable/edit_bg"
-            />
+                    android:hint="@string/threshold"
+                    android:maxLength="7"
+                    android:textSize="25dp" />
         </LinearLayout>
+
         <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="30dp"
-        >
+                android:orientation="horizontal">
+
             <TextView
-                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="磁偏角设置"
-                    android:textColor="@color/white"
-                    android:textSize="25dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
-            />
+                    android:text="@string/Magnetic_declination_setting"
+                    android:textColor="@color/white"
+                    android:textSize="25dp" />
+
             <EditText
                     android:id="@+id/declination"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="0.00"
-                    android:textSize="25dp"
                     android:layout_marginLeft="10dp"
-                    android:maxLength="12"
                     android:background="@drawable/edit_bg"
-            />
+                    android:hint="0.00"
+                    android:maxLength="12"
+                    android:textSize="25dp" />
         </LinearLayout>
+
         <Button
                 android:id="@+id/Confirm_settings"
-                android:layout_marginTop="30dp"
-                android:layout_gravity="center_horizontal"
                 android:layout_width="150dp"
                 android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
                 android:background="@drawable/border_line_while"
-                android:text="确认设置"
-                android:textSize="25dp"
-        />
+                android:text="@string/Confirm_settings"
+                android:textSize="25dp" />
+
         <Button
                 android:id="@+id/retreat"
-                android:layout_marginTop="25dp"
-                android:layout_gravity="center_horizontal"
                 android:layout_width="150dp"
                 android:layout_height="50dp"
-                android:text="退        出"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
                 android:background="@drawable/border_line_while"
-                android:textSize="25dp"
-        />
+                android:text="@string/EXIT"
+                android:textSize="25dp" />
     </LinearLayout>
 </LinearLayout>

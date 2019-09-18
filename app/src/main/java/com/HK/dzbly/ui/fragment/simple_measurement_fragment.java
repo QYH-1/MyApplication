@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.LpszActivity;
@@ -30,7 +32,7 @@ import java.util.Date;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/7/25$
- * 描述：
+ * 描述：简易测量
  * 修订历史：
  */
 public class simple_measurement_fragment extends Fragment {
@@ -43,15 +45,16 @@ public class simple_measurement_fragment extends Fragment {
     private DBhelper dBhelper;
 
     FileOutputStream fileOutputStream = null; //文件输入流
-    SharedPreferences sp =null;  //存储对象
+    SharedPreferences sp = null;  //存储对象
     private int num = 1; //文件出现次数
-    float val ; //方位角
-    float eada ; //仰角
-    float rana ; //横滚角
-    String result ;//产状信息
+    float val; //方位角
+    float eada; //仰角
+    float rana; //横滚角
+    String result;//产状信息
 
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath()+"/CameraDemo"+"/data";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+
     public simple_measurement_fragment() {
     }
 
@@ -63,7 +66,7 @@ public class simple_measurement_fragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.simple_measurement,container,false);
+        View view = inflater.inflate(R.layout.simple_measurement, container, false);
         //所有的方法
         methods(view);
         return view;
@@ -78,24 +81,27 @@ public class simple_measurement_fragment extends Fragment {
         setCompass_settings(view);
         setMsave(view);//保存数据
     }
+
     @Override
     public void onPause() {
         super.onPause();
     }
+
     //获取控件
-    private void inint(View view){
-        mexplain =view.findViewById(R.id.mexplain);
-        re_measurement =view.findViewById(R.id.re_measurement);
-        locking_occurrence =view.findViewById(R.id.locking_occurrence);
-        msave =view.findViewById(R.id.msave);
+    private void inint(View view) {
+        mexplain = view.findViewById(R.id.mexplain);
+        re_measurement = view.findViewById(R.id.re_measurement);
+        locking_occurrence = view.findViewById(R.id.locking_occurrence);
+        msave = view.findViewById(R.id.msave);
         Compass_settings = view.findViewById(R.id.Compass_settings);
     }
+
     //给定说明中的显示
     private void setExplain(View view) {
-        type=0;
-        switch (type){
+        type = 0;
+        switch (type) {
             case 0:
-                mexplain.setPadding(15,50,0,0);//设置边距
+                mexplain.setPadding(15, 50, 0, 0);//设置边距
                 //explain.setGravity(Gravity.CENTER);//居中显示
                 String text = "<p> 测量方法：通过两次视产状测量获得真倾角与倾角<br>\n" +
                         "\t\t1）右侧测量：设备右偏后调整姿态，使左侧激光线与左侧产状线重合，右侧点\n" +
@@ -112,10 +118,11 @@ public class simple_measurement_fragment extends Fragment {
         }
 
     }
+
     /**
      * 罗盘设置
      */
-    private void setCompass_settings(View view){
+    private void setCompass_settings(View view) {
         Compass_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,10 +133,11 @@ public class simple_measurement_fragment extends Fragment {
             }
         });
     }
+
     /**
      * 保存数据
      */
-    private void setMsave(View view){
+    private void setMsave(View view) {
         msave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,8 +145,9 @@ public class simple_measurement_fragment extends Fragment {
             }
         });
     }
-    private void showDialog(){
-        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout,null,false);
+
+    private void showDialog() {
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
 
@@ -157,61 +166,61 @@ public class simple_measurement_fragment extends Fragment {
                         String name = text.getText().toString();
 
                         SharedPreferences.Editor editor = sp.edit();
-                        val = sp.getFloat("val",0);//获取指南针数据
-                        eada = sp.getFloat("eada",0);//获取仰角数据
-                        rana = sp.getFloat("rana",0);//获取横滚角数据
-                        result = sp.getString("result","");//获取产状信息数据
+                        val = sp.getFloat("val", 0);//获取指南针数据
+                        eada = sp.getFloat("eada", 0);//获取仰角数据
+                        rana = sp.getFloat("rana", 0);//获取横滚角数据
+                        result = sp.getString("result", "");//获取产状信息数据
                         //将数据存储到数据库中
-                        dBhelper = new DBhelper(getContext(),dBhelper.db_name,null,1);
+                        dBhelper = new DBhelper(getContext(), dBhelper.db_name, null, 1);
                         //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
-                        String sqlNumber = sp.getString("sqlNumber","0");
-                        Log.d("sqlNumber",sqlNumber);
-                        if(sqlNumber.equals("0")){
+                        String sqlNumber = sp.getString("sqlNumber", "0");
+                        Log.d("sqlNumber", sqlNumber);
+                        if (sqlNumber.equals("0")) {
                             SQLiteDatabase db3 = dBhelper.getWritableDatabase();
-                            editor.putString("sqlNumber","1");
-                        }else{
-                            editor.putString("sqlNumber","1");
+                            editor.putString("sqlNumber", "1");
+                        } else {
+                            editor.putString("sqlNumber", "1");
                             editor.commit();
                         }
                         ContentValues cv = new ContentValues();
-                        cv.put("name",name);
-                        cv.put("val","1");
-                        cv.put("rollAngle","1");
-                        cv.put("elevation","1");
-                        cv.put("type","dZbl");
-                        cv.put("result","1");
-                        dBhelper.Insert(getContext(),dBhelper.DZBLY_TABLE,cv);
+                        cv.put("name", name);
+                        cv.put("val", "1");
+                        cv.put("rollAngle", "1");
+                        cv.put("elevation", "1");
+                        cv.put("type", "dZbl");
+                        cv.put("result", "1");
+                        dBhelper.Insert(getContext(), dBhelper.DZBLY_TABLE, cv);
 
-                        Log.d("name",name);
-                        String dname = name+".txt";
-                        Log.d("name1",dname);
+                        Log.d("name", name);
+                        String dname = name + ".txt";
+                        Log.d("name1", dname);
                         try {
                             //如果文件存在则删除文件
                             File file = new File(path, dname);
-                            if(file.exists()){
-                                fileOutputStream = new FileOutputStream(file,true);
-                                num = sp.getInt("num"+name,1)+1;
+                            if (file.exists()) {
+                                fileOutputStream = new FileOutputStream(file, true);
+                                num = sp.getInt("num" + name, 1) + 1;
                                 Log.d("num", String.valueOf(num));
-                                editor.putInt("num"+name,num);
+                                editor.putInt("num" + name, num);
                                 editor.commit();
                                 //file.delete();
                                 String str = "\n" +
-                                        "\t编  号："+num+"\n" +
-                                        "\t仰  角："+eada+"  \n" +
-                                        "\t横滚角："+rana+" \t\n" +
-                                        "\t方位角："+val+" \t\n" +
-                                        "\t产状信息："+result+" \t\n" +
-                                        "\t测量时间："+date+"\t\n" +
+                                        "\t编  号：" + num + "\n" +
+                                        "\t仰  角：" + eada + "  \n" +
+                                        "\t横滚角：" + rana + " \t\n" +
+                                        "\t方位角：" + val + " \t\n" +
+                                        "\t产状信息：" + result + " \t\n" +
+                                        "\t测量时间：" + date + "\t\n" +
                                         "\t\n";
                                 fileOutputStream.write(str.getBytes());
                                 fileOutputStream.close();
 
-                            }else {
+                            } else {
                                 fileOutputStream = new FileOutputStream(file);
-                                editor.putInt("num"+name,1);
+                                editor.putInt("num" + name, 1);
                                 editor.commit();
                                 String str = "\n" +
-                                        "\t编  号："+num+"<br>\n" +
+                                        "\t编  号：" + num + "<br>\n" +
                                         "\t仰  角：   <br>\n" +
                                         "\t横滚角：\t<br>\n" +
                                         "\t方位角：\t<br>\n" +
@@ -227,7 +236,7 @@ public class simple_measurement_fragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
-                }).setNegativeButton ("取消", null)
+                }).setNegativeButton("取消", null)
                 .create()
                 .show();
     }

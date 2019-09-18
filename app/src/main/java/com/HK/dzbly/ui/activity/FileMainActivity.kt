@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException
 import java.text.Collator
 import java.text.SimpleDateFormat
 import java.util.*
+
 /**
  * @Author：qyh
  * 版本：1.0
@@ -34,7 +35,8 @@ import java.util.*
  * 修订历史：
  *
  */
-class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.OnQueryTextListener, AdapterView.OnItemClickListener {
+class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.OnQueryTextListener,
+    AdapterView.OnItemClickListener {
     internal lateinit var list: List<FileInfo>// 数据
     internal lateinit var lv: ListView
     internal var allList: MutableList<FileInfo> = ArrayList<FileInfo>()
@@ -45,13 +47,13 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
     internal lateinit var text: EditText
     internal lateinit var img: ImageView
     internal lateinit var img1: ImageView
-    internal lateinit var desc1 :TextView
+    internal lateinit var desc1: TextView
     internal lateinit var tv_path: TextView
     internal lateinit var view: View
     internal lateinit var currPath: String // 当前目录
     internal lateinit var parentPath: String // 上级目录
-    internal lateinit var oldPath : String //当前文件地址
-    internal lateinit var newPath : String //新的文件地址
+    internal lateinit var oldPath: String //当前文件地址
+    internal lateinit var newPath: String //新的文件地址
 
 
     internal val ROOT = FileUtils.sdCardPath + "/CameraDemo" //SDCard打开目录  File.separator
@@ -156,12 +158,20 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         setContentView(R.layout.file_main)
         checkPermission()
         initView()// 初始化
         Log.e("path_erro", getStoragePath(this, false)!! + "/CameraDemo")
-        updateData(getStoragePath(this, false)!! + "/CameraDemo")//"/storage/emulated/0/amap/file_locks"
+        updateData(
+            getStoragePath(
+                this,
+                false
+            )!! + "/CameraDemo"
+        )//"/storage/emulated/0/amap/file_locks"
         FileUtils.KEY = ""//初始化
         // 初始化控件
         lv = findViewById(R.id.list) as ListView
@@ -221,6 +231,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
             currPath.substring(ROOT.length)
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -237,14 +248,25 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
 
     private fun checkPermission() {
         //检查权限（NEED_PERMISSION）是否被授权 PackageManager.PERMISSION_GRANTED表示同意授权
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             //用户已经拒绝过一次，再次弹出权限申请对话框需要给用户一个解释
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission
-                    .WRITE_EXTERNAL_STORAGE)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission
+                        .WRITE_EXTERNAL_STORAGE
+                )
+            ) {
                 Toast.makeText(this, "请开通相关权限，否则无法正常使用本应用！", Toast.LENGTH_SHORT).show()
             }
             //申请权限
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_WRITE_EXTERNAL_STORAGE
+            )
 
         } else {
             Toast.makeText(this, "授权成功！", Toast.LENGTH_SHORT).show()
@@ -268,7 +290,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         } else if (id == R.id.sort_size) {
             currSort = SORT_SIZE
         } else if (id == R.id.c1) {
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
 
             //设置系统时间
@@ -282,7 +305,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    if(name ==""){
+                    if (name == "") {
                         name = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     }
                     val destDir = File("$currPath/$name")
@@ -298,7 +321,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         } else if (id == R.id.y1) {
 
 
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
             img1 = view.findViewById(R.id.icon1) as ImageView
             img1.setImageResource(R.drawable.txt)
@@ -313,7 +337,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    if(name ==""){
+                    if (name == "") {
                         name = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     }
                     val destDir = File("$currPath/$name.txt")
@@ -333,7 +357,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         } else if (id == R.id.y2) {
 
 
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
             img1 = view.findViewById(R.id.icon1) as ImageView
             img1.setImageResource(R.drawable.xml)
@@ -348,7 +373,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    if(name ==""){
+                    if (name == "") {
                         name = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     }
                     val destDir = File("$currPath/$name.xml")
@@ -366,7 +391,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
 
         } else if (id == R.id.y3) {
 
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
             img1 = view.findViewById(R.id.icon1) as ImageView
             img1.setImageResource(R.drawable.doc)
@@ -381,7 +407,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    if(name ==""){
+                    if (name == "") {
                         name = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     }
                     val destDir = File("$currPath/$name.doc")
@@ -400,7 +426,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
 
         } else if (id == R.id.y4) {
 
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
             img1 = view.findViewById(R.id.icon1) as ImageView
             img1.setImageResource(R.drawable.xls)
@@ -417,7 +444,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    if(name ==""){
+                    if (name == "") {
                         name = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     }
                     val destDir = File("$currPath/$name.xls")
@@ -432,11 +459,12 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                     updateData1(currPath)
                 }.setNegativeButton("取消", null)
                 .create().show()
-        }else if(id == R.id.d1){
-            val inflater = this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        } else if (id == R.id.d1) {
+            val inflater =
+                this@FileMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.layout, null)
-           // img1 = view.findViewById(R.id.icon1) as ImageView
-         //  img1.setImageResource(R.drawable.xls)
+            // img1 = view.findViewById(R.id.icon1) as ImageView
+            //  img1.setImageResource(R.drawable.xls)
 
             //设置系统时间
             val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
@@ -450,8 +478,8 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 .setPositiveButton("确定") { dialog, which ->
                     text = view.findViewById(R.id.name1) as EditText
                     name = text.text.toString()
-                    Log.d("文件重命名",name)
-                    rename(view,name)
+                    Log.d("文件重命名", name)
+                    rename(view, name)
                 }.setNegativeButton("取消", null)
                 .create().show()
         }
@@ -521,7 +549,12 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         object : Thread() {
             override fun run() {
                 //TODO 获得数据(所有的应用)TODO
-                list = FileUtils.getListData(getStoragePath(this@FileMainActivity, false)!! + "/CameraDemo")
+                list = FileUtils.getListData(
+                    getStoragePath(
+                        this@FileMainActivity,
+                        false
+                    )!! + "/CameraDemo"
+                )
                 allList.clear()// 清空
                 allList.addAll(list)// 复制集合
                 list = FileUtils.getGroupList(list)//2次排序
@@ -618,7 +651,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
 
         } else {
             // 文件: 打开
-           FileUtils.openFile(this, File(item.path))
+            FileUtils.openFile(this, File(item.path))
         }
 
     }
@@ -653,6 +686,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         }
         mAdapter.notifyDataSetChanged()
     }
+
     //复制
     fun cope(view: View) {
 
@@ -676,29 +710,30 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
         }
 
     }
+
     /**
      * 重命名
      */
-    fun rename(view : View,name : String){
+    fun rename(view: View, name: String) {
         if (mAdapter.selectMap.size === 0) {
             Toast.makeText(this, "您还没选中任何项目！", Toast.LENGTH_SHORT).show()
-        }else{
+        } else {
             for (position in mAdapter.selectMap.keys) {
                 val path = list[position!!].path
                 oldPath = File(path).toString()
-               //Log.d("根据path路径删除文件",oldPath);
-                val hz = oldPath.substring(oldPath.indexOf(".")+0)
-             // Log.d("后缀名",hz)
-                val hz1 =FileUtils.getnameData()
-              // Log.d("文件名hz1",hz1.toString())
-                val hz2 = oldPath.substring(0,oldPath.length-hz1.length)
-               //Log.d("文件名hz2",hz2.toString())
-                val newpath =hz2+name+hz
-              //  Log.d("newpath",newpath.toString())
+                //Log.d("根据path路径删除文件",oldPath);
+                val hz = oldPath.substring(oldPath.indexOf(".") + 0)
+                // Log.d("后缀名",hz)
+                val hz1 = FileUtils.getnameData()
+                // Log.d("文件名hz1",hz1.toString())
+                val hz2 = oldPath.substring(0, oldPath.length - hz1.length)
+                //Log.d("文件名hz2",hz2.toString())
+                val newpath = hz2 + name + hz
+                //  Log.d("newpath",newpath.toString())
 
                 var file = File(oldPath);
-                file.renameTo( File(newpath));
-               // Toast.makeText(this, "121212！", Toast.LENGTH_SHORT).show()
+                file.renameTo(File(newpath));
+                // Toast.makeText(this, "121212！", Toast.LENGTH_SHORT).show()
             }
         }
         //更新
@@ -723,7 +758,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                     for (position in mAdapter.selectMap.keys) {
                         val path = list[position!!].path
                         val file = File(path)
-                        Log.d("根据path路径删除文件",file.toString());
+                        Log.d("根据path路径删除文件", file.toString());
                         //根据path路径删除文件
                         if (file.isFile()) {
                             FileUtils.deleteFile(path)
@@ -807,7 +842,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
     private var isCut: Boolean = false
 
     fun pathDelete(v: View) {
-        if (mAdapter.selectMap.size> 0) {
+        if (mAdapter.selectMap.size > 0) {
             copyMap.clear()
             for (position in mAdapter.selectMap.keys) {
 
@@ -819,7 +854,7 @@ class FileMainActivity : AppCompatActivity(), OnclickInterfaceFile, SearchView.O
                 if (file.isFile) {
 
                     val res = FileUtils.pasteFile(currPath, File(path))
-                    isCut=true
+                    isCut = true
                     Toast.makeText(this, path + "文件剪切成功", Toast.LENGTH_SHORT).show()
                     //切换粘贴为激活状态
                     layout.isEnabled = true

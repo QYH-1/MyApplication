@@ -6,9 +6,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.DataFragment;
 import com.HK.dzbly.ui.fragment.DatashowFragment;
@@ -21,7 +23,7 @@ import java.util.Map;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/28$
- * 描述：
+ * 描述：查看数据，向用户展示数据
  * 修订历史：
  */
 public class DatadisplayActivity extends FragmentActivity implements DatashowFragment.FragmentInteraction {
@@ -54,16 +56,17 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         tspinner = findViewById(R.id.time);
         kz = findViewById(R.id.kz);
     }
-    private void setKz(){
+
+    private void setKz() {
         kz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 df = new DatashowFragment();
                 Bundle bundle = new Bundle();
-                Log.i("ditem----------",ditem);
-                Log.i("titem------",titem);
-                bundle.putString("ditem",ditem);
-                bundle.putString("titem",titem);
+                Log.i("ditem----------", ditem);
+                Log.i("titem------", titem);
+                bundle.putString("ditem", ditem);
+                bundle.putString("titem", titem);
                 df.setArguments(bundle);//数据传递到fragment中
                 FragmentManager manager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = manager.beginTransaction();
@@ -73,6 +76,7 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
             }
         });
     }
+
     private void setSpinner() {
         //列表定义一个数组适配器
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_datatype, data);
@@ -132,6 +136,7 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         tdata.add("一年");
         tdata.add("全部");
     }
+
     //实现接口，实现回调
     @Override
     public void process(Map<String, Object> str) {
@@ -146,18 +151,18 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         dataFragment = new DataFragment();
         videoFragment = new VideoFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("dataName",dataName);
-        bundle.putString("dataTime",dataTime);
-        bundle.putString("ditem",ditem);
-        String data = dataName.substring(dataName.indexOf(".")+1);
-        Log.i("----data",data);
+        bundle.putString("dataName", dataName);
+        bundle.putString("dataTime", dataTime);
+        bundle.putString("ditem", ditem);
+        String data = dataName.substring(dataName.indexOf(".") + 1);
+        Log.i("----data", data);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if(data.equals("mp4")){
+        if (data.equals("mp4")) {
             videoFragment.setArguments(bundle);
             fragmentTransaction.replace(R.id.dataShow, videoFragment);
-        }else {
+        } else {
             dataFragment.setArguments(bundle);//数据传递到fragment中
             fragmentTransaction.replace(R.id.dataShow, dataFragment);
         }

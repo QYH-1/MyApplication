@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
 import com.HK.dzbly.ui.activity.MainActivity;
 import com.HK.dzbly.ui.activity.WelcomeActivity;
 
@@ -11,7 +12,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     //重写onReceive方法
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e("broadCastReceiver","onReceiver...");
+        Log.e("broadCastReceiver", "onReceiver...");
         try {
             Intent mBootIntent = new Intent(context, WelcomeActivity.class);
             // 下面这句话必须加上才能开机自动运行app的界面

@@ -9,7 +9,9 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
 import androidx.annotation.RequiresApi;
+
 import com.HK.dzbly.R;
 
 /**
@@ -111,7 +113,7 @@ public class CompassView extends View {
         this(context, null);
     }
 
-    public CompassView(Context context,AttributeSet attrs) {
+    public CompassView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
@@ -208,9 +210,9 @@ public class CompassView extends View {
         //画文字
         drawText();
         //画指南针外圈
-       drawCompassOutSide();
+        drawCompassOutSide();
         //画指南针外接圆
-       drawCompassCircum();
+        drawCompassCircum();
         //画内部渐变颜色圆
         drawInnerCricle();
         //画指南针内部刻度
@@ -248,7 +250,7 @@ public class CompassView extends View {
     }
 
     private void drawCenterText() {
-        String centerText = val+"°";
+        String centerText = val + "°";
         mCenterPaint.getTextBounds(centerText, 0, centerText.length(), mCenterTextRect);
         int centerTextWidth = mCenterTextRect.width();
         int centerTextHeight = mCenterTextRect.height();
@@ -343,7 +345,7 @@ public class CompassView extends View {
             mCanvas.drawArc(new RectF(width / 2 - mCircumRadius, mTextHeight + mOutSideRadius - mCircumRadius, width / 2 + mCircumRadius, mTextHeight + mOutSideRadius + mCircumRadius), -85, valCompare, false, mAnglePaint);
         } else {
             valCompare = 360 - val;
-            mCanvas.drawArc(new RectF(width /2 - mCircumRadius, mTextHeight + mOutSideRadius - mCircumRadius, width / 2 + mCircumRadius, mTextHeight + mOutSideRadius + mCircumRadius), -95, -valCompare, false, mAnglePaint);
+            mCanvas.drawArc(new RectF(width / 2 - mCircumRadius, mTextHeight + mOutSideRadius - mCircumRadius, width / 2 + mCircumRadius, mTextHeight + mOutSideRadius + mCircumRadius), -95, -valCompare, false, mAnglePaint);
         }
 
         mCanvas.restore();
@@ -374,10 +376,10 @@ public class CompassView extends View {
         mLightGrayPaint.setStrokeWidth((float) 5);
         mDeepGrayPaint.setStrokeWidth((float) 3);
         mLightGrayPaint.setStyle(Paint.Style.STROKE);
-        mCanvas.drawArc(new RectF(width/2-mOutSideRadius,mTextHeight,width/2+mOutSideRadius,mTextHeight+mOutSideRadius*2),-80,120,false,mLightGrayPaint);
-        mCanvas.drawArc(new RectF(width/2-mOutSideRadius,mTextHeight,width/2+mOutSideRadius,mTextHeight+mOutSideRadius*2),40,20,false,mDeepGrayPaint);
-        mCanvas.drawArc(new RectF(width/2-mOutSideRadius,mTextHeight,width/2+mOutSideRadius,mTextHeight+mOutSideRadius*2),-100,-20,false,mLightGrayPaint);
-        mCanvas.drawArc(new RectF(width/2-mOutSideRadius,mTextHeight,width/2+mOutSideRadius,mTextHeight+mOutSideRadius*2),-120,-120,false,mDarkRedPaint);
+        mCanvas.drawArc(new RectF(width / 2 - mOutSideRadius, mTextHeight, width / 2 + mOutSideRadius, mTextHeight + mOutSideRadius * 2), -80, 120, false, mLightGrayPaint);
+        mCanvas.drawArc(new RectF(width / 2 - mOutSideRadius, mTextHeight, width / 2 + mOutSideRadius, mTextHeight + mOutSideRadius * 2), 40, 20, false, mDeepGrayPaint);
+        mCanvas.drawArc(new RectF(width / 2 - mOutSideRadius, mTextHeight, width / 2 + mOutSideRadius, mTextHeight + mOutSideRadius * 2), -100, -20, false, mLightGrayPaint);
+        mCanvas.drawArc(new RectF(width / 2 - mOutSideRadius, mTextHeight, width / 2 + mOutSideRadius, mTextHeight + mOutSideRadius * 2), -120, -120, false, mDarkRedPaint);
         mCanvas.restore();
     }
 
@@ -553,7 +555,8 @@ public class CompassView extends View {
         percentArr[1] = percentY;
         return percentArr;
     }
-    public void CompassViewdata(float val){
+
+    public void CompassViewdata(float val) {
         this.val = val;
         invalidate();//进行View的刷新
     }

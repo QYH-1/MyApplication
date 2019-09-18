@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+
 import com.HK.dzbly.R;
 
 /**
@@ -16,15 +17,15 @@ import com.HK.dzbly.R;
  * 修订历史：
  */
 public class Elevation extends View {
-    private Paint paint , tmpPaint , textPaint ,  strokePain;
+    private Paint paint, tmpPaint, textPaint, strokePain;
     private RectF rect;
     private int backGroundColor;    //背景色
     private float pointLength;      //指针长度
-    private float per ;             //指数百分比
-    private float perPoint ;        //缓存(变化中)指针百分比
-    private float perOld ;          //变化前指针百分比
-    private float length ;          //仪表盘半径
-    private float r ;
+    private float per;             //指数百分比
+    private float perPoint;        //缓存(变化中)指针百分比
+    private float perOld;          //变化前指针百分比
+    private float length;          //仪表盘半径
+    private float r;
     private float edata = 0;            //仰角提示角度
 
     public Elevation(Context context) {
@@ -48,8 +49,8 @@ public class Elevation extends View {
     private void initIndex(int specSize) {
         backGroundColor = Color.WHITE;
         r = specSize;
-        length = r  / 4 * 3;
-        pointLength =  - (float) (r *  0.6);
+        length = r / 4 * 3;
+        pointLength = -(float) (r * 0.6);
         per = 0;
         perOld = 0;
     }
@@ -69,7 +70,7 @@ public class Elevation extends View {
 
     public void setR(float r) {
         this.r = r;
-        this.length = r  / 4 * 3;
+        this.length = r / 4 * 3;
     }
 
     @Override
@@ -92,28 +93,28 @@ public class Elevation extends View {
     //先绘制一个带阴影的圆环 再居中绘制提示的文本信息
     private void initText(Canvas canvas) {
         //抗锯齿
-        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG));
+        canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
 
-        float rIndex = length ;
+        float rIndex = length;
 
         //设置文字展示的圆环
-        RadialGradient mInnerShader = new RadialGradient(0, 0, rIndex /2+rIndex /12, Color.parseColor("#323232"),
+        RadialGradient mInnerShader = new RadialGradient(0, 0, rIndex / 2 + rIndex / 12, Color.parseColor("#323232"),
                 Color.parseColor("#000000"), Shader.TileMode.CLAMP);
         paint.setShader(mInnerShader);
         //paint.setShadowLayer(5, 0, 0, 0x54000000);
         // rect = new RectF( - (rIndex/ 2 ), - (rIndex / 2), rIndex / 2, rIndex /2);
         //canvas.drawArc(rect, 0, 360, true, paint);
 
-        canvas.drawCircle(0, 0, rIndex /2+rIndex /12, paint);
+        canvas.drawCircle(0, 0, rIndex / 2 + rIndex / 12, paint);
 
         paint.clearShadowLayer();
 
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2f , r);
+        canvas.translate(canvas.getWidth() / 2f, r);
 
         textPaint.setStrokeWidth(1);
         textPaint.setAntiAlias(true);
@@ -124,47 +125,48 @@ public class Elevation extends View {
 
         //判断指数变化及颜色设定
         int _per = (int) (per * 120);
-        if (_per < 60){
+        if (_per < 60) {
             textPaint.setColor(Color.parseColor("#FF0000"));
-        }else if (_per < 100) {
+        } else if (_per < 100) {
             textPaint.setColor(Color.parseColor("#FF0000"));
-        }else {
+        } else {
             textPaint.setColor(Color.parseColor("#FF0000"));
         }
 
         float swidth = textPaint.measureText(String.valueOf(_per));
         //计算偏移量 是的数字和百分号整体居中显示
-        swidth =   (swidth - (swidth + 22) / 2);
+        swidth = (swidth - (swidth + 22) / 2);
         //角度
         textPaint.setTextSize(45);
-        canvas.translate( swidth , 0);
+        canvas.translate(swidth, 0);
         canvas.drawText("" + edata, 40, -15, textPaint);
         //提示字体大小
         textPaint.setTextSize(40);
         textPaint.setTextAlign(Paint.Align.LEFT);
 
-        canvas.drawText("°" , 42, -20, textPaint);
+        canvas.drawText("°", 42, -20, textPaint);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(Color.parseColor("#FF0000"));
 
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2  , r + length / 3 /2 );
-        canvas.drawText("仰角" , 0, 4, textPaint);
+        canvas.translate(canvas.getWidth() / 2, r + length / 3 / 2);
+        canvas.drawText("仰角", 0, 4, textPaint);
     }
 
-    public void setBackGroundColor(int color){
+    public void setBackGroundColor(int color) {
         this.backGroundColor = color;
     }
 
-    public void setPointLength1(float pointLength1){
-        this.pointLength = -length * pointLength1 ;
+    public void setPointLength1(float pointLength1) {
+        this.pointLength = -length * pointLength1;
     }
+
     //外侧刻度盘及文字显示
     private void initScale(Canvas canvas) {
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
         paint.setColor(Color.parseColor("#FFFFFF"));
 
         tmpPaint = new Paint(paint); //小刻度画笔对象
@@ -172,10 +174,10 @@ public class Elevation extends View {
         tmpPaint.setTextSize(30);
         tmpPaint.setTextAlign(Paint.Align.CENTER);
 
-        canvas.rotate(-90,0f,0f);
+        canvas.rotate(-90, 0f, 0f);
 
-        float  y = length;
-        y = - y;
+        float y = length;
+        y = -y;
         int count = 18; //总刻度数
         paint.setColor(backGroundColor);
 
@@ -185,60 +187,62 @@ public class Elevation extends View {
         paint.setStrokeWidth(5);
 
         //绘制刻度和百分比
-        for (int i = 0 ; i <= count ; i++){
+        for (int i = 0; i <= count; i++) {
             int temp;
-            if(i <= 9 ){
+            if (i <= 9) {
                 temp = 9 - i;
-                if (temp % 2 == 0 ) {
+                if (temp % 2 == 0) {
                     canvas.drawText(String.valueOf((temp) * -10), 0, y - 20f, tmpPaint);
                 }
-            } else{
-                temp = i-9;
-                if (temp % 2 == 0 ) {
+            } else {
+                temp = i - 9;
+                if (temp % 2 == 0) {
                     canvas.drawText(String.valueOf((temp) * 10), 0, y - 20f, tmpPaint);
                 }
             }
-            canvas.drawLine(0f, y , 0, y + length / 15, paint);
+            canvas.drawLine(0f, y, 0, y + length / 15, paint);
 
-            canvas.rotate(tempRou,0f,0f);
+            canvas.rotate(tempRou, 0f, 0f);
         }
 
     }
+
     //指针显示
     private void initPointer(Canvas canvas) {
         paint.setColor(Color.RED);
 
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
         float change;
 
-        if (perPoint < 1 ){
+        if (perPoint < 1) {
             change = perPoint * 180;
-        }else {
+        } else {
             change = 180;
         }
 
         //根据参数得到旋转角度
-        canvas.rotate(-90 + change,0f,0f);
+        canvas.rotate(-90 + change, 0f, 0f);
 
         //绘制三角形形成指针
         Path path = new Path();
-        path.moveTo(0 , pointLength);
-        path.lineTo(-10 , 0);
-        path.lineTo(10,0);
-        path.lineTo(0 , pointLength);
+        path.moveTo(0, pointLength);
+        path.lineTo(-10, 0);
+        path.lineTo(10, 0);
+        path.lineTo(0, pointLength);
         path.close();
 
         canvas.drawPath(path, paint);
 
     }
+
     //外侧颜色指示圆环
     private void initRing(Canvas canvas) {
         paint.setAntiAlias(true);
         paint.setStrokeWidth(2);
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
 
 //        //前100红黄渐变圆环
 //        paint.setStyle(Paint.Style.FILL);
@@ -263,7 +267,7 @@ public class Elevation extends View {
 
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
 
         strokePain = new Paint(paint);
 
@@ -275,32 +279,31 @@ public class Elevation extends View {
 
         canvas.restore();
         canvas.save();
-        canvas.translate(canvas.getWidth()/2, r);
+        canvas.translate(canvas.getWidth() / 2, r);
         //底边水平
         paint.setShader(null);
         paint.setColor(backGroundColor);
         paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(-length  , (float) (Math.sin(Math.toRadians(10) ) * length /3f * 2f), length  ,  (float) (Math.sin(Math.toRadians(10)) * length  + 100) , paint);
-        canvas.drawRect(-length  , (float) (Math.sin(Math.toRadians(10) ) * length /3f * 2f), length  ,  (float) (Math.sin(Math.toRadians(10) ) * length /3f * 2f) , strokePain);
+        canvas.drawRect(-length, (float) (Math.sin(Math.toRadians(10)) * length / 3f * 2f), length, (float) (Math.sin(Math.toRadians(10)) * length + 100), paint);
+        canvas.drawRect(-length, (float) (Math.sin(Math.toRadians(10)) * length / 3f * 2f), length, (float) (Math.sin(Math.toRadians(10)) * length / 3f * 2f), strokePain);
 
         //内部背景色填充
         paint.setColor(getResources().getColor(R.color.lightGray));
         paint.setShader(null);
-        rect = new RectF( - (length - length / 3f  - 2), -(length / 3f * 2f - 2), length - length / 3f -2 , length / 3f * 2f - 2);
+        rect = new RectF(-(length - length / 3f - 2), -(length / 3f * 2f - 2), length - length / 3f - 2, length / 3f * 2f - 2);
         canvas.drawArc(rect, 170, 200, true, strokePain);
         canvas.drawArc(rect, 0, 360, true, paint);
-
 
 
     }
 
     //使用ValueAnimator实现指针的转动动画效果
-    public void cgangePer(float per,float eada ){
+    public void cgangePer(float per, float eada) {
         this.perOld = this.per;
         this.per = per;
         this.edata = eada;
         Log.d("E_edata", String.valueOf(edata));
-        ValueAnimator va =  ValueAnimator.ofFloat(perOld,per);
+        ValueAnimator va = ValueAnimator.ofFloat(perOld, per);
         va.setDuration(1000);
         va.setInterpolator(new OvershootInterpolator());
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

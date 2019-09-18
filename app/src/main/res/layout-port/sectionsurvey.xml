@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="MissingDefaultResource">
 
     <HorizontalScrollView
             android:layout_width="wrap_content"
@@ -26,7 +28,7 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="直线测距"
+                    android:text="@string/Straight_line_ranging"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -40,7 +42,7 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="两点测距"
+                    android:text="@string/Two_point_ranging"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -55,7 +57,7 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="断面测距"
+                    android:text="@string/Section_ranging"
                     android:textColor="@color/red"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -104,20 +106,15 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!--    <android.opengl.GLSurfaceView-->
-    <!--            android:id="@+id/glView1"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="0dp"-->
-    <!--            android:layout_weight="12" />-->
     <com.HK.dzbly.utils.drawing.dynamicDrawing
             android:id="@+id/drawingView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="11"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
             android:layout_marginBottom="30dp"
-            android:layout_marginRight="30dp"/>
+            android:layout_weight="11" />
     />
 
     <HorizontalScrollView
@@ -144,13 +141,13 @@
                         android:id="@+id/nIncluding_length_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="不含仪器长度" />
+                        android:text="@string/Doesnot_include_instrument_length" />
 
                 <RadioButton
                         android:id="@+id/Including_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="含仪器长度  " />
+                        android:text="@string/include_instrument_length" />
             </RadioGroup>
 
             <TextView
@@ -160,7 +157,7 @@
                     android:background="@drawable/boder"
                     android:clickable="true"
                     android:gravity="center"
-                    android:text=" 测 量 "
+                    android:text="@string/Measured_quantity"
                     android:textColor="@color/black" />
 
             <TextView
@@ -170,7 +167,7 @@
                     android:background="@drawable/boder"
                     android:clickable="true"
                     android:gravity="center"
-                    android:text=" 重 置 "
+                    android:text="@string/reset"
                     android:textColor="@color/black" />
 
             <TextView
@@ -180,7 +177,7 @@
                     android:background="@drawable/boder"
                     android:clickable="true"
                     android:gravity="center"
-                    android:text=" 保 存 "
+                    android:text="@string/Save"
                     android:textColor="@color/black" />
         </LinearLayout>
     </HorizontalScrollView>

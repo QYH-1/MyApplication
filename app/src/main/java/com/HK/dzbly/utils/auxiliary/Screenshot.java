@@ -21,6 +21,7 @@ import java.io.IOException;
 public class Screenshot {
     /**
      * 获取当前actvity的截图
+     *
      * @param activity
      * @return
      */
@@ -48,6 +49,7 @@ public class Screenshot {
 
     /**
      * 写入sd中保存
+     *
      * @param bitmap
      * @param dirName
      * @param fileName
@@ -62,7 +64,7 @@ public class Screenshot {
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            File file = new File(dirName,fileName+".jpg");
+            File file = new File(dirName, fileName + ".jpg");
             // 判断文件是否存在，不存在则创建
             if (!file.exists()) {
                 file.createNewFile();

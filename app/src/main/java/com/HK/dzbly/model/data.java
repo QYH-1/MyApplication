@@ -16,9 +16,10 @@ public class data {
     private String type;//文件的类型
     private String folder;//所在文件夹
 
-    private void data(){
+    private void data() {
 
     }
+
     public String getName() {
         return name;
     }

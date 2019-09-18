@@ -85,10 +85,10 @@ class FileAdapter(context: Context) : BaseAdapter() {
             // 字符串样式对象
             val style = SpannableStringBuilder(map.name as String)
             style.setSpan(// 设定样式
-                    ForegroundColorSpan(Color.BLUE), // 前景样式
-                    start, // 起始坐标
-                    end, // 终止坐标
-                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE// 旗标
+                ForegroundColorSpan(Color.BLUE), // 前景样式
+                start, // 起始坐标
+                end, // 终止坐标
+                Spannable.SPAN_EXCLUSIVE_INCLUSIVE// 旗标
             )
 
             holder!!.name!!.setText(style)// 将样式设置给TextView

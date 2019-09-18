@@ -3,14 +3,20 @@ package com.HK.dzbly.ui.base;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.HK.dzbly.collector.ActivityCollector;
 
-/* 基类Activity 方便日志中查询界面所处的Activity*/
+/**
+ * @Author：qyh 版本：1.0
+ * 创建日期：2019/7/24$
+ * 描述：基类Activity 方便日志中查询界面所处的Activity
+ * 修订历史：
+ */
 public class BaseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("BaseActivity",getClass().getSimpleName());
+        Log.d("BaseActivity", getClass().getSimpleName());
         ActivityCollector.addActivity(this);
     }
 

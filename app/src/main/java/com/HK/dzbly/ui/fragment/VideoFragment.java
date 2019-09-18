@@ -8,9 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.VideoView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.HK.dzbly.R;
 
 import java.io.File;
@@ -18,7 +20,7 @@ import java.io.File;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/9/6$
- * 描述：
+ * 描述： 视频展示界面
  * 修订历史：
  */
 public class VideoFragment extends Fragment {

@@ -10,7 +10,7 @@ import android.util.Log;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/30$
- * 描述：
+ * 描述： 数据库的创建和定义增删改查操作
  * 修订历史：
  */
 public class DBhelper extends SQLiteOpenHelper {
@@ -44,6 +44,7 @@ public class DBhelper extends SQLiteOpenHelper {
                 "[CreatedTime] TimeStamp NOT NULL DEFAULT (datetime('now','localtime')),name text not null,val text ,rollAngle text,elevation text,type text not null,result text)";
         db.execSQL(sql);
     }
+
     //根据传参创建表
     public void CreateTable(Context context, String table) {
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_NAME, null);
@@ -88,7 +89,7 @@ public class DBhelper extends SQLiteOpenHelper {
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(
                 DB_NAME, null);
         boolean isTableExist = true;
-        Cursor cursor = db.rawQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='"+table+"'", null);
+        Cursor cursor = db.rawQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='" + table + "'", null);
         int learned = 0;
         if (cursor.moveToFirst()) {
             learned = cursor.getInt(0);

@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
+
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.LpszActivity;
@@ -170,29 +172,29 @@ public class ordinary_measurement_fragment extends Fragment {
                         rana = sp.getFloat("rana", 0);//获取横滚角数据
                         result = sp.getString("result", "");//获取产状信息数据
                         //将数据存储到数据库中
-                        dBhelper = new DBhelper(getContext(),dBhelper.db_name,null,1);
+                        dBhelper = new DBhelper(getContext(), dBhelper.db_name, null, 1);
                         //判断数据库是否存在，不存在就创建数据库（0为不存在，1为已经存在）
-                        String sqlNumber = sp.getString("sqlNumber","0");
-                        Log.d("sqlNumber",sqlNumber);
-                        if(sqlNumber.equals("0")){
+                        String sqlNumber = sp.getString("sqlNumber", "0");
+                        Log.d("sqlNumber", sqlNumber);
+                        if (sqlNumber.equals("0")) {
                             SQLiteDatabase db3 = dBhelper.getWritableDatabase();
-                            editor.putString("sqlNumber","1");
-                        }else{
-                            editor.putString("sqlNumber","1");
+                            editor.putString("sqlNumber", "1");
+                        } else {
+                            editor.putString("sqlNumber", "1");
                             editor.commit();
                         }
 //                        if(!dBhelper.IsTableExist(dBhelper.DZBLY_TABLE)){
 //                            dBhelper.CreateTable(getContext(),dBhelper.DZBLY_TABLE);
 //                        }
                         ContentValues cv = new ContentValues();
-                        cv.put("name",name);
-                        cv.put("val","1");
-                        cv.put("rollAngle","1");
-                        cv.put("elevation","1");
-                        cv.put("type","dZbl");
-                        cv.put("result","1");
+                        cv.put("name", name);
+                        cv.put("val", "1");
+                        cv.put("rollAngle", "1");
+                        cv.put("elevation", "1");
+                        cv.put("type", "dZbl");
+                        cv.put("result", "1");
 
-                        dBhelper.Insert(getContext(),dBhelper.DZBLY_TABLE,cv);
+                        dBhelper.Insert(getContext(), dBhelper.DZBLY_TABLE, cv);
 
                         Log.d("name", name);
                         String dname = name + ".txt";
@@ -200,30 +202,30 @@ public class ordinary_measurement_fragment extends Fragment {
                         try {
                             //查看当前文件是否存在
                             File file = new File(path, dname);
-                            if(file.exists()){
-                                fileOutputStream = new FileOutputStream(file,true);
-                                num = sp.getInt("num"+name,1)+1;
+                            if (file.exists()) {
+                                fileOutputStream = new FileOutputStream(file, true);
+                                num = sp.getInt("num" + name, 1) + 1;
                                 Log.d("num", String.valueOf(num));
-                                editor.putInt("num"+name,num);
+                                editor.putInt("num" + name, num);
                                 editor.commit();
                                 //file.delete();
                                 String str = "\n" +
-                                        "\t编  号："+num+"\n" +
-                                        "\t仰  角："+eada+"  \n" +
-                                        "\t横滚角："+rana+" \t\n" +
-                                        "\t方位角："+val+" \t\n" +
-                                        "\t产状信息："+result+" \t\n" +
-                                        "\t测量时间："+date+"\t\n" +
+                                        "\t编  号：" + num + "\n" +
+                                        "\t仰  角：" + eada + "  \n" +
+                                        "\t横滚角：" + rana + " \t\n" +
+                                        "\t方位角：" + val + " \t\n" +
+                                        "\t产状信息：" + result + " \t\n" +
+                                        "\t测量时间：" + date + "\t\n" +
                                         "\t\n";
                                 fileOutputStream.write(str.getBytes());
                                 fileOutputStream.close();
 
-                            }else {
+                            } else {
                                 fileOutputStream = new FileOutputStream(file);
-                                editor.putInt("num"+name,1);
+                                editor.putInt("num" + name, 1);
                                 editor.commit();
                                 String str = "\n" +
-                                        "\t编  号："+num+"<br>\n" +
+                                        "\t编  号：" + num + "<br>\n" +
                                         "\t仰  角：   <br>\n" +
                                         "\t横滚角：\t<br>\n" +
                                         "\t方位角：\t<br>\n" +

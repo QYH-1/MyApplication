@@ -40,7 +40,7 @@ import java.util.Date;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/8/6$
- * 描述：
+ * 描述：直线测距
  * 修订历史：
  */
 public class LineFragment extends Fragment implements RadioGroup.OnCheckedChangeListener, View.OnClickListener {
