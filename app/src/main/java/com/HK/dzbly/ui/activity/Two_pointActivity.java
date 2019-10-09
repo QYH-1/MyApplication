@@ -93,7 +93,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
-        setContentView(R.layout.three_dimensional);
+        setContentView(R.layout.two_point);
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
         STATE = sp.getInt("STATE", 0);
 
@@ -138,11 +138,11 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         save.setOnClickListener(this);
 
         if (STATE % 3 == 1) {
-            lock.setText("锁定点B");
+            lock.setText("有效点B");
         } else if (STATE % 3 == 2) {
             lock.setText("测量完成");
         } else {
-            lock.setText("锁定点A");
+            lock.setText("有效点A");
         }
     }
 
@@ -150,9 +150,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.reset:
-                SharedPreferences.Editor editor1 = sp.edit();
-                editor1.putInt("STATE", 1);
-                editor1.commit();
+                SharedPreferences.Editor ediTor = sp.edit();
+                ediTor.putInt("STATE", 0);
+                ediTor.commit();
                 Intent intent1 = new Intent(this, Two_pointActivity.class);
                 startActivity(intent1);
                 finish();
@@ -208,23 +208,16 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE", STATE + 1);
                     editor.commit();
-                    if (netConnection.isNetworkConnected(Two_pointActivity.this)) {
                         connectThread = new ConnectThread(socket, handler);
                         connectThread.start();
 
                         Intent intent2 = new Intent(Two_pointActivity.this, Two_pointActivity.class);
                         startActivity(intent2);
                         finish();
-                    } else {
-                        Toast.makeText(Two_pointActivity.this, "WIFI没有连接", Toast.LENGTH_SHORT).show();
-                    }
-
                 } else {
-                    lock.setClickable(false);
                     lock.setText("锁定点A");
                     //当没有正常接收wifi的数据时
                     Log.i("RECORD_VARIABLE-A", String.valueOf(RECORD_VARIABLE));
-                    if (netConnection.isNetworkConnected(Two_pointActivity.this)) {
                         connectThread = new ConnectThread(socket, myhandler);
                         connectThread.start();
                         if (RECORD_VARIABLE) {
@@ -237,9 +230,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                             startActivity(intent2);
                             finish();
                         }
-                    } else {
-                        Toast.makeText(Two_pointActivity.this, "WIFI没有连接", Toast.LENGTH_SHORT).show();
-                    }
                 }
             }
         });
@@ -311,6 +301,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
      * 向画三维坐标示意图传递数据
      */
     private void setTdc() {
+        Log.i("setTdc","setTdc");
         if (STATE % 3 == 1) {
             aRdistance = sp.getFloat("aRdistance", 0.00001f);
             aAzimuth = sp.getFloat("aAzimuth", 0.00001f);
@@ -322,7 +313,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
 
             fontRenderer = new FontRenderer(drawlineHandler, this);
             fontRenderer.getData(Ax, Ay, Az);
+            Log.i("调用方法","调用成功");
             glView.setRenderer(fontRenderer);
+
         } else if (STATE % 3 == 2) {
             aRdistance = sp.getFloat("aRdistance", 0.00001f);
             aAzimuth = sp.getFloat("aAzimuth", 0.00001f);

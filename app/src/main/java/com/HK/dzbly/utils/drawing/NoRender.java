@@ -53,18 +53,6 @@ public class NoRender implements Renderer {
         lineVertices = new float[]{
                 // 上顶面正方形的四个顶点
                 x1, y1, z1,//0
-                // x2,y2,z2//1
-                //x, 0,z,//1
-                //  0,0,z,//2
-                // 0,y,z,//3
-
-                // 下底面正方形的四个顶点
-                //x,y,0,//4
-                //x,0,0,//5
-                //0,0,0//2原点
-                // 0,y,0,//7 
-
-
         };
         //画特殊点
         float[] pointFacets = new float[]{
@@ -179,7 +167,7 @@ public class NoRender implements Renderer {
         // 将立方体的顶点位置数据数组包装成FloatBuffer;
         lineVerticesBuffer = floatBufferUtil(lineVertices);
         xyzVerticesBuffer = floatBufferUtil(xyzVertices);
-        //绘制两个点
+        //绘制点
         pointVerticesBuffer = floatBufferUtil(pointFacets);
         // 将直线的数组包装成ByteBuffer
         xiangliangFacetsBuffer = ByteBuffer.wrap(xiangliangFacets);
@@ -204,16 +192,7 @@ public class NoRender implements Renderer {
         task = new TimerTask() {
             public void run() {
                 String[] xyz = new String[5];//发送给activity用的
-                //2s生成xyz的随机数
-                //x=(float) (Math.random()*(-2)+1);
-                //y=(float) (Math.random()*(-2)+1);
-                // z=(float) (Math.random()*(-2)+1);
-//                x = x1;
-//                y = y1;
-//                z = z1;
-//                Log.d("xxxxxx", String.valueOf(x));
-//                Log.d("yyyyyy", String.valueOf(y));
-//                Log.d("zzzzzz", String.valueOf(z));
+
                 //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
                 Message msg = new Message();
                 msg.what = 200;//这是发送给当前类中用来更新立方体的
@@ -378,21 +357,5 @@ public class NoRender implements Renderer {
         mBuffer.position(0);// 设置缓冲区起始位置
 
         return mBuffer;
-    }
-
-    /**
-     * 接收activity传递过来的数据
-     *
-     * @param x1
-     * @param y1
-     * @param z1
-     * @param x2
-     * @param y2
-     * @param z2
-     */
-    public void getData(float x1, float y1, float z1, float x2, float y2, float z2) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.z1 = z1;
     }
 }

@@ -29,22 +29,19 @@ public class FontRenderer implements Renderer {
     Handler handler, handler2;
     private Timer timer = new Timer();
     private TimerTask task;
-    private float x1 = 0f, y1 = 0f, z1 = 0f;
+    private float x1 = 0f, y1 = 0f, z1 = 0f,x2 = 0f, y2 = 0f, z2 = 0f;
     private final Context mContext;
 
     // 定义Open GL ES绘制所需要的Buffer对象
     FloatBuffer lineVerticesBuffer;
     FloatBuffer xyzVerticesBuffer;
-
     FloatBuffer pointVerticesBuffer;
 
-    ByteBuffer lineFacetsBuffer;
     ByteBuffer xiangliangFacetsBuffer;
     ByteBuffer XFacetsBuffer;
     ByteBuffer YFacetsBuffer;
     ByteBuffer ZFacetsBuffer;
     ByteBuffer AFacetsBuffer;
-
     float[] lineVertices;
 
 
@@ -52,13 +49,16 @@ public class FontRenderer implements Renderer {
         // 定义立方体的8个顶点                                                       
         lineVertices = new float[]{
                 // 上顶面正方形的四个顶点
-                x1, y1, z1,//0
+                x2, y2, z2,//0
 
         };
         //画特殊点
+        Log.i(" x1", String.valueOf(x1));
+        Log.i(" y1", String.valueOf(y1));
+        Log.i(" z1", String.valueOf(z1));
+
         float[] pointFacets = new float[]{
-                x1, y1, z1,//0
-                //x2,y2,z2//1
+                x1, y1, z1//0
         };
         //定义XYZ坐标和显示的字
         float xyzVertices[] = new float[]{
@@ -179,7 +179,7 @@ public class FontRenderer implements Renderer {
         // 将立方体的顶点位置数据数组包装成FloatBuffer;
         lineVerticesBuffer = floatBufferUtil(lineVertices);
         xyzVerticesBuffer = floatBufferUtil(xyzVertices);
-        //绘制两个点
+        //绘制点
         pointVerticesBuffer = floatBufferUtil(pointFacets);
         // 将直线的数组包装成ByteBuffer
         xiangliangFacetsBuffer = ByteBuffer.wrap(xiangliangFacets);
@@ -199,35 +199,11 @@ public class FontRenderer implements Renderer {
                 if (msg.what == 200)//这是接收本类中定时器发送过来的信号用来更新正方体
                     updateXYZ();// 2.2
             }
-
         };
         //定时器任务中发送了两个信号，给本类中发送了一个，给activity类中发了一个
         task = new TimerTask() {
             public void run() {
                 String[] xyz = new String[5];//发送给activity用的
-                //2s生成xyz的随机数
-                //x=(float) (Math.random()*(-2)+1);
-                //y=(float) (Math.random()*(-2)+1);
-                // z=(float) (Math.random()*(-2)+1);
-//                x = x1;
-//                y = y1;
-//                z = z1;
-//                Log.d("xxxxxx", String.valueOf(x));
-//                Log.d("yyyyyy", String.valueOf(y));
-//                Log.d("zzzzzz", String.valueOf(z));
-//                //设定一下要显示的XYZ位数,不管正负都显示小数点后两位
-//                if(x>0)
-//                    xyz[0]=String.valueOf(x).substring(0, 4);
-//                else
-//                    xyz[0]=String.valueOf(x).substring(0, 5);
-//                if(y>0)
-//                    xyz[1]=String.valueOf(y).substring(0, 4);
-//                else
-//                    xyz[1]=String.valueOf(y).substring(0, 5);
-//                if(z>0)
-//                    xyz[2]=String.valueOf(z).substring(0, 4);
-//                else
-//                    xyz[2]=String.valueOf(z).substring(0, 5);
 
                 Message msg = new Message();
                 msg.what = 200;//这是发送给当前类中用来更新立方体的
@@ -243,7 +219,7 @@ public class FontRenderer implements Renderer {
 
             }
         };
-        // timer.schedule(task, 0, 7000);
+        timer.schedule(task, 0, 7000);
     }
 
     //2.3 实现接口里的三个方法
@@ -387,5 +363,6 @@ public class FontRenderer implements Renderer {
         this.x1 = x1;
         this.y1 = y1;
         this.z1 = z1;
+        Log.i("getData_x1", String.valueOf(x1));
     }
 }

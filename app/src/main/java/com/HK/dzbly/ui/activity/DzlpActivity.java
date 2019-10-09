@@ -113,9 +113,6 @@ public class DzlpActivity extends FragmentActivity {
                 //获取当前的方位角
                 //通过线程进行view的刷新
                 chaosCompassView.setVal(val);
-//                SharedPreferences.Editor editor = sp.edit();
-//                editor.putFloat("val",val);
-//                editor.commit();
                 Log.d("val", String.valueOf(val));
 
             }
@@ -235,18 +232,22 @@ public class DzlpActivity extends FragmentActivity {
 
     /**
      * 对fragment中ui进行更新
+     * 给出结果控件的值
      */
     @SuppressLint("ResourceAsColor")
     private void setFragment(String data) {
-        // TextView textView = getFragmentManager().findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
-        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
-        textView.setText(data);
-        textView.setTextSize(35);
-        textView.setGravity(Gravity.CENTER);
-        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString("result", data);
-        editor.commit();
+        //当选择了产状测量控件后才显示结果
+        if (occurrence_survey.isChecked()) {
+            TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+            textView.setText(data);
+            textView.setTextSize(35);
+            textView.setGravity(Gravity.CENTER);
+            textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("result", data);
+            editor.commit();
+        }
+
     }
 
     /**
@@ -270,24 +271,45 @@ public class DzlpActivity extends FragmentActivity {
                 //对wifi获取的数据进行处理
                 //俯仰角
                 data1 = concerto.Dataconversion(data.substring(0, 5));
+                Log.d("data1-dzlpActivity", String.valueOf(data1));
                 //横滚角
                 data2 = concerto.Dataconversion(data.substring(6, 12));
                 //方位角
                 data3 = concerto.Dataconversion(data.substring(12, 18));
                 Log.d("DzlpActivity_data3", data3);
                 //结果显示
-                Log.d("data1", String.valueOf(data1));
-                String t = data3.substring(0, data3.indexOf("."));
-                int t1 = Integer.parseInt(t) + 180;
-                String tmp = t1 + data3.substring(data3.indexOf("."));
-                Log.d("tmp", tmp);
-                float temp = Float.parseFloat(tmp);
-                Log.d("temp", String.valueOf(temp));
-                data5 = String.valueOf(temp);
-                Log.d("data5", data5);
-                data4 = data5 + "∠" + data1;
+                //当俯仰角的值在±1之间时，产状信息显示横滚角
+                if (Math.abs(Float.valueOf(data1)) <= 1) {
+                    String t = data3.substring(0, data3.indexOf("."));
+                    int t1 = Integer.parseInt(t) + 180;
+                    if (t1 / 360 > 1) {
+                        t1 = t1 -360;
+                    }
+                    String tmp = t1 + data3.substring(data3.indexOf("."));
+                    float temp = Float.parseFloat(tmp);
+                    Log.d("temp", String.valueOf(temp));
+                    data5 = String.valueOf(temp);
+                    Log.d("data5", data5);
+                    data4 = data5 + "∠" + data2;
+                    //调用显示
+                    setFragment(data4);
+                } else if (Math.abs(Float.valueOf(data2)) <= 1) {
+                    //当横滚角的值在±1之间时，产状信息使用俯仰角
+                    String t = data3.substring(0, data3.indexOf("."));
+                    int t1 = Integer.parseInt(t) + 180;
+                    if (t1 / 360 > 1) {
+                        t1 = t1 -360;
+                    }
+                    String tmp = t1 + data3.substring(data3.indexOf("."));
+                    float temp = Float.parseFloat(tmp);
+                    Log.d("temp", String.valueOf(temp));
+                    data5 = String.valueOf(temp);
+                    Log.d("data5", data5);
+                    data4 = data5 + "∠" + data1;
+                    //调用显示
+                    setFragment(data4);
+                }
 
-                Log.d("DzlpActivity_data1", data1);
                 //将最新的数据存储起来
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString("setElevation", data1);
@@ -305,8 +327,7 @@ public class DzlpActivity extends FragmentActivity {
             //改变控件的显示
             setElevation(data1);
             setRollangle(data2);
-            //Compass(Float.parseFloat(data3));
-            setFragment(data4);
+            //setFragment(data4);
             setChaosCompassView(data3);
         }
     };

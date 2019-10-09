@@ -100,7 +100,8 @@ public class MainActivity extends BaseActivity {
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                //Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
                 startActivity(intent); // 打开系统设置界面
             }
         });

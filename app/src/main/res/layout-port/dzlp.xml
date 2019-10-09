@@ -64,6 +64,7 @@
                 android:scaleX="1"
                 android:scaleY="1"
                 android:text="@string/Occurrence_survey"
+                android:checked="true"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:theme="@style/My_CheckBox"

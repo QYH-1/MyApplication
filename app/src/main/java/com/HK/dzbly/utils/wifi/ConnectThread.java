@@ -49,6 +49,7 @@ public class ConnectThread extends Thread {
         try {
             //创建与热点通信的socket
             socket = new Socket(sIP, port);
+            Log.i("接受wifi的数据","数据接受");
             try {
                 //向服务器端发送消息
                 outputStream = socket.getOutputStream();
@@ -97,7 +98,7 @@ public class ConnectThread extends Thread {
                             stringBuilder = null;
                             break;
                         }
-                        socket.close();
+                        //socket.close();
                     } catch (NullPointerException e) {
 
                     }

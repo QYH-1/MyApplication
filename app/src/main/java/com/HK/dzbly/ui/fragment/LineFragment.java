@@ -107,13 +107,9 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-        if (netConnection.isNetworkConnected(getActivity())) {
             connectThread = new ConnectThread(socket, myHandler);
             connectThread.start();
             Log.d("connectThread", "启动成功111111");
-        } else {
-            Toast.makeText(getActivity(), "请连接wifi", Toast.LENGTH_SHORT).show();
-        }
     }
 
     Handler myHandler = new Handler() {

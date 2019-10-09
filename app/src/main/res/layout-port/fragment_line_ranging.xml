@@ -47,7 +47,7 @@
                         android:id="@+id/Including_length"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/include_instrument_length" />
+                        android:text="含仪器长度  " />
             </RadioGroup>
 
             <TextView

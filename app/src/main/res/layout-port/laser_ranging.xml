@@ -48,7 +48,21 @@
 
 
             <TextView
-                    android:id="@+id/section_ranging"
+                android:id="@+id/section_ranging"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/boderwhite"
+                android:clickable="true"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/Section_ranging"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                    android:id="@+id/Continuous_ranging"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/boderwhite"
@@ -56,13 +70,13 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="@string/Section_ranging"
-                    android:textColor="@color/white"
+                    android:text="连续测距"
+                    android:textColor="@drawable/textcolor_selector"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
             <TextView
-                    android:id="@+id/tv_agora_log_activity"
+                    android:id="@+id/Accumulative_ranging"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/boderwhite"
@@ -70,13 +84,13 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="Agora"
+                    android:text="累加测距"
                     android:textColor="@drawable/textcolor_selector"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
             <TextView
-                    android:id="@+id/tv_other_log_activity"
+                    android:id="@+id/Reduced_range_finding"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/boderwhite"
@@ -84,24 +98,11 @@
                     android:gravity="center"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="Other"
+                    android:text="累减测距"
                     android:textColor="@drawable/textcolor_selector"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-            <TextView
-                    android:id="@+id/tv_clear_base_call_activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/boderwhite"
-                    android:clickable="true"
-                    android:gravity="center"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="Clear"
-                    android:textColor="@drawable/textcolor_selector"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
         </LinearLayout>
     </HorizontalScrollView>
 

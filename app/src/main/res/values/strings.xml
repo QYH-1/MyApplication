@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"></string>
+    <string name="app_name">地质编录仪</string>
     <string name="welcome">开机欢迎界面</string>
     <string name="DEVICE_CONNECTING">1</string> <!--有设备正在连接热点-->
     <string name="DEVICE_CONNECTED">2</string>  <!--有设备连上热点-->
@@ -34,7 +34,7 @@
     <string name="Doesnot_include_instrument_length">不含仪器长度</string>
     <string name="include_instrument_length">含仪器长度</string>
     <string name="reset"> 重 置 </string>
-    <string name="lock">锁 定</string>
+    <string name="lock">有 效</string>
     <string name="Cruise">游轮</string>
     <string name="Name">名称</string>
     <string name="Time">时间</string>
@@ -53,13 +53,13 @@
     <string name="Laser_ranging">激光测距</string>
     <string name="File_management">文件管理</string>
     <string name="geological_record">地质编录</string>
-    <string name="View_data">查看数据</string>
+    <string name="View_data">数据管理</string>
     <string name="Compass_settings">罗盘设置</string>
     <string name="Point_laser">点激光</string>
     <string name="Line_laser">线激光</string>
     <string name="Measured_quantity">测 量</string>
     <string name="Re_measurement">重新测量</string>
     <string name="Lock_the_left_visual_occurrence">锁定左侧视产状</string>
-
-
+    <string name="vertical">垂直</string>
+    <string name="horizontal">水平</string>
 </resources>

@@ -2,6 +2,7 @@ package com.HK.dzbly.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +27,9 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     private TextView line_ranging; //直线测距
     private TextView twopoint_ranging; //两点测距
     private TextView section_ranging; //断面测距
+    private TextView continuous_ranging; //连续测距
+    private TextView accumulative_ranging; //累加测距
+    private TextView reduced_range_finding; //累减测距
     private LineFragment mlineFragment; //创建直线测距fragment对象
     private static boolean enableExit = false;
 
@@ -49,13 +53,19 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
      * 获取控件和点击事件
      */
     private void inintView() {
-        line_ranging = findViewById(R.id.line_ranging);
-        twopoint_ranging = findViewById(R.id.twopoint_ranging);
-        section_ranging = findViewById(R.id.section_ranging);
+        line_ranging = findViewById(R.id.line_ranging);   //直线测距
+        twopoint_ranging = findViewById(R.id.twopoint_ranging);  //两点测距
+        section_ranging = findViewById(R.id.section_ranging);  //断面测距
+        continuous_ranging = findViewById(R.id.Continuous_ranging);  //连续测距
+        accumulative_ranging = findViewById(R.id.Accumulative_ranging);  //累加测距
+        reduced_range_finding = findViewById(R.id.Reduced_range_finding);  //累减测距
         //点击事件
         line_ranging.setOnClickListener(this);
         twopoint_ranging.setOnClickListener(this);
         section_ranging.setOnClickListener(this);
+        continuous_ranging.setOnClickListener(this);
+        accumulative_ranging.setOnClickListener(this);
+        reduced_range_finding.setOnClickListener(this);
 
     }
 
@@ -71,6 +81,13 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 break;
             case R.id.section_ranging:
                 selectFragment(2);
+            case R.id.Continuous_ranging:
+                continuous_ranging.setTextColor(Color.RED);
+                selectFragment(3);
+            case R.id.Accumulative_ranging:
+                selectFragment(4);
+            case R.id.Reduced_range_finding:
+                selectFragment(5);
         }
     }
 
