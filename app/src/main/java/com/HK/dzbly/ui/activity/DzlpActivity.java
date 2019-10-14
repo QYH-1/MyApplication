@@ -33,6 +33,8 @@ import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -81,10 +83,15 @@ public class DzlpActivity extends FragmentActivity {
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
 
-        connectThread = new ConnectThread(socket, handler);
-        connectThread.start();
-        Log.d("connectThread", "启动成功");
-
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                connectThread = new ConnectThread(socket, handler);
+                connectThread.start();
+                Log.d("connectThread", "启动成功");
+            }
+        }, 100);
     }
 
     /**
@@ -283,7 +290,7 @@ public class DzlpActivity extends FragmentActivity {
                     String t = data3.substring(0, data3.indexOf("."));
                     int t1 = Integer.parseInt(t) + 180;
                     if (t1 / 360 > 1) {
-                        t1 = t1 -360;
+                        t1 = t1 - 360;
                     }
                     String tmp = t1 + data3.substring(data3.indexOf("."));
                     float temp = Float.parseFloat(tmp);
@@ -298,7 +305,7 @@ public class DzlpActivity extends FragmentActivity {
                     String t = data3.substring(0, data3.indexOf("."));
                     int t1 = Integer.parseInt(t) + 180;
                     if (t1 / 360 > 1) {
-                        t1 = t1 -360;
+                        t1 = t1 - 360;
                     }
                     String tmp = t1 + data3.substring(data3.indexOf("."));
                     float temp = Float.parseFloat(tmp);

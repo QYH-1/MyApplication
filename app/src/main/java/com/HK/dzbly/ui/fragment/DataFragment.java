@@ -79,20 +79,44 @@ public class DataFragment extends Fragment {
 
         } else {
             if (type.equals("line")) {
-                displayDataName = "直线测距：";
+                displayDataName = "直线测距：" + "\n";
                 displayName = "\t名  称：" + dataName + "";
                 display = "\t时  间：" + dataTime + "\n" +
                         "\t距  离：" + result + "\n" +
                         "\t\n";
 
             } else if (type.equals("twoPoint")) {
-                displayDataName = "两点测距：";
+                displayDataName = "两点测距：" + "\n" + "\n";
                 displayName = "\t名  称：" + dataName + "";
                 display = "\t时  间：" + dataTime + "\n" +
                         "\t距  离：" + result + "\n" +
                         "\t\n";
+            } else if (type.equals("continuous")) {
+                displayDataName = "连续测距：" + "\n";
+                displayName = "\t名        称：" + dataName + "";
+                display = "\t时        间：" + dataTime + "\n" +
+                        "\t测量次数：" + val + "\n" +
+                        "\t详细数据：" + "\n" + rollAngle + "\n" +
+                        "\t最终距离：" + result + "米" + "\n" +
+                        "\t\n";
+            } else if (type.equals("accumulative")) {
+                displayDataName = "累加测距：" + "\n";
+                displayName = "\t名        称：" + dataName + "";
+                display = "\t时        间：" + dataTime + "\n" +
+                        "\t测量次数：" + val + "\n" +
+                        "\t详细数据：" + "\n" + rollAngle + "\n" +
+                        "\t累加距离：" + result + "米" + "\n" +
+                        "\t\n";
+            } else if (type.equals("reduced")) {
+                displayDataName = "累减测距：" + "\n" + "\n";
+                displayName = "\t名        称：" + dataName + "";
+                display = "\t时        间：" + dataTime + "\n" +
+                        "\t测量次数：" + val + "\n" +
+                        "\t详细数据：" + "\n" + rollAngle + "\n" +
+                        "\t累减距离：" + result + "米" + "\n" +
+                        "\t\n";
             } else if (type.equals("dZbl")) {
-                displayDataName = "产状测量：";
+                displayDataName = "产状测量：" + "\n";
                 displayName = "\t名        称：" + dataName + "";
                 display = "\t时        间：" + dataTime + "\n" +
                         "\t方  位  角：" + val + "\n" +
@@ -117,14 +141,23 @@ public class DataFragment extends Fragment {
             dataName = bundle.getString("dataName");
             dataTime = bundle.getString("dataTime");
             ditem = bundle.getString("ditem");
-            Log.i("--ditem--", ditem);
+            Log.i("DataFragment_ditem", ditem);
+            Log.i("DataFragment_dataName", dataName);
         }
-        if (ditem.equals("照片")) {
-            type = "jpg";
-        } else if (ditem.equals("视频")) {
-            type = "video";
+        Log.d("DataFragment_dataNamel", String.valueOf(dataName.length()));
+        if (dataName.length() > 5) {
+            if ((dataName.substring(dataName.length() - 4)).equals(".jpg")) {
+                type = "jpg";
+            }
+            // Log.d("DataFragment_type",type);
         } else {
-            type = "";
+            if (ditem.equals("照片") || ditem.equals("断面测距")) {
+                type = "jpg";
+            } else if (ditem.equals("视频")) {
+                type = "video";
+            } else {
+                type = "";
+            }
         }
 
         //获取数据库对象

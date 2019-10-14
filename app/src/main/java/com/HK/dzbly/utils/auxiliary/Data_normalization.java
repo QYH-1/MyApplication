@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
  * 修订历史：
  */
 public class Data_normalization {
-    DecimalFormat df = new DecimalFormat("0.##");
+    DecimalFormat df = new DecimalFormat("0.###");
 
     public double[] normalization(double[] temp) {
 
@@ -21,7 +21,16 @@ public class Data_normalization {
         }
         return p;
     }
+    public float[] normalization(float[] temp) {
 
+        float[] p = new float[temp.length];
+        //求出数组中的最大值
+        double db = maxV(temp);
+        for (int i = 0; i < p.length; i++) {
+            p[i] = Float.parseFloat((df.format(temp[i] / db)));
+        }
+        return p;
+    }
     /**
      * 获取数组中的最大值
      *
@@ -30,6 +39,21 @@ public class Data_normalization {
      */
     public double maxV(double[] matrixJ) {
         double v = matrixJ[0];
+        for (int i = 0; i < matrixJ.length; i++) {
+            if (matrixJ[i] > v) {
+                v = matrixJ[i];
+            }
+        }
+        return v;
+    }
+    /**
+     * 获取数组中的最大值
+     *
+     * @param matrixJ matrixJ
+     * @return v
+     */
+    public float maxV(float[] matrixJ) {
+        float v = matrixJ[0];
         for (int i = 0; i < matrixJ.length; i++) {
             if (matrixJ[i] > v) {
                 v = matrixJ[i];

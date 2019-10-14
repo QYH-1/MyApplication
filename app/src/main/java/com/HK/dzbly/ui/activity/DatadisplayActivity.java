@@ -121,9 +121,16 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         });
     }
 
+    /**
+     * 添加下拉菜单列表
+     */
     public void getDataSource() {
         data.add("直线测距");
         data.add("两点测距");
+        data.add("断面测距");
+        data.add("连续测距");
+        data.add("累加测距");
+        data.add("累减测距");
         data.add("地质编录");
         data.add("照片");
         data.add("视频");
@@ -155,7 +162,7 @@ public class DatadisplayActivity extends FragmentActivity implements DatashowFra
         bundle.putString("dataTime", dataTime);
         bundle.putString("ditem", ditem);
         String data = dataName.substring(dataName.indexOf(".") + 1);
-        Log.i("----data", data);
+        Log.i("----data======", data);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

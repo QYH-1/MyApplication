@@ -1,0 +1,5 @@
+针对数据库说明：
+    1、数据库名称：cqhk.db。
+    2、在数据库中存在两张表分别为DZBLY（Did,datetime,name,val,rollAngle,elevation,type,result），File(type,datetime,name)。
+    3、其中表File主要用来存储照片和视频文件，DZBLY用来存储其他数据。
+    4、特例：在储存连续测距、累加测距、累减测距时使用val来记录测量点的个数,rollAngle记录详细数据，再存储其他数据时按期表意。

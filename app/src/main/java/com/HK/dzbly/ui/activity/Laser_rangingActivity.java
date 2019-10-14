@@ -1,9 +1,11 @@
 package com.HK.dzbly.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,7 +16,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.HK.dzbly.R;
+import com.HK.dzbly.ui.fragment.Accumulative_rangingFragment;
+import com.HK.dzbly.ui.fragment.Continuous_rangingFragment;
 import com.HK.dzbly.ui.fragment.LineFragment;
+import com.HK.dzbly.ui.fragment.Reduced_range_findingFragment;
 
 
 /**
@@ -23,7 +28,7 @@ import com.HK.dzbly.ui.fragment.LineFragment;
  * 描述：激光测距
  * 修订历史：
  */
-public class Laser_rangingActivity extends FragmentActivity implements View.OnClickListener {
+public class Laser_rangingActivity extends FragmentActivity implements View.OnClickListener,Continuous_rangingFragment.CallBack,Accumulative_rangingFragment.CallBack,Reduced_range_findingFragment.CallBack {
     private TextView line_ranging; //直线测距
     private TextView twopoint_ranging; //两点测距
     private TextView section_ranging; //断面测距
@@ -31,6 +36,9 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     private TextView accumulative_ranging; //累加测距
     private TextView reduced_range_finding; //累减测距
     private LineFragment mlineFragment; //创建直线测距fragment对象
+    private Continuous_rangingFragment continuous_rangingFragment; //创建连续测距fragment对象
+    private Accumulative_rangingFragment accumulativeFragment; //创建累加测距fragment对象
+    private Reduced_range_findingFragment reduced_range_findingFragment;//创建累减测距fragment对象
     private static boolean enableExit = false;
 
     @Override
@@ -46,7 +54,7 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
 
         inintView();
         selectFragment(0);
-
+        intentData();
     }
 
     /**
@@ -74,6 +82,10 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.line_ranging:
+                continuous_ranging.setTextColor(Color.WHITE );
+                line_ranging.setTextColor(Color.RED);
+                accumulative_ranging.setTextColor(Color.WHITE);
+                reduced_range_finding.setTextColor(Color.WHITE);
                 selectFragment(0);
                 break;
             case R.id.twopoint_ranging:
@@ -81,16 +93,36 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 break;
             case R.id.section_ranging:
                 selectFragment(2);
+                break;
             case R.id.Continuous_ranging:
                 continuous_ranging.setTextColor(Color.RED);
+                line_ranging.setTextColor(Color.WHITE);
+                accumulative_ranging.setTextColor(Color.WHITE);
+                reduced_range_finding.setTextColor(Color.WHITE);
                 selectFragment(3);
+                break;
             case R.id.Accumulative_ranging:
+                continuous_ranging.setTextColor(Color.WHITE);
+                line_ranging.setTextColor(Color.WHITE);
+                accumulative_ranging.setTextColor(Color.RED);
+                reduced_range_finding.setTextColor(Color.WHITE);
                 selectFragment(4);
+                break;
             case R.id.Reduced_range_finding:
+                continuous_ranging.setTextColor(Color.WHITE);
+                line_ranging.setTextColor(Color.WHITE);
+                accumulative_ranging.setTextColor(Color.WHITE);
+                reduced_range_finding.setTextColor(Color.RED);
                 selectFragment(5);
+                break;
+            default:
+                break;
         }
     }
-
+    /**
+     * 选择加载的布局
+     * @param position
+     */
     @SuppressLint("ResourceAsColor")
     private void selectFragment(int position) {
         FragmentManager manager = getSupportFragmentManager();
@@ -112,6 +144,100 @@ public class Laser_rangingActivity extends FragmentActivity implements View.OnCl
                 startActivity(intent1);
                 finish();
                 break;
+            case 3:
+                if (continuous_rangingFragment == null) {
+                    continuous_rangingFragment = new Continuous_rangingFragment();
+                }
+                fragmentTransaction.replace(R.id.measurement_options, continuous_rangingFragment).commit();
+                break;
+            case 4:
+                if (accumulativeFragment == null) {
+                    accumulativeFragment = new Accumulative_rangingFragment();
+                }
+                fragmentTransaction.replace(R.id.measurement_options, accumulativeFragment).commit();
+                break;
+            case 5:
+                if (reduced_range_findingFragment == null) {
+                    reduced_range_findingFragment = new Reduced_range_findingFragment();
+                }
+                fragmentTransaction.replace(R.id.measurement_options, reduced_range_findingFragment).commit();
+                break;
+            default:
+                break;
         }
+    }
+
+    /**
+     * 接受界面跳转的数据，确定fragment的加载
+     */
+    private void intentData(){
+        Intent intent = getIntent();
+        int number = intent.getIntExtra("fragmentNumber",0);
+        if(number == 0){
+            continuous_ranging.setTextColor(Color.WHITE );
+            line_ranging.setTextColor(Color.RED);
+            accumulative_ranging.setTextColor(Color.WHITE);
+            reduced_range_finding.setTextColor(Color.WHITE);
+            selectFragment(0);
+        }else if(number == 3){
+            continuous_ranging.setTextColor(Color.RED);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.WHITE);
+            reduced_range_finding.setTextColor(Color.WHITE);
+            selectFragment(3);
+        }else if(number ==4){
+            continuous_ranging.setTextColor(Color.WHITE);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.RED);
+            reduced_range_finding.setTextColor(Color.WHITE);
+            selectFragment(4);
+        }else{
+            continuous_ranging.setTextColor(Color.WHITE);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.WHITE);
+            reduced_range_finding.setTextColor(Color.RED);
+            selectFragment(5);
+        }
+
+    }
+
+    /**
+     * 重写Continuous_rangingFragment中的方法,获取fragment传递过来的数据
+     * @param content
+     */
+    @Override
+    public void getResult(int content) {
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = manager.beginTransaction();
+        Log.i("content", String.valueOf(content));
+        if(content ==3){
+            continuous_ranging.setTextColor(Color.RED);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.WHITE);
+            reduced_range_finding.setTextColor(Color.WHITE);
+            if (continuous_rangingFragment != null) {
+                continuous_rangingFragment = new Continuous_rangingFragment();
+            }
+            fragmentTransaction.replace(R.id.measurement_options, continuous_rangingFragment).commit();
+        }else if(content ==4){
+            continuous_ranging.setTextColor(Color.WHITE);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.RED);
+            reduced_range_finding.setTextColor(Color.WHITE);
+            if (accumulativeFragment != null) {
+                accumulativeFragment = new Accumulative_rangingFragment();
+            }
+            fragmentTransaction.replace(R.id.measurement_options, accumulativeFragment).commit();
+        }else if(content ==5){
+            continuous_ranging.setTextColor(Color.WHITE);
+            line_ranging.setTextColor(Color.WHITE);
+            accumulative_ranging.setTextColor(Color.WHITE);
+            reduced_range_finding.setTextColor(Color.RED);
+            if (reduced_range_findingFragment != null) {
+                reduced_range_findingFragment = new Reduced_range_findingFragment();
+            }
+            fragmentTransaction.replace(R.id.measurement_options, reduced_range_findingFragment).commit();
+        }
+
     }
 }

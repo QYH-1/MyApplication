@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -51,6 +53,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private Handler drawlineHandler;
     private GLSurfaceView glView;
     private TextView line_ranging, section_ranging;//测距
+    private TextView continuous_ranging; //连续测距
+    private TextView accumulative_ranging; //累加测距
+    private TextView reduced_range_finding; //累减测距
     private RadioButton nIncluding_length_length; //不包含仪器长度
     private RadioButton Including_length; //包含仪器长度
     private RadioGroup Initial_length;
@@ -124,6 +129,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         nIncluding_length_length = findViewById(R.id.nIncluding_length_length);
         Including_length = findViewById(R.id.Including_length);
         Initial_length = findViewById(R.id.Initial_length);
+        continuous_ranging = findViewById(R.id.continuous_measurement);  //连续测距
+        accumulative_ranging = findViewById(R.id.Cumulative_measurement);  //累加测距
+        reduced_range_finding = findViewById(R.id.Cumulative_reduction_measurement);  //累减测距
         reSet = findViewById(R.id.reset);
         lock = findViewById(R.id.lock);
         save = findViewById(R.id.Save);
@@ -133,6 +141,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         Initial_length.setOnCheckedChangeListener(this);
         line_ranging.setOnClickListener(this);
         section_ranging.setOnClickListener(this);
+        continuous_ranging.setOnClickListener(this);
+        accumulative_ranging.setOnClickListener(this);
+        reduced_range_finding.setOnClickListener(this);
 
         reSet.setOnClickListener(this);
         save.setOnClickListener(this);
@@ -165,6 +176,25 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 startActivity(intent2);
                 finish();
                 break;
+            case R.id.continuous_measurement:
+                Intent intent3 = new Intent(this,Laser_rangingActivity.class);
+                intent3.putExtra("fragmentNumber",3);
+                startActivity(intent3);
+                finish();
+                break;
+            case R.id.Cumulative_measurement:
+                Intent intent4 = new Intent(this,Laser_rangingActivity.class);
+                intent4.putExtra("fragmentNumber",4);
+                startActivity(intent4);
+                finish();
+                break;
+            case R.id.Cumulative_reduction_measurement:
+                Intent intent5 = new Intent(this,Laser_rangingActivity.class);
+                intent5.putExtra("fragmentNumber",5);
+                startActivity(intent5);
+                finish();
+                break;
+
         }
     }
 
@@ -271,7 +301,15 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             Log.d("TWO_wifi_data2", data);
             //当接收wifi的数据不是24位，就提示信息并将接收标志置为false
             if (data.length() < 24) {
-                Toast.makeText(Two_pointActivity.this, "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
+                Toast toast = Toast.makeText(Two_pointActivity.this, "网络错误,请检查网络连接！", Toast.LENGTH_SHORT);
+                //设置提示字体
+                LinearLayout layout = (LinearLayout) toast.getView();
+                TextView tv = (TextView) layout.getChildAt(0);
+                tv.setTextSize(25);
+                tv.setTextColor(Color.RED);
+
+                toast.setGravity(Gravity.CENTER, 0, 0);// 居中显示
+                toast.show();
                 RECORD_VARIABLE = false;
             }
             bRdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));

@@ -2,9 +2,11 @@ package com.HK.dzbly.ui.fragment;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,9 +120,22 @@ public class DatashowFragment extends Fragment {
     //为listview适配样式和数据
     private void setListView_names(View view) {
         Log.i("----data1", String.valueOf(data1));
-        simpleAdapter = new SimpleAdapter(getActivity(), data1, R.layout.item_datall, new String[]
-                {"name", "time"}, new int[]{R.id.nameall, R.id.timeall});
-        listView_names.setAdapter(simpleAdapter);
+        if (data1.size() == 0) {
+            Toast toast = Toast.makeText(getActivity(), "不存在数据！", Toast.LENGTH_SHORT);
+            //设置提示字体
+            LinearLayout layout = (LinearLayout) toast.getView();
+            TextView tv = (TextView) layout.getChildAt(0);
+            tv.setTextSize(25);
+            tv.setTextColor(Color.RED);
+
+            toast.setGravity(Gravity.CENTER, 0, 0);// 居中显示
+            toast.show();
+        } else {
+            simpleAdapter = new SimpleAdapter(getActivity(), data1, R.layout.item_datall, new String[]
+                    {"name", "time"}, new int[]{R.id.nameall, R.id.timeall});
+            listView_names.setAdapter(simpleAdapter);
+        }
+
         //设置监听事件
         listView_names.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -154,7 +169,9 @@ public class DatashowFragment extends Fragment {
         }).start();
     }
 
-    //获取数据源
+    /**
+     * 获取数据源
+     */
     private List<Map<String, Object>> getData() {
         List<Map<String, Object>> subList = new ArrayList<>();
         if (data1.size() > 20) {
@@ -165,6 +182,11 @@ public class DatashowFragment extends Fragment {
         return subList;
     }
 
+    /**
+     * 从数据库中获取符合条件的数据
+     *
+     * @return
+     */
     private List<Map<String, Object>> setData() {
         DBhelper dbHelper2 = new DBhelper(getActivity(), "cqhk.db");
         Log.i("------type", type);
@@ -221,7 +243,10 @@ public class DatashowFragment extends Fragment {
 
     }
 
-    //进行数据的转换
+    /**
+     * 进行数据到类型的转换
+     */
+
     private void DataConversion() {
         Bundle bundle = this.getArguments();//得到从Activity传来的数据
         if (bundle != null) {
@@ -234,6 +259,14 @@ public class DatashowFragment extends Fragment {
             type = "line";
         } else if (ditem.equals("两点测距")) {
             type = "twoPoint";
+        } else if (ditem.equals("断面测距")) {
+            type = "jpg";
+        } else if (ditem.equals("连续测距")) {
+            type = "continuous";
+        } else if (ditem.equals("累加测距")) {
+            type = "accumulative";
+        } else if (ditem.equals("累减测距")) {
+            type = "reduced";
         } else if (ditem.equals("地质编录")) {
             type = "dZbl";
         } else if (ditem.equals("照片")) {

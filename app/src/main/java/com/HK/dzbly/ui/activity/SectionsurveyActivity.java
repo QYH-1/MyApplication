@@ -58,6 +58,9 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private TextView line_ranging, twopoint_ranging, Measurement, reset;//测距
     private RadioButton nIncluding_length_length; //不包含仪器长度
     private RadioButton Including_length; //包含仪器长度
+    private TextView continuous_ranging; //连续测距
+    private TextView accumulative_ranging; //累加测距
+    private TextView reduced_range_finding; //累减测距
     private RadioGroup Initial_length;
     private TextView save; //保存
     private NetConnection netConnection;//检查wifi是否连接
@@ -100,6 +103,9 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         nIncluding_length_length = findViewById(R.id.nIncluding_length_length);
         Including_length = findViewById(R.id.Including_length);
         Initial_length = findViewById(R.id.Initial_length);
+        continuous_ranging = findViewById(R.id.continuous_measurement);  //连续测距
+        accumulative_ranging = findViewById(R.id.Cumulative_measurement);  //累加测距
+        reduced_range_finding = findViewById(R.id.Cumulative_reduction_measurement);  //累减测距
         Measurement = findViewById(R.id.measurement);
         reset = findViewById(R.id.reset);
         save = findViewById(R.id.Save);
@@ -108,6 +114,9 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         nIncluding_length_length.setChecked(true);
         line_ranging.setOnClickListener(this);
         twopoint_ranging.setOnClickListener(this);
+        continuous_ranging.setOnClickListener(this);
+        accumulative_ranging.setOnClickListener(this);
+        reduced_range_finding.setOnClickListener(this);
         Measurement.setOnClickListener(this);
         reset.setOnClickListener(this);
         save.setOnClickListener(this);
@@ -151,6 +160,24 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 finish();
             case R.id.Save:
                 showDialog();
+                break;
+            case R.id.continuous_measurement:
+                Intent intent3 = new Intent(this,Laser_rangingActivity.class);
+                intent3.putExtra("fragmentNumber",3);
+                startActivity(intent3);
+                finish();
+                break;
+            case R.id.Cumulative_measurement:
+                Intent intent4 = new Intent(this,Laser_rangingActivity.class);
+                intent4.putExtra("fragmentNumber",4);
+                startActivity(intent4);
+                finish();
+                break;
+            case R.id.Cumulative_reduction_measurement:
+                Intent intent5 = new Intent(this,Laser_rangingActivity.class);
+                intent5.putExtra("fragmentNumber",5);
+                startActivity(intent5);
+                finish();
                 break;
         }
     }

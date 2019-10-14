@@ -30,8 +30,11 @@ public class ConnectThread extends Thread {
     private static String hexString = "0123456789ABCDEF";
     private String datas = null;
     private StringBuilder stringBuilder = new StringBuilder();
+    //向硬件发送的数据
     private byte msg = (byte) 0x01;
+    //wifi的服务端ip
     private String sIP = "10.10.100.254";
+    //wifi的服务端端口
     private String sPort = "8899"; //找到端口号8899
     private int port = Integer.parseInt(sPort); //String型转换为Int型
 
