@@ -52,14 +52,14 @@ public class ConnectThread extends Thread {
         try {
             //创建与热点通信的socket
             socket = new Socket(sIP, port);
-            Log.i("接受wifi的数据","数据接受");
+            Log.i("接受wifi的数据", "数据接受");
             try {
                 //向服务器端发送消息
                 outputStream = socket.getOutputStream();
                 outputStream.write(msg);
                 Log.d("向服务器端发送消息", String.valueOf(msg));
                 outputStream.flush();
-
+                sendData();
                 InetAddress address = InetAddress.getLocalHost();
                 Log.d("客户端的IP地址", String.valueOf(address));
                 while (true) {
@@ -87,8 +87,8 @@ public class ConnectThread extends Thread {
                         Log.d("stringBuilder", String.valueOf(stringBuilder));
                         datas = String.valueOf(stringBuilder);
                         Log.d("datas", String.valueOf(datas));
-                        //当接受的wifi的数据为24位的整数倍时，通过handler向界面传递数据
-                        while (datas.length() % 24 == 0 && datas.length() != 0) {
+                        //当接受的wifi的数据为30位的整数倍时，通过handler向界面传递数据
+                        while (datas.length() % 30 == 0 && datas.length() != 0) {
                             Message msg = Message.obtain();
                             msg.what = 1;
                             Bundle bundle = new Bundle();
@@ -112,5 +112,18 @@ public class ConnectThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendData() {
+        try {
+            outputStream = socket.getOutputStream();
+            outputStream.write(msg);
+            Log.d("向服务器端发送消息", String.valueOf(msg));
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

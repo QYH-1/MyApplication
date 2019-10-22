@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
@@ -31,10 +33,17 @@ import com.HK.dzbly.utils.drawing.Rollangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @Author：qyh 版本：1.0
@@ -55,14 +64,21 @@ public class DzlpActivity extends FragmentActivity {
     //创建fragment对象
     private ordinary_measurement_fragment mordinary_measurement_fragment;
     private simple_measurement_fragment msimple_measurement_fragment;
-
     private ConnectThread connectThread; //获取wifi连接对象
     private Socket socket;
-    //  private Handler handler;
     private String data;//wifi传递过来的数据
     private SharedPreferences sp; //用来保存数据，传递给fragment进行存储
     private NetConnection netConnection;//检查网络连接
     private Concerto concerto;//处理wifi传递过来的数据
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private String data1 = null; //俯仰角
+    private String data2 = null; //横滚角
+    private String data3 = null;//方位角
+    private String data4 = null; //显示结果
+    private String data5 = null; //计算后的产转的角
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,18 +96,43 @@ public class DzlpActivity extends FragmentActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
         concerto = new Concerto();
         inint(); //获取控件
+
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
-
+        //使用子线程得到wifi的socket连接
+        send = new Send();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                connectThread = new ConnectThread(socket, handler);
-                connectThread.start();
-                Log.d("connectThread", "启动成功");
+                Data();
             }
-        }, 100);
+        }, 0, 2000 * 2);
+    }
+
+    private void Data() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        send.sendData(outputStream, (byte) 0x01);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, handler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /**
@@ -102,10 +143,11 @@ public class DzlpActivity extends FragmentActivity {
         chaosCompassView = (CompassView) findViewById(R.id.activity_compass_compassview);
         //获取SensorManager实例
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        occurrence_survey = findViewById(R.id.occurrence_survey);
+        occurrence_survey = findViewById(R.id.occurrence_survey); //产状测量
         selection_method = findViewById(R.id.selection_method);
         elevation = findViewById(R.id.elevation);
         rollangle = findViewById(R.id.roll_angle);
+
     }
 
     /**
@@ -237,12 +279,38 @@ public class DzlpActivity extends FragmentActivity {
         chaosCompassView.CompassViewdata(val);
     }
 
+//    private void setLo(String data) {
+//        //获取fragment中的控件
+//        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+//        occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+//                if (isChecked) {
+//                    textView.setText(data);
+//                    textView.setTextSize(35);
+//                    textView.setGravity(Gravity.CENTER);
+//                    textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+//                } else {
+//
+//                    String text = "<p> 测量方法：<br>\n" +
+//                            "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
+//                            "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
+//                            "\t</p>";
+//                    textView.setText(Html.fromHtml(text));
+//                    textView.setTextSize(18);
+//                    textView.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
+//                }
+//            }
+//        });
+//    }
+
     /**
      * 对fragment中ui进行更新
      * 给出结果控件的值
      */
     @SuppressLint("ResourceAsColor")
     private void setFragment(String data) {
+
         //当选择了产状测量控件后才显示结果
         if (occurrence_survey.isChecked()) {
             TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
@@ -250,9 +318,6 @@ public class DzlpActivity extends FragmentActivity {
             textView.setTextSize(35);
             textView.setGravity(Gravity.CENTER);
             textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString("result", data);
-            editor.commit();
         }
 
     }
@@ -260,21 +325,15 @@ public class DzlpActivity extends FragmentActivity {
     /**
      * 接收wifi的数据，并对控件进行设置
      */
-    private Handler handler = new Handler() {
+    private final Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Bundle bundle = new Bundle();
             bundle = msg.getData();
             data = bundle.getString("msg");
-
             Log.d("DzlpActivity_data", data);
-            String data1 = null;
-            String data2 = null;
-            String data3 = null;
-            String data4 = null;
-            String data5 = null;
-            if (data.length() == 24) {
+            if (data.length() == 30) {
                 //对wifi获取的数据进行处理
                 //俯仰角
                 data1 = concerto.Dataconversion(data.substring(0, 5));
@@ -289,7 +348,7 @@ public class DzlpActivity extends FragmentActivity {
                 if (Math.abs(Float.valueOf(data1)) <= 1) {
                     String t = data3.substring(0, data3.indexOf("."));
                     int t1 = Integer.parseInt(t) + 180;
-                    if (t1 / 360 > 1) {
+                    if (t1 >= 360) {
                         t1 = t1 - 360;
                     }
                     String tmp = t1 + data3.substring(data3.indexOf("."));
@@ -299,12 +358,21 @@ public class DzlpActivity extends FragmentActivity {
                     Log.d("data5", data5);
                     data4 = data5 + "∠" + data2;
                     //调用显示
-                    setFragment(data4);
+                    //setFragment(data4);
+                    //当选择了产状测量控件后才显示结果
+                    if (occurrence_survey.isChecked()) {
+                        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+                        textView.setText(data4);
+                        textView.setTextSize(35);
+                        textView.setGravity(Gravity.CENTER);
+                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                    }
+                    //setLo(data4);
                 } else if (Math.abs(Float.valueOf(data2)) <= 1) {
                     //当横滚角的值在±1之间时，产状信息使用俯仰角
                     String t = data3.substring(0, data3.indexOf("."));
                     int t1 = Integer.parseInt(t) + 180;
-                    if (t1 / 360 > 1) {
+                    if (t1 >= 360) {
                         t1 = t1 - 360;
                     }
                     String tmp = t1 + data3.substring(data3.indexOf("."));
@@ -314,7 +382,16 @@ public class DzlpActivity extends FragmentActivity {
                     Log.d("data5", data5);
                     data4 = data5 + "∠" + data1;
                     //调用显示
-                    setFragment(data4);
+                    // setFragment(data4);
+                    //当选择了产状测量控件后才显示结果
+                    if (occurrence_survey.isChecked()) {
+                        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+                        textView.setText(data4);
+                        textView.setTextSize(35);
+                        textView.setGravity(Gravity.CENTER);
+                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                    }
+                    //setLo(data4);
                 }
 
                 //将最新的数据存储起来
@@ -324,19 +401,33 @@ public class DzlpActivity extends FragmentActivity {
                 editor.putString("Compass", data3);
                 editor.putString("setFragment", data4);
 
-            } else {
-                //当wifi传递来的数据不完整或者为空时，将前面最新的数据用于显示
-                data1 = sp.getString("setElevation", "0.0");
-                data2 = sp.getString("setRollangle", "0.0");
-                data3 = sp.getString("Compass", "0.0");
-                data4 = sp.getString("setFragment", "");
             }
             //改变控件的显示
             setElevation(data1);
             setRollangle(data2);
             //setFragment(data4);
             setChaosCompassView(data3);
+            TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+            occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        textView.setText(data4);
+                        textView.setTextSize(35);
+                        textView.setGravity(Gravity.CENTER);
+                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                    } else {
+
+                        String text = "<p> 测量方法：<br>\n" +
+                                "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
+                                "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
+                                "\t</p>";
+                        textView.setText(Html.fromHtml(text));
+                        textView.setTextSize(18);
+                        textView.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
+                    }
+                }
+            });
         }
     };
-
 }

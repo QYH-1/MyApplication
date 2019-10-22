@@ -32,11 +32,15 @@ import com.HK.dzbly.utils.drawing.Accumulative_rangingDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.Socket;
@@ -47,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -86,6 +92,7 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
     private float angle;//水平倾角（俯仰角）
     private double x = 0, y = 0;//由传感器传递过来的数据转换为点的坐标
     private float aAzimuth;//方位角
+    private OutputStream outputStream;  //数据输出流
 
     //义用来与外部activity交互，获取到宿主activity
     private Continuous_rangingFragment.CallBack callback;
@@ -125,6 +132,7 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
      */
     private void Content(View view) {
         initView(view);
+        getWifiData();
     }
 
     /**
@@ -156,8 +164,37 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-        connectThread = new ConnectThread(socket, myHandler);
-        connectThread.start();
+
+        //使用子线程得到wifi的socket连接
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    //使用定时器实现wifi数据的刷新
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+//                            Send send = new Send();
+//                            try {
+//                                send.sendData(outputStream, (byte) 0x01);
+//                                ReceiveMsg receiveMsg = new ReceiveMsg();
+//                                receiveMsg.receiveMsg(inputStream,myHandler);
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+
+                        }
+                    }, 100, 100);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         //记录测量的次数
     }
 
@@ -165,29 +202,35 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Bundle bundle = new Bundle();
-            bundle = msg.getData();
-            Log.d("bundle", String.valueOf(bundle));
-            Log.w("是否进行赋值", "执行当当前语句");
-            String data = bundle.getString("msg");
-            Log.d("LineFragmentwifi_data", data);
-            if (data.length() < 24) {
-                Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
+            switch (msg.what) {
+                case 0:
+                    Bundle bundle = new Bundle();
+                    bundle = msg.getData();
+                    Log.d("bundle", String.valueOf(bundle));
+                    Log.w("是否进行赋值", "执行当当前语句");
+                    String data = bundle.getString("msg");
+                    Log.d("LineFragmentwifi_data", data);
+                    if (data.length() < 30) {
+                        Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
+                    }
+                    //处理wifi传递过来的数据
+                    concerto = new Concerto();
+                    distance = Integer.parseInt(concerto.Dataconversion(data.substring(18)));
+                    aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
+                    angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 5)));
+                    double a = Math.abs((distance));
+                    x = (a * Math.cos(angle) * Math.sin(aAzimuth));
+                    y = (a * Math.sin(angle));
+                    break;
+                case 1:
+                    //保存坐标和距离数据
+                    Map<String, Object> mMap = new HashMap<>();//保存wifi传递过来点的具体坐标
+                    mMap.put("x", x);
+                    mMap.put("y", y);
+                    mMap.put("distance", distance);
+                    mList.add(mMap);
+                    break;
             }
-            //处理wifi传递过来的数据
-            concerto = new Concerto();
-            distance = Integer.parseInt(concerto.Dataconversion(data.substring(18)));
-            aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 5)));
-            double a = Math.abs((distance));
-            x = (a * Math.cos(angle) * Math.sin(aAzimuth));
-            y = (a * Math.sin(angle));
-            //保存坐标和距离数据
-            Map<String, Object> mMap = new HashMap<>();//保存wifi传递过来点的具体坐标
-            mMap.put("x", x);
-            mMap.put("y", y);
-            mMap.put("distance", distance);
-            mList.add(mMap);
         }
     };
 
@@ -214,8 +257,18 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
                 Toast.makeText(getActivity(), "重置成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.lock:
-                //getWifiData();
-                setCoordinateSet();
+                //setCoordinateSet();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        Message msg = Message.obtain();
+                        Bundle bundle = new Bundle();
+                        //bundle.putString("msg", "lock");
+                        msg.setData(bundle);
+                        msg.what = 1; //当what的标志为1时代表锁定一次有效数据
+                        myHandler.sendMessage(msg);
+                    }
+                }.start();
                 videoData();
                 list = mList;
                 accumulative_rangingDrawing.setData(list);
@@ -254,12 +307,12 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
         for (int i = 0; i < mList.size(); i++) {
             if (i == 0) {
                 totalDistance = (double) mList.get(i).get("distance");
-                BigDecimal b  =new BigDecimal(totalDistance);
-                totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal(totalDistance);
+                totalDistance = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
             } else {
                 totalDistance = totalDistance + (double) mList.get(i).get("distance");
-                BigDecimal b  =new BigDecimal(totalDistance);
-                totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal(totalDistance);
+                totalDistance = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
             }
         }
         Log.d("totalDistance", String.valueOf(totalDistance));
@@ -267,12 +320,12 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
         current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
         for (int i = 0; i < mList.size(); i++) {
             if (i == 0) {
-                BigDecimal b  =new BigDecimal((Double) mList.get(i).get("distance"));
-                double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal((Double) mList.get(i).get("distance"));
+                double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                 content = "第 1 次测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
             } else {
-                BigDecimal b  =new BigDecimal((Double) mList.get(i).get("distance"));
-                double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal((Double) mList.get(i).get("distance"));
+                double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                 content = content + "第 " + (i + 1) + " 次测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
             }
         }
