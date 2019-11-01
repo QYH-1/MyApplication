@@ -101,7 +101,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 //Intent intent = new Intent(Settings.ACTION_SETTINGS);
-                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                //Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                Intent intent = new Intent(MainActivity.this, Laser_controlActivity.class);
                 startActivity(intent); // 打开系统设置界面
             }
         });

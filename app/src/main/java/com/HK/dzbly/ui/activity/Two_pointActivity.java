@@ -66,6 +66,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private TextView Adistance;//A点距离
     private TextView Bdistance;//B点距离
     private TextView ABdistance;//AB两点的距离
+    private TextView ABVerticalDistance; //两点垂直间距
+    private TextView ABHorizontalDistance; //两点水平间距
+    private TextView ABHorizontalAngleDistance; //两点水平夹角
     private float aRdistance;  //点到仪器距离
     private float aAzimuth;//方位角
     private float abangle; //俯仰角
@@ -126,6 +129,9 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         Adistance = findViewById(R.id.Adistance);
         Bdistance = findViewById(R.id.Bdistance);
         ABdistance = findViewById(R.id.ABdistance);
+        ABVerticalDistance = findViewById(R.id.ABVerticalDistance);
+        ABHorizontalDistance = findViewById(R.id.ABHorizontalDistance);
+        ABHorizontalAngleDistance = findViewById(R.id.ABHorizontalAngleDistance);
         nIncluding_length_length = findViewById(R.id.nIncluding_length_length);
         Including_length = findViewById(R.id.Including_length);
         Initial_length = findViewById(R.id.Initial_length);
@@ -238,28 +244,28 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putInt("STATE", STATE + 1);
                     editor.commit();
-                        connectThread = new ConnectThread(socket, handler);
-                        connectThread.start();
+                    connectThread = new ConnectThread(socket, handler);
+                    connectThread.start();
 
-                        Intent intent2 = new Intent(Two_pointActivity.this, Two_pointActivity.class);
-                        startActivity(intent2);
-                        finish();
+                    Intent intent2 = new Intent(Two_pointActivity.this, Two_pointActivity.class);
+                    startActivity(intent2);
+                    finish();
                 } else {
                     lock.setText("锁定点A");
                     //当没有正常接收wifi的数据时
                     Log.i("RECORD_VARIABLE-A", String.valueOf(RECORD_VARIABLE));
-                        connectThread = new ConnectThread(socket, myhandler);
-                        connectThread.start();
-                        if (RECORD_VARIABLE) {
-                            lock.setClickable(true);
-                            SharedPreferences.Editor editor = sp.edit();
-                            editor.putInt("STATE", STATE + 1);
-                            editor.commit();
+                    connectThread = new ConnectThread(socket, myhandler);
+                    connectThread.start();
+                    if (RECORD_VARIABLE) {
+                        lock.setClickable(true);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putInt("STATE", STATE + 1);
+                        editor.commit();
 
-                            Intent intent2 = new Intent(Two_pointActivity.this, Two_pointActivity.class);
-                            startActivity(intent2);
-                            finish();
-                        }
+                        Intent intent2 = new Intent(Two_pointActivity.this, Two_pointActivity.class);
+                        startActivity(intent2);
+                        finish();
+                    }
                 }
             }
         });
@@ -341,13 +347,13 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private void setTdc() {
         Log.i("setTdc","setTdc");
         if (STATE % 3 == 1) {
-            aRdistance = sp.getFloat("aRdistance", 0.00001f);
-            aAzimuth = sp.getFloat("aAzimuth", 0.00001f);
-            abangle = sp.getFloat("abangle", 0.00001f);
+            aRdistance = sp.getFloat("aRdistance", 0.0001f);
+            aAzimuth = sp.getFloat("aAzimuth", 0.0001f);
+            abangle = sp.getFloat("abangle", 0.0001f);
 
-            Ax = (float) (aRdistance * Math.cos(abangle) * Math.sin(aAzimuth)) + 0.00000001f;
-            Ay = (float) (aRdistance * Math.sin(abangle)) + 0.00000001f;
-            Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth)) + 0.00000001f;
+            Ax = (float) (aRdistance * Math.cos(abangle) * Math.sin(aAzimuth)) + 0.0001f;
+            Ay = (float) (aRdistance * Math.sin(abangle)) + 0.0001f;
+            Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth)) + 0.0001f;
 
             fontRenderer = new FontRenderer(drawlineHandler, this);
             fontRenderer.getData(Ax, Ay, Az);
@@ -355,19 +361,19 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             glView.setRenderer(fontRenderer);
 
         } else if (STATE % 3 == 2) {
-            aRdistance = sp.getFloat("aRdistance", 0.00001f);
-            aAzimuth = sp.getFloat("aAzimuth", 0.00001f);
-            abangle = sp.getFloat("abangle", 0.00001f);
-            bRdistance = sp.getFloat("bRdistance", 0.00001f);
-            bAzimuth = sp.getFloat("bAzimuth", 0.00001f);
-            bangle = sp.getFloat("bangle", 0.00001f);
+            aRdistance = sp.getFloat("aRdistance", 0.0001f);
+            aAzimuth = sp.getFloat("aAzimuth", 0.0001f);
+            abangle = sp.getFloat("abangle", 0.0001f);
+            bRdistance = sp.getFloat("bRdistance", 0.0001f);
+            bAzimuth = sp.getFloat("bAzimuth", 0.0001f);
+            bangle = sp.getFloat("bangle", 0.0001f);
 
-            Ax = (float) (aRdistance * Math.cos(abangle) * Math.sin(aAzimuth)) + 0.00000001f;
-            Ay = (float) (aRdistance * Math.sin(abangle)) + 0.00000001f;
-            Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth)) + 0.00000001f;
-            Bx = (float) (bRdistance * Math.cos(bangle) * Math.sin(bAzimuth)) + 0.00000001f;
-            By = (float) (bRdistance * Math.sin(bangle)) + 0.00000001f;
-            Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth)) + 0.00000001f;
+            Ax = (float) (aRdistance * Math.cos(abangle) * Math.sin(aAzimuth)) + 0.0001f;
+            Ay = (float) (aRdistance * Math.sin(abangle)) + 0.0001f;
+            Az = (float) (aRdistance * Math.cos(abangle) * Math.cos(aAzimuth)) + 0.0001f;
+            Bx = (float) (bRdistance * Math.cos(bangle) * Math.sin(bAzimuth)) + 0.0001f;
+            By = (float) (bRdistance * Math.sin(bangle)) + 0.0001f;
+            Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth)) + 0.0001f;
 
             myRender = new Threedimensional_coordinates(drawlineHandler, this);
             myRender.getData(Ax, Ay, Az, Bx, By, Bz);
@@ -382,7 +388,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private void setDistance() {
         DecimalFormat df = new DecimalFormat("#.00");
         if (STATE % 3 == 1) {
-            String ad = String.valueOf(sp.getFloat("aRdistance", 0.00f));
+            String ad = String.valueOf(df.format(sp.getFloat("aRdistance", 0.00f)));
             Adistance.setText("A点距离" + ad + "米");
             Bdistance.setText("B点距离    0.00米");
             ABdistance.setText("AB两点距离0.00米");
@@ -403,12 +409,15 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             Bz = (float) (bRdistance * Math.cos(bangle) * Math.cos(bAzimuth));
             abdistance = (float) Math.abs(Math.sqrt((Ax - Bx) * (Ax - Bx) + (Ay - By) * (Ay - By) + (Az - Bz) * (Az - Bz)));
 
-            String ABdata = "AB两点的距离  " + abdistance + "米";
-            String ad = String.valueOf(sp.getFloat("aRdistance", 0.00f));
-            String bd = String.valueOf(sp.getFloat("bRdistance", 0.00f));
-            ;
+            String ABdata = "两点的距离  " + abdistance + "米";
+            String ad = String.valueOf(df.format(sp.getFloat("aRdistance", 0.00f)));
+            String bd = String.valueOf(df.format(sp.getFloat("bRdistance", 0.00f)));
             String Bdata = "B点距离    " + bd + "米";
             String Adata = "A点距离" + ad + "米";
+            String ABv = "两点垂直间距"+df.format(Math.abs(Az-Bz))+"米";
+            String ABh = "两点水平间距"+df.format(Math.abs(Ax-Bx))+"米";
+            String ABhad = "两点夹角"+df.format(Math.abs(aAzimuth-bAzimuth))+"°";
+
             //存储距离数据
             SharedPreferences.Editor editor = sp.edit();
             editor.putString("Adata", Adata);
@@ -418,7 +427,10 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             //通过Txtview显示数据
             Adistance.setText(Adata);
             Bdistance.setText(Bdata);
-            ABdistance.setText(ABdata);
+            ABdistance.setText(ABdata); //两点间距
+            ABVerticalDistance.setText(ABv); //两点垂直间距
+            ABHorizontalDistance.setText(ABh); //两点水平
+            ABHorizontalAngleDistance.setText(ABhad); //两点水平夹角
         } else {
             Adistance.setText("A点距离    0.000米");
             Bdistance.setText("B点距离    0.000米");

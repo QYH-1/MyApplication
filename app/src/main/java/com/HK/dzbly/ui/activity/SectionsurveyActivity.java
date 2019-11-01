@@ -29,17 +29,24 @@ import androidx.annotation.NonNull;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
+import com.HK.dzbly.utils.auxiliary.Calculated_area;
+import com.HK.dzbly.utils.auxiliary.Data_normalization;
 import com.HK.dzbly.utils.auxiliary.Screenshot;
 import com.HK.dzbly.utils.auxiliary.planar_equation;
 import com.HK.dzbly.utils.drawing.dynamicDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -61,6 +70,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private TextView continuous_ranging; //连续测距
     private TextView accumulative_ranging; //累加测距
     private TextView reduced_range_finding; //累减测距
+    private TextView area; //面积
     private RadioGroup Initial_length;
     private TextView save; //保存
     private NetConnection netConnection;//检查wifi是否连接
@@ -77,6 +87,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private dynamicDrawing dynamicDrawing;  //画图对象
     private Handler drawlineHandler;
     private List<Map<String, Object>> dataList = new ArrayList<>();
+    private List<Map<String, Object>> drawingList = new ArrayList<>();
     private List<Map<String, Object>> mlist = new ArrayList<>(); //用于保存所有的从wifi接受的点
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
@@ -84,6 +95,14 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private int num = 1; //文件出现次数
     private Context context;
     private Screenshot screenshot;
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private Timer timer;
+    private Calculated_area calculated_area = new Calculated_area(); //计算面积
+    private DecimalFormat df = new DecimalFormat("0.##");
+    private double Signal_quality = 200; //测距时信号质量参数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +125,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         continuous_ranging = findViewById(R.id.continuous_measurement);  //连续测距
         accumulative_ranging = findViewById(R.id.Cumulative_measurement);  //累加测距
         reduced_range_finding = findViewById(R.id.Cumulative_reduction_measurement);  //累减测距
+        area = findViewById(R.id.area);
         Measurement = findViewById(R.id.measurement);
         reset = findViewById(R.id.reset);
         save = findViewById(R.id.Save);
@@ -122,6 +142,27 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         save.setOnClickListener(this);
         Initial_length.setOnCheckedChangeListener(this);
 
+        //定时获取向硬件发送信息，得到最新的数据
+        send = new Send();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getPointsData();
+
+                Log.i("Signal_quality", String.valueOf(Signal_quality));
+                //不能在子线程中更新UI，所以只能再建立一个主线程
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //此处更新UI
+                        if (Signal_quality <150) {
+                            Toast.makeText(SectionsurveyActivity.this, "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }, 0, 2000 * 2);
     }
 
     //单选按钮，判断是否包含仪器长度
@@ -150,9 +191,13 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 break;
             case R.id.measurement:
                 //调用画图
+                Log.d("mlist", String.valueOf(mlist));
                 dataList = getPointData(mlist);
                 Log.d("dataList", String.valueOf(dataList));
-                dynamicDrawing.setData(dataList);
+                drawingList = drawingData(dataList);
+                Log.d("dataList", String.valueOf(drawingList));
+                dynamicDrawing.setData(drawingList);
+                area.setText("所测的面积:" + df.format(calculated_area.area(dataList))+"平方米");
                 break;
             case R.id.reset:
                 Intent intent2 = new Intent(SectionsurveyActivity.this, SectionsurveyActivity.class);
@@ -162,20 +207,20 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 showDialog();
                 break;
             case R.id.continuous_measurement:
-                Intent intent3 = new Intent(this,Laser_rangingActivity.class);
-                intent3.putExtra("fragmentNumber",3);
+                Intent intent3 = new Intent(this, Laser_rangingActivity.class);
+                intent3.putExtra("fragmentNumber", 3);
                 startActivity(intent3);
                 finish();
                 break;
             case R.id.Cumulative_measurement:
-                Intent intent4 = new Intent(this,Laser_rangingActivity.class);
-                intent4.putExtra("fragmentNumber",4);
+                Intent intent4 = new Intent(this, Laser_rangingActivity.class);
+                intent4.putExtra("fragmentNumber", 4);
                 startActivity(intent4);
                 finish();
                 break;
             case R.id.Cumulative_reduction_measurement:
-                Intent intent5 = new Intent(this,Laser_rangingActivity.class);
-                intent5.putExtra("fragmentNumber",5);
+                Intent intent5 = new Intent(this, Laser_rangingActivity.class);
+                intent5.putExtra("fragmentNumber", 5);
                 startActivity(intent5);
                 finish();
                 break;
@@ -186,13 +231,30 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
      * 通过wifi获得传感器传递的一组数据，并将数据存入二维数组中
      */
     private void getPointsData() {
-        //获得一次连接得到一个空间点的数据
-        if (!netConnection.isNetworkConnected(this)) {
-            Toast.makeText(SectionsurveyActivity.this, "请连接WiFi", Toast.LENGTH_LONG).show();
-        } else {
-            connectThread = new ConnectThread(socket, myHandler);
-            connectThread.start();
-        }
+        //在子线程获取连接
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        byte[] bytes = {69,73,87,0,1};
+                        send.sendData(outputStream, bytes);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, myHandler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 
@@ -209,9 +271,10 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 Toast.makeText(SectionsurveyActivity.this, "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
             }
             //获取一组数据
-            Rdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18)));
+            Rdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18,24)));
             Azimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
             angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
+            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
             //根据距离和角度求出空间点的坐标
             x = Rdistance * Math.cos(angle) * Math.sin(Azimuth);
             y = Rdistance * Math.sin(angle);
@@ -269,7 +332,32 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         Log.d("SecActivity-list", String.valueOf(list));
         return list;
     }
-
+    private List<Map<String, Object>> drawingData(List<Map<String, Object>> list){
+        //定义数组接受凸包算法得到的坐标的集合
+        List<Map<String, Object>> datalist = new ArrayList<Map<String, Object>>();
+        double[] detox = new double[list.size()]; //x
+        double[] decoy = new double[list.size()]; //y
+        double[] deco = new double[list.size()]; //z
+        for (int i = 0; i < list.size(); i++) {
+            detox[i] = Double.valueOf(list.get(i).get("xp").toString());
+            decoy[i] = Double.valueOf(list.get(i).get("yp").toString());
+            deco[i] = Double.valueOf(list.get(i).get("zp").toString());
+        }
+        //将得到的凸包坐标进行归一化
+        Data_normalization dn = new Data_normalization();
+        double[] dxTemp = dn.normalization(detox);
+        double[] dyTemp = dn.normalization(decoy);
+        double[] dzTemp = dn.normalization(deco);
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> pMap = new HashMap<String, Object>();
+            //将数据存储在list中
+            pMap.put("xp", dxTemp[i]);
+            pMap.put("yp", dyTemp[i]);
+            pMap.put("zp", dzTemp[i]);
+            datalist.add(pMap);
+        }
+        return datalist;
+    }
     //保存数据
     private void showDialog() {
         final View view = LayoutInflater.from(this).inflate(R.layout.layout, null, false);
@@ -322,5 +410,11 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 }).setNegativeButton("取消", null)
                 .create()
                 .show();
+    }
+
+    @Override
+    public void onPause() {
+//        timer.cancel();
+        super.onPause();
     }
 }

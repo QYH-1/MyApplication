@@ -35,11 +35,15 @@ import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.Socket;
@@ -51,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -91,6 +97,12 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
     private float angle;//水平倾角（俯仰角）
     private double x = 0, y = 0, z = 0;//由传感器传递过来的数据转换为点的坐标
     private float aAzimuth;//方位角
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private Timer timer;
+    private double Signal_quality = 200; //测距时信号质量参数
 
     //义用来与外部activity交互，获取到宿主activity
     private Continuous_rangingFragment.CallBack callback;
@@ -130,6 +142,26 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
      */
     private void Content(View view) {
         initView(view);
+        send = new Send();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getWifiData();
+
+                Log.i("Signal_quality", String.valueOf(Signal_quality));
+                //不能在子线程中更新UI，所以只能再建立一个主线程
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //此处更新UI
+                        if (Signal_quality <150) {
+                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }, 0, 2000 * 2);
     }
 
     /**
@@ -161,9 +193,30 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-        connectThread = new ConnectThread(socket, myHandler);
-        connectThread.start();
-        //记录测量的次数
+        //在子线程获取连接
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        byte[] bytes = {69,73,87,0,1};
+                        send.sendData(outputStream, bytes);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, myHandler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     Handler myHandler = new Handler() {
@@ -181,9 +234,10 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
             }
             //处理wifi传递过来的数据
             concerto = new Concerto();
-            distance = Integer.parseInt(concerto.Dataconversion(data.substring(18)));
+            distance = Double.parseDouble((concerto.Dataconversion(data.substring(18,24))));
             aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 5)));
+            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
+            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
             double a = Math.abs((distance));
             x = (a * Math.cos(angle) * Math.sin(aAzimuth));
             y = (a * Math.sin(angle));
@@ -196,6 +250,7 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
             mMap.put("z", z);
             mMap.put("distance", distance);
             mList.add(mMap);
+            current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
         }
     };
 
@@ -224,9 +279,15 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
                 break;
             case R.id.lock:
                 //getWifiData();
-                setCoordinateSet();
+                //setCoordinateSet();
+                //当点击有效值，锁定点时，将接受wifi传递过来的最新数据保存到有效数据list中
+//                list.add( mList.get(mList.size()));
+                if(mList.size() == 1){
+                    list.add( mList.get(0));
+                }else {
+                    list.add(mList.get(mList.size()-1));
+                }
                 videoData();
-                list = mList;
                 continuous_rangingDrawing.setData(list);
                 number++;
                 List.clear();
@@ -261,19 +322,19 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
      * 数据的显示
      */
     private void videoData() {
-        Log.i("mList.size()", String.valueOf(mList.size()));
+        Log.i("list.size()", String.valueOf(list.size()));
         //连续测距时，当存在两个点后才能给出一段距离
-        for (int i = 0; i < mList.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
                 totalDistance = 0;
             } else {
                 Map<String, Object> map = new HashMap<>();//保存wifi传递过来点的具体坐标
-                double ax = (double) mList.get(i).get("x");
-                double bx = (double) mList.get(i - 1).get("x");
-                double ay = (double) mList.get(i).get("y");
-                double by = (double) mList.get(i - 1).get("y");
-                double az = (double) mList.get(i).get("z");
-                double bz = (double) mList.get(i - 1).get("z");
+                double ax = (double) list.get(i).get("x");
+                double bx = (double) list.get(i - 1).get("x");
+                double ay = (double) list.get(i).get("y");
+                double by = (double) list.get(i - 1).get("y");
+                double az = (double) list.get(i).get("z");
+                double bz = (double) list.get(i - 1).get("z");
                 //计算两点之间的距离
                 double abDistance = Math.abs(Math.sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by) + (az - bz) * (az - bz)));
                 map.put("abDistance", abDistance);
@@ -285,22 +346,23 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
             }
         }
         total_length.setText("\t\t\t\t" + totalDistance + "米");
-        current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
+        //current_length.setText("\t\t\t\t" + (double) list.get(list.size() - 1).get("distance") + "米");
         if (List.size() > 0) {
             for (int i = 0; i < List.size(); i++) {
                 if (i == 0) {
                     BigDecimal b = new BigDecimal((Double) List.get(i).get("abDistance"));
+                    Log.i("-------b", String.valueOf(b));
                     double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                     content = "第 " + 1 + " 段测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
                 } else {
                     BigDecimal b = new BigDecimal((Double) List.get(i).get("abDistance"));
+                    Log.i("-------b", String.valueOf(b));
                     double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                     content = content + "第 " + (i + 1) + " 段测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
                 }
 
             }
         }
-
         detailed_data.setText(content);
     }
 
@@ -397,5 +459,10 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
                 }).setNegativeButton("取消", null)
                 .create()
                 .show();
+    }
+    @Override
+    public void onPause() {
+        timer.cancel();
+        super.onPause();
     }
 }

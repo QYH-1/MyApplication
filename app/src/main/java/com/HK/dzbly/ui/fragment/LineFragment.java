@@ -27,15 +27,21 @@ import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -67,7 +73,12 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     File root = Environment.getExternalStorageDirectory();
     String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
     SharedPreferences sp = null;
-
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private Timer timer;
+    private double Signal_quality = 200.0; //测距时信号质量参数
 
     public LineFragment() {
         // Required empty public constructor
@@ -84,6 +95,29 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
 
     private void Content(View view) {
         initView(view);
+
+        //定时获取向硬件发送信息，得到最新的数据
+        send = new Send();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //执行子线程，向硬件发送消息和接受wifi传递过来的信息
+                getWifiData();
+
+                Log.i("Signal_quality", String.valueOf(Signal_quality));
+                //不能在子线程中更新UI，所以只能再建立一个主线程
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //此处更新UI
+                        if (Signal_quality < 150) {
+                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }, 0, 2000 * 2);
     }
 
     private void initView(View view) {
@@ -107,9 +141,32 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-            connectThread = new ConnectThread(socket, myHandler);
-            connectThread.start();
-            Log.d("connectThread", "启动成功111111");
+//            connectThread = new ConnectThread(socket, myHandler);
+//            connectThread.start();
+        //在子线程获取连接
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        byte[] bytes = {69, 73, 87, 1};
+                        send.sendData(outputStream, bytes);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, myHandler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     Handler myHandler = new Handler() {
@@ -126,8 +183,9 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                 Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
             }
             concerto = new Concerto();
-            String distance = concerto.Dataconversion(data.substring(18));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 5)));
+            String distance = concerto.Dataconversion(data.substring(18, 24));
+            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
+            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
             float a = Math.abs(Float.parseFloat(distance));
             Verticaldistance = (float) (a * Math.sin(angle));
             Horizontaldistance = (float) (a * Math.cos(angle));
@@ -266,4 +324,9 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                 .show();
     }
 
+    @Override
+    public void onPause() {
+        timer.cancel();
+        super.onPause();
+    }
 }

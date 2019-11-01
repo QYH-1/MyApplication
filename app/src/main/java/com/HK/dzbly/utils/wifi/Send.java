@@ -11,10 +11,11 @@ import java.io.OutputStream;
  * 修订历史：
  */
 public class Send {
-    public void sendData(OutputStream outputStream,byte msg) throws IOException {
-        Log.i("msg", String.valueOf(msg));
+
+    public void sendData(OutputStream outputStream,byte[] msg) throws IOException {
+        Log.i("--msg--", String.valueOf(msg));
         outputStream.write(msg);
         Log.d("向服务器端发送消息", String.valueOf(msg));
-        outputStream.flush();
+        //outputStream.close();
     }
 }

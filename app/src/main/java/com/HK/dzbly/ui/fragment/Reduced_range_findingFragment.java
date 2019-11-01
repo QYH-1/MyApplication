@@ -31,11 +31,15 @@ import com.HK.dzbly.utils.drawing.Accumulative_rangingDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
 import com.HK.dzbly.utils.wifi.NetConnection;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.Socket;
@@ -46,6 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -85,6 +91,12 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     private float angle;//水平倾角（俯仰角）
     private double x = 0, y = 0;//由传感器传递过来的数据转换为点的坐标
     private float aAzimuth;//方位角
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private Timer timer;
+    private double Signal_quality = 200; //测距时信号质量参数
 
     //义用来与外部activity交互，获取到宿主activity
     private Continuous_rangingFragment.CallBack callback;
@@ -124,6 +136,27 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
      */
     private void Content(View view) {
         initView(view);
+        //定时获取向硬件发送信息，得到最新的数据
+        send = new Send();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getWifiData();
+
+                Log.i("Signal_quality", String.valueOf(Signal_quality));
+                //不能在子线程中更新UI，所以只能再建立一个主线程
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //此处更新UI
+                        if (Signal_quality <150) {
+                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }, 0, 2000 * 2);
     }
 
     /**
@@ -155,9 +188,30 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-        connectThread = new ConnectThread(socket, myHandler);
-        connectThread.start();
-        //记录测量的次数
+        //在子线程获取连接
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        byte[] bytes = {69,73,87,0,1};
+                        send.sendData(outputStream, bytes);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, myHandler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     Handler myHandler = new Handler() {
@@ -175,9 +229,10 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
             }
             //处理wifi传递过来的数据
             concerto = new Concerto();
-            distance = Integer.parseInt(concerto.Dataconversion(data.substring(18)));
+            distance = Double.parseDouble((concerto.Dataconversion(data.substring(18,24))));
             aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 5)));
+            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
+            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
             double a = Math.abs((distance));
             x = (a * Math.cos(angle) * Math.sin(aAzimuth));
             y = (a * Math.sin(angle));
@@ -187,7 +242,7 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
             mMap.put("y", y);
             mMap.put("distance", distance);
             mList.add(mMap);
-
+            current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
         }
     };
 
@@ -215,9 +270,15 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
                 break;
             case R.id.lock:
                 //getWifiData();
-                setCoordinateSet();
+                //setCoordinateSet();
+                //当点击有效值，锁定点时，将接受wifi传递过来的最新数据保存到有效数据list中
+                if(mList.size() == 1){
+                    list.add( mList.get(0));
+                }else {
+                    list.add(mList.get(mList.size()-1));
+                }
+
                 videoData();
-                list = mList;
                 reduced_range_findingDrawing.setData(list);
                 number++;
                 break;
@@ -247,28 +308,28 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     }
 
     private void videoData() {
-        Log.i("mList.size()", String.valueOf(mList.size()));
-        for (int i = 0; i < mList.size(); i++) {
+        Log.i("list.size()", String.valueOf(list.size()));
+        for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
-                totalDistance = (double) mList.get(i).get("distance");
+                totalDistance = (double) list.get(i).get("distance");
                 BigDecimal b  =new BigDecimal(totalDistance);
                 totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
             } else {
-                totalDistance = totalDistance - (double) mList.get(i).get("distance");
+                totalDistance = totalDistance - (double) list.get(i).get("distance");
                 BigDecimal b  =new BigDecimal(totalDistance);
                 totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
             }
         }
         Log.d("totalDistance", String.valueOf(totalDistance));
         total_length.setText("\t\t\t\t" + totalDistance + "米");
-        current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
-        for (int i = 0; i < mList.size(); i++) {
+        //current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
+        for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
                 BigDecimal b  =new BigDecimal((Double) mList.get(i).get("distance"));
                 double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
                 content = "第 1 次测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
             } else {
-                BigDecimal b  =new BigDecimal((Double) mList.get(i).get("distance"));
+                BigDecimal b  =new BigDecimal((Double) list.get(i).get("distance"));
                 double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
                 content = content + "第 " + (i + 1) + " 次测量的距离：" + "\n" + "\t\t\t\t" + f1  + "米" + "\n";
             }
@@ -369,5 +430,10 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
                 }).setNegativeButton("取消", null)
                 .create()
                 .show();
+    }
+    @Override
+    public void onPause() {
+        timer.cancel();
+        super.onPause();
     }
 }

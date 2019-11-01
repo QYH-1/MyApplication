@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/spy3">
+        android:background="@drawable/backdground">
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center_horizontal"
                     android:text="vert"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="40sp" />
 
             <TextView
@@ -65,7 +65,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center_horizontal"
                     android:text="@string/vertical"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp" />
         </RelativeLayout>
 
@@ -82,7 +82,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center_horizontal"
                     android:text="horiz"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="40sp" />
 
             <TextView
@@ -93,7 +93,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center_horizontal"
                     android:text="@string/horizontal"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp" />
         </RelativeLayout>
     </LinearLayout>

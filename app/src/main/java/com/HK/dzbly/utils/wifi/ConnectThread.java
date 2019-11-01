@@ -32,6 +32,7 @@ public class ConnectThread extends Thread {
     private StringBuilder stringBuilder = new StringBuilder();
     //向硬件发送的数据
     private byte msg = (byte) 0x01;
+    private byte[] bytes = {69,73,87,0,1};
     //wifi的服务端ip
     private String sIP = "10.10.100.254";
     //wifi的服务端端口
@@ -56,8 +57,8 @@ public class ConnectThread extends Thread {
             try {
                 //向服务器端发送消息
                 outputStream = socket.getOutputStream();
-                outputStream.write(msg);
-                Log.d("向服务器端发送消息", String.valueOf(msg));
+                outputStream.write(bytes);
+                Log.d("向服务器端发送消息", String.valueOf(bytes));
                 outputStream.flush();
                 sendData();
                 InetAddress address = InetAddress.getLocalHost();

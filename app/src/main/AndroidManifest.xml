@@ -92,6 +92,7 @@
         <activity android:name=".ui.activity.testActivity"></activity>
         <activity android:name=".ui.activity.SectionsurveyActivity"></activity>
         <activity android:name=".ui.activity.LevelActivity"></activity>
+        <activity android:name=".ui.activity.Laser_controlActivity"></activity>
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="com.cs.dzl.fileProvider"

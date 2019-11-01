@@ -79,6 +79,7 @@ public class DzlpActivity extends FragmentActivity {
     private String data3 = null;//方位角
     private String data4 = null; //显示结果
     private String data5 = null; //计算后的产转的角
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +102,7 @@ public class DzlpActivity extends FragmentActivity {
         setSelection_method();//切换fregment
         //使用子线程得到wifi的socket连接
         send = new Send();
-        Timer timer = new Timer();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -120,7 +121,8 @@ public class DzlpActivity extends FragmentActivity {
                     outputStream = socket.getOutputStream();
                     try {
                         Log.i("-------------timer", "timer");
-                        send.sendData(outputStream, (byte) 0x01);
+                        byte[] bytes = {69,73,87,0,0};
+                        send.sendData(outputStream,  bytes);
                         Log.i("receiveMsg", "receiveMsg");
                         receiveMsg = new ReceiveMsg();
                         receiveMsg.receiveMsg(inputStream, handler);
@@ -336,7 +338,7 @@ public class DzlpActivity extends FragmentActivity {
             if (data.length() == 30) {
                 //对wifi获取的数据进行处理
                 //俯仰角
-                data1 = concerto.Dataconversion(data.substring(0, 5));
+                data1 = concerto.Dataconversion(data.substring(0, 6));
                 Log.d("data1-dzlpActivity", String.valueOf(data1));
                 //横滚角
                 data2 = concerto.Dataconversion(data.substring(6, 12));
@@ -360,8 +362,10 @@ public class DzlpActivity extends FragmentActivity {
                     //调用显示
                     //setFragment(data4);
                     //当选择了产状测量控件后才显示结果
-                    if (occurrence_survey.isChecked()) {
-                        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+
+                    if (occurrence_survey.isChecked() && !data4.equals("")) {
+                        FragmentManager manager = getSupportFragmentManager();
+                        TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
                         textView.setText(data4);
                         textView.setTextSize(35);
                         textView.setGravity(Gravity.CENTER);
@@ -384,8 +388,9 @@ public class DzlpActivity extends FragmentActivity {
                     //调用显示
                     // setFragment(data4);
                     //当选择了产状测量控件后才显示结果
-                    if (occurrence_survey.isChecked()) {
-                        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+                    if (occurrence_survey.isChecked() && !data4.equals("")) {
+                        FragmentManager manager = getSupportFragmentManager();
+                        TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
                         textView.setText(data4);
                         textView.setTextSize(35);
                         textView.setGravity(Gravity.CENTER);
@@ -407,11 +412,12 @@ public class DzlpActivity extends FragmentActivity {
             setRollangle(data2);
             //setFragment(data4);
             setChaosCompassView(data3);
-            TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
+            FragmentManager manager = getSupportFragmentManager();
+            TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
             occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
+                    if (isChecked && !data4.equals("")) {
                         textView.setText(data4);
                         textView.setTextSize(35);
                         textView.setGravity(Gravity.CENTER);
@@ -430,4 +436,10 @@ public class DzlpActivity extends FragmentActivity {
             });
         }
     };
+
+    @Override
+    protected void onPause() {
+        timer.cancel();
+        super.onPause();
+    }
 }

@@ -14,9 +14,7 @@ public class Point implements Comparable {
     // 按x升序排列,x相同按y升序
     @Override
     public int compareTo(Object o) {
-
         Point b = (Point) o;
-
         if (this.x > b.x)
             return 1;
         else if (this.x == b.x) {

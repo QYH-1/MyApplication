@@ -152,16 +152,24 @@ public class planar_equation {
             decoy[i] = Double.valueOf(pointList.get(i).get("y").toString());
             deco[i] = Double.valueOf(pointList.get(i).get("z").toString());
         }
-        //将得到的凸包坐标进行归一化
-        double[] dxTemp = dn.normalization(detox);
-        double[] dyTemp = dn.normalization(decoy);
-        double[] dzTemp = dn.normalization(deco);
+//        //将得到的凸包坐标进行归一化
+//        double[] dxTemp = dn.normalization(detox);
+//        double[] dyTemp = dn.normalization(decoy);
+//        double[] dzTemp = dn.normalization(deco);
+//        for (int i = 0; i < pointList.size(); i++) {
+//            Map<String, Object> pMap = new HashMap<String, Object>();
+//            //将数据存储在list中
+//            pMap.put("xp", dxTemp[i]);
+//            pMap.put("yp", dyTemp[i]);
+//            pMap.put("zp", dzTemp[i]);
+//            list.add(pMap);
+//        }
         for (int i = 0; i < pointList.size(); i++) {
             Map<String, Object> pMap = new HashMap<String, Object>();
             //将数据存储在list中
-            pMap.put("xp", dxTemp[i]);
-            pMap.put("yp", dyTemp[i]);
-            pMap.put("zp", dzTemp[i]);
+            pMap.put("xp", detox[i]);
+            pMap.put("yp", decoy[i]);
+            pMap.put("zp", deco[i]);
             list.add(pMap);
         }
         Log.i("planar_equation-list", String.valueOf(list));
