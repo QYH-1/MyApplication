@@ -52,7 +52,7 @@ public class LevelHew extends View {
 
     private void init(Context context) {
         limitCircle = BitmapFactory.decodeResource(context.getResources(), R.mipmap.cylinder_h);
-        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_orientation);
+        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.blister);
         //取图片的宽、高来决定当前水平仪的宽和高
         mLimitRadius = limitCircle.getWidth() / 2;
         mLiHeight = limitCircle.getHeight() / 2;
@@ -95,7 +95,7 @@ public class LevelHew extends View {
             return false;
         }
         //float threshold = 3.0f;
-        return Math.abs(bubblePoint.x - centerPnt.x) < 1 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
+        return Math.abs(bubblePoint.x - centerPnt.x) < 3.28 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
     }
 
     private void drawBubble(Canvas canvas) {
@@ -104,6 +104,11 @@ public class LevelHew extends View {
             canvas.translate(bubblePoint.x, bubblePoint.y);
             canvas.drawBitmap(bubbleBall, 0, 0, paint);
             canvas.restore();
+        }
+        if (isCenter(bubblePoint)) {
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.cylinder_h1);
+        }else{
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.cylinder_h);
         }
     }
 

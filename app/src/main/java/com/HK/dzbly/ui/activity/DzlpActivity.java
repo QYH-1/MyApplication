@@ -2,11 +2,15 @@ package com.HK.dzbly.ui.activity;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,7 +18,6 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
@@ -32,9 +35,9 @@ import com.HK.dzbly.utils.drawing.Elevation;
 import com.HK.dzbly.utils.drawing.Rollangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 import com.HK.dzbly.utils.wifi.ReceiveMsg;
 import com.HK.dzbly.utils.wifi.Send;
+import com.HK.dzbly.utils.wifi.checkNetworkConnection;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -42,8 +45,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @Author：qyh 版本：1.0
@@ -68,7 +69,6 @@ public class DzlpActivity extends FragmentActivity {
     private Socket socket;
     private String data;//wifi传递过来的数据
     private SharedPreferences sp; //用来保存数据，传递给fragment进行存储
-    private NetConnection netConnection;//检查网络连接
     private Concerto concerto;//处理wifi传递过来的数据
     private OutputStream outputStream;  //数据输出流
     private DataInputStream inputStream;
@@ -81,6 +81,9 @@ public class DzlpActivity extends FragmentActivity {
     private String data5 = null; //计算后的产转的角
     Timer timer;
 
+    private WifiManager mWifiManager ;
+    private ConnectivityManager mConnectivityManager;
+    private com.HK.dzbly.utils.wifi.checkNetworkConnection checkNetworkConnection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +112,12 @@ public class DzlpActivity extends FragmentActivity {
                 Data();
             }
         }, 0, 2000 * 2);
+
+        mWifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        mConnectivityManager = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        WifiInfo mWifiInfo = mWifiManager.getConnectionInfo();
+        checkNetworkConnection = new checkNetworkConnection();
+        boolean temp = checkNetworkConnection.isConnected("",mWifiInfo);
     }
 
     private void Data() {
@@ -121,8 +130,8 @@ public class DzlpActivity extends FragmentActivity {
                     outputStream = socket.getOutputStream();
                     try {
                         Log.i("-------------timer", "timer");
-                        byte[] bytes = {69,73,87,0,0};
-                        send.sendData(outputStream,  bytes);
+                        byte[] bytes = {69, 73, 87, 0, 0};
+                        send.sendData(outputStream, bytes);
                         Log.i("receiveMsg", "receiveMsg");
                         receiveMsg = new ReceiveMsg();
                         receiveMsg.receiveMsg(inputStream, handler);
@@ -439,7 +448,7 @@ public class DzlpActivity extends FragmentActivity {
 
     @Override
     protected void onPause() {
-        timer.cancel();
         super.onPause();
+        timer.cancel();
     }
 }

@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -28,13 +26,9 @@ import androidx.fragment.app.Fragment;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
-import com.HK.dzbly.ui.activity.Laser_rangingActivity;
-import com.HK.dzbly.utils.drawing.Accumulative_rangingDrawing;
 import com.HK.dzbly.utils.drawing.Continuous_rangingDrawing;
-import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 import com.HK.dzbly.utils.wifi.ReceiveMsg;
 import com.HK.dzbly.utils.wifi.Send;
 
@@ -47,7 +41,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.Socket;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +70,6 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
     private TextView current_length;//当前距离
     private TextView detailed_data;//每次测量的详细数据
     private ConnectThread connectThread;//wifi连接
-    private NetConnection netConnection;//wifi连接检查
     private Concerto concerto;//wifi的数据处理
     private Socket socket;
     private double totalDistance = 00.000;//测量的总的距离
@@ -462,7 +454,7 @@ public class Continuous_rangingFragment extends Fragment implements RadioGroup.O
     }
     @Override
     public void onPause() {
-        timer.cancel();
         super.onPause();
+        timer.cancel();
     }
 }

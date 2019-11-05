@@ -18,6 +18,7 @@ import com.HK.dzbly.ui.base.BaseActivity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/7/24$
@@ -26,8 +27,8 @@ import java.util.List;
  */
 public class MainActivity extends BaseActivity {
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
-    private ImageButton prompt, setting, data, camera, tools, dzcsy, shutdown;
-    private TextView setting1, data1, camera1, jgcj, dzcsy1;
+    private ImageButton prompt, setting, data, camera, tools, dzcsy, shutdown, Other_software, laser_control, Level;
+    private TextView setting1, data1, camera1, jgcj, dzcsy1, Other_software1, laser_control1, Level1;
     private String AUTHORITY = "com.cs.dzl.fileProvider";//文件工具位置
     private String TAG = MainActivity.class.getSimpleName();//获得类的简称
     SharedPreferences sp = null;  //存储对象
@@ -47,9 +48,11 @@ public class MainActivity extends BaseActivity {
         setting();//设置的处理事件
         data();//数据管理的处理事件
         setDzcsy();//地质参数仪处理事件
-        setShutdown();//手机关机
+        dataDisplay();//手机关机
         setTools();//激光测距
-        //saveData();
+        setLevel(); //水平仪
+        setLaser_control(); //激光控制
+        setOther_software(); //实用工具
     }
 
     /**
@@ -61,16 +64,20 @@ public class MainActivity extends BaseActivity {
         data = findViewById(R.id.data_management);//数据管理
         camera = findViewById(R.id.camera);//相机
         tools = findViewById(R.id.tools);//工具
-        shutdown = findViewById(R.id.shutdown);//关机
+        shutdown = findViewById(R.id.shutdown);//数据展示
         dzcsy = findViewById(R.id.dzcsy);//地质参数仪
+        Other_software = findViewById(R.id.Other_software);//其他软件
+        laser_control = findViewById(R.id.laser_control);  //激光控制
+        Level = findViewById(R.id.Level); //水平仪
 
-        setting1 = findViewById(R.id.setting1);
+        setting1 = findViewById(R.id.setting1); //设置
         data1 = findViewById(R.id.data_management1);//数据管理
         camera1 = findViewById(R.id.camera1);//相机
-        jgcj = findViewById(R.id.jgcj);//工具
+        jgcj = findViewById(R.id.jgcj);//激光测距
         dzcsy1 = findViewById(R.id.dzcsy1);//地质参数仪
-
-
+        Other_software1 = findViewById(R.id.Other_software1); //其他软件
+        laser_control1 = findViewById(R.id.laser_control1); //激光控制
+        Level1 = findViewById(R.id.Level1); //水平仪
     }
 
     /**
@@ -100,9 +107,9 @@ public class MainActivity extends BaseActivity {
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                Intent intent = new Intent(Settings.ACTION_SETTINGS);
                 //Intent intent = new Intent(MainActivity.this,LevelActivity.class);
-                Intent intent = new Intent(MainActivity.this, Laser_controlActivity.class);
+                //Intent intent = new Intent(MainActivity.this, Laser_controlActivity.class);
                 startActivity(intent); // 打开系统设置界面
             }
         });
@@ -138,19 +145,16 @@ public class MainActivity extends BaseActivity {
     /**
      * 关机的处理
      */
-    public void setShutdown() {
+    public void dataDisplay() {
         shutdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shutDowm();
+               // dataDisplay();
+                Intent intent = new Intent(MainActivity.this, DatadisplayActivity.class);
+                //  Intent intent = new Intent(MainActivity.this,wifi.class);
+                startActivity(intent);
             }
         });
-    }
-
-    private void shutDowm() {
-        Intent intent = new Intent(MainActivity.this, DatadisplayActivity.class);
-        //  Intent intent = new Intent(MainActivity.this,wifi.class);
-        startActivity(intent);
     }
 
     /**
@@ -193,18 +197,53 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    //遍历文件
-    public List<String> getFilesAllName(String path) {
-        File file = new File(path);
-        File[] files = file.listFiles();
-        if (files == null) {
-            Log.e("error", "空目录");
-            return null;
-        }
-        List<String> s = new ArrayList<>();
-        for (int i = 0; i < files.length; i++) {
-            s.add(files[i].getName());
-        }
-        return s;
+    /**
+     * 其他软件
+     */
+    private void setOther_software(){
+        Other_software.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,Utility_toolsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    /**
+     * 激光控制
+     */
+    private void setLaser_control(){
+        laser_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,Laser_controlActivity.class);
+                startActivity(intent);
+            }
+        });
+        laser_control1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,Laser_controlActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void setLevel(){
+        Level.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                startActivity(intent);
+            }
+        });
+        Level1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

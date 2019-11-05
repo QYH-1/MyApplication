@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -30,7 +29,6 @@ import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.utils.drawing.Accumulative_rangingDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 import com.HK.dzbly.utils.wifi.ReceiveMsg;
 import com.HK.dzbly.utils.wifi.Send;
 
@@ -72,7 +70,6 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     private TextView current_length;//当前距离
     private TextView detailed_data;//每次测量的详细数据
     private ConnectThread connectThread;//wifi连接
-    private NetConnection netConnection;//wifi连接检查
     private Concerto concerto;//wifi的数据处理
     private Socket socket;
     private double totalDistance = 0.00;//测量的总的距离
@@ -433,7 +430,7 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     }
     @Override
     public void onPause() {
-        timer.cancel();
         super.onPause();
+        timer.cancel();
     }
 }

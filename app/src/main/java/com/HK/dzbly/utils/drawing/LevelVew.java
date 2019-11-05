@@ -15,7 +15,7 @@ import com.HK.dzbly.R;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/10/9
- * 描述：
+ * 描述：画水平仪的垂直圆柱示意图
  * 修订历史：
  */
 public class LevelVew extends View {
@@ -52,7 +52,7 @@ public class LevelVew extends View {
 
     private void init(Context context) {
         limitCircle = BitmapFactory.decodeResource(context.getResources(), R.mipmap.cylinder_v);
-        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_orientation);
+        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.blister);
         //取图片的宽、高来决定当前水平仪的宽和高
         mLimitRadius = limitCircle.getHeight() / 2;
         mLiWidth = limitCircle.getWidth() / 2;
@@ -95,7 +95,7 @@ public class LevelVew extends View {
             return false;
         }
         //float threshold = 3.0f;
-        return Math.abs(bubblePoint.x - centerPnt.x) < 1 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
+        return Math.abs(bubblePoint.x - centerPnt.x) < 3.28 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
     }
 
     private void drawBubble(Canvas canvas) {
@@ -104,6 +104,11 @@ public class LevelVew extends View {
             canvas.translate(bubblePoint.x, bubblePoint.y);
             canvas.drawBitmap(bubbleBall, 0, 0, paint);
             canvas.restore();
+        }
+        if (isCenter(bubblePoint)) {
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.cylinder_v1);
+        }else{
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.cylinder_v);
         }
     }
 

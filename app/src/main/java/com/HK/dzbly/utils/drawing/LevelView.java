@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.HK.dzbly.R;
@@ -34,6 +35,10 @@ public class LevelView extends View {
     private double pitchAngle = -90;
     private double rollAngle = -90;
 
+    public double getRollAngle() {
+        return rollAngle;
+    }
+
     public LevelView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -49,7 +54,7 @@ public class LevelView extends View {
 
     private void init(Context context) {
         limitCircle = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bg_orientation);
-        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_orientation);
+        bubbleBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.blister);
         //取图片的宽、高来决定当前水平仪的宽和高
         mLimitRadius = limitCircle.getWidth() / 2;
         mBubbleRadius = bubbleBall.getWidth() / 2;
@@ -90,8 +95,11 @@ public class LevelView extends View {
         if (bubblePoint == null) {
             return false;
         }
-        //float threshold = 3.0f;
-        return Math.abs(bubblePoint.x - centerPnt.x) < 1 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
+        Log.i("bubblePoint.x ", String.valueOf(bubblePoint.x));
+        Log.i("centerPnt.x ", String.valueOf(centerPnt.x));
+        Log.i("bubblePoint.y", String.valueOf(bubblePoint.y));
+        Log.i("centerPnt.y", String.valueOf(centerPnt.y));
+        return Math.abs(bubblePoint.x - centerPnt.x) < 3.28 && Math.abs(bubblePoint.y - centerPnt.y) < 1;
     }
 
     private void drawBubble(Canvas canvas) {
@@ -101,10 +109,16 @@ public class LevelView extends View {
             canvas.drawBitmap(bubbleBall, 0, 0, paint);
             canvas.restore();
         }
+        if (isCenter(bubblePoint)) {
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.bg_orientation1);
+        }else{
+            limitCircle = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.bg_orientation);
+        }
     }
 
     /**
      * 将角度转换为屏幕坐标点。
+     *
      * @param rollAngle  横滚角(弧度)
      * @param pitchAngle 俯仰角(弧度)
      * @return
@@ -147,6 +161,7 @@ public class LevelView extends View {
 
     /**
      * 验证气泡点是否超过限制{@link #mLimitRadius}
+     *
      * @param bubblePnt
      * @return
      */

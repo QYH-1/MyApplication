@@ -62,4 +62,5 @@
     <string name="Lock_the_left_visual_occurrence">锁定左侧视产状</string>
     <string name="vertical">垂直</string>
     <string name="horizontal">水平</string>
+    <string name="dynamic_permissions">动态权限</string>
 </resources>

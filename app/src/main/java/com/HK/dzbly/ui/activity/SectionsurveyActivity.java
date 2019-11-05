@@ -36,7 +36,6 @@ import com.HK.dzbly.utils.auxiliary.planar_equation;
 import com.HK.dzbly.utils.drawing.dynamicDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 import com.HK.dzbly.utils.wifi.ReceiveMsg;
 import com.HK.dzbly.utils.wifi.Send;
 
@@ -73,7 +72,6 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private TextView area; //面积
     private RadioGroup Initial_length;
     private TextView save; //保存
-    private NetConnection netConnection;//检查wifi是否连接
     private ConnectThread connectThread;//连接wifi,接收数据
     private Concerto concerto;//处理wifi的数据
     private Socket socket;
@@ -416,5 +414,6 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     public void onPause() {
 //        timer.cancel();
         super.onPause();
+
     }
 }

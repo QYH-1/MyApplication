@@ -28,7 +28,6 @@ import com.HK.dzbly.utils.drawing.NoRender;
 import com.HK.dzbly.utils.drawing.Threedimensional_coordinates;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -84,7 +83,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private float abdistance; //AB两点的距离
     private int STATE = 0;//用来判断当前锁定的状态
     private SharedPreferences sp = null;
-    private NetConnection netConnection;//检查wifi是否连接
     private ConnectThread connectThread;//连接wifi,接收数据
     private Concerto concerto;//处理wifi的数据
     private Socket socket;
@@ -106,10 +104,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         STATE = sp.getInt("STATE", 0);
 
         Log.d("STATE", String.valueOf(STATE));
-        netConnection = new NetConnection();
-        boolean ts = netConnection.isNetworkConnected(Two_pointActivity.this);
-        Log.d("ts", String.valueOf(ts));
-        if (netConnection.isNetworkConnected(Two_pointActivity.this)) {
             connectThread = new ConnectThread(socket, handler);
             connectThread.start();
             inInt();
@@ -117,9 +111,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
             setLock();
             setTdc();
             setDistance();
-        } else {
-            Toast.makeText(Two_pointActivity.this, "WIFI没有连接", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void inInt() {
@@ -449,8 +440,6 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
-        //glView.onPause();
-        Log.w("glView", "glView");
     }
 
     //保存数据

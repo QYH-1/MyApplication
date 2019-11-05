@@ -26,7 +26,6 @@ import com.HK.dzbly.ui.activity.Laser_rangingActivity;
 import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
-import com.HK.dzbly.utils.wifi.NetConnection;
 import com.HK.dzbly.utils.wifi.ReceiveMsg;
 import com.HK.dzbly.utils.wifi.Send;
 
@@ -63,7 +62,6 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private TextView lock;//锁定
     private TextView save; //保存
     private ConnectThread connectThread;//wifi连接
-    private NetConnection netConnection;//wifi连接检查
     private Concerto concerto;//wifi的数据处理
     private Socket socket;
     private String Objectdistance;//目标距离
