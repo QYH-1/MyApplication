@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
@@ -79,7 +80,7 @@ public class DzlpActivity extends FragmentActivity {
     private String data3 = null;//方位角
     private String data4 = null; //显示结果
     private String data5 = null; //计算后的产转的角
-    Timer timer;
+    private Timer timer;
 
     private WifiManager mWifiManager ;
     private ConnectivityManager mConnectivityManager;
@@ -289,31 +290,6 @@ public class DzlpActivity extends FragmentActivity {
         float val = Float.parseFloat(x);
         chaosCompassView.CompassViewdata(val);
     }
-
-//    private void setLo(String data) {
-//        //获取fragment中的控件
-//        TextView textView = mordinary_measurement_fragment.getView().findViewById(R.id.explain);
-//        occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-//                if (isChecked) {
-//                    textView.setText(data);
-//                    textView.setTextSize(35);
-//                    textView.setGravity(Gravity.CENTER);
-//                    textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-//                } else {
-//
-//                    String text = "<p> 测量方法：<br>\n" +
-//                            "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
-//                            "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
-//                            "\t</p>";
-//                    textView.setText(Html.fromHtml(text));
-//                    textView.setTextSize(18);
-//                    textView.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
-//                }
-//            }
-//        });
-//    }
 
     /**
      * 对fragment中ui进行更新

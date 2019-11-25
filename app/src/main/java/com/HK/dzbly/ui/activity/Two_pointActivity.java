@@ -90,7 +90,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
     private DBhelper dBhelper;
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/测距数据";  //文件保存的目录
     private int num = 1; //文件出现次数
     private boolean RECORD_VARIABLE = true; //接收标志置（true为正常接收 flase为非正常接收）
 
@@ -447,12 +447,13 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         final View view = LayoutInflater.from(this).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
-
+        EditText fileName = view.findViewById(R.id.name1);
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
+        fileName.setText(date);
         new AlertDialog.Builder(this)
                 .setTitle("系统提示")
                 .setView(view)

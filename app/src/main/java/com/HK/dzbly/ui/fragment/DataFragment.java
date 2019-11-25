@@ -148,6 +148,10 @@ public class DataFragment extends Fragment {
         if (dataName.length() > 5) {
             if ((dataName.substring(dataName.length() - 4)).equals(".jpg")) {
                 type = "jpg";
+            }else if ((dataName.substring(dataName.length() - 4)).equals(".mp4")){
+                type = "video";
+            }else {
+                type ="";
             }
             // Log.d("DataFragment_type",type);
         } else {
@@ -157,6 +161,7 @@ public class DataFragment extends Fragment {
                 type = "video";
             } else {
                 type = "";
+                Log.i("111","000");
             }
         }
 

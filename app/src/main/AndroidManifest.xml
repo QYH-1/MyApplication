@@ -12,7 +12,11 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- 拍照 -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
+
+    <!-- 开机启动所需权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- 拍照 -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- 允许创建和删除文件 -->
     <uses-permission
             android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
@@ -29,6 +33,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+            tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.STATUS_BAR"
+            tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name = "android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name = "android.permission.WAKE_LOCK"/>
 
     <uses-feature
             android:glEsVersion="0x00020000"
@@ -52,9 +64,11 @@
                 android:enabled="true"
                 android:exported="true">
             <intent-filter>
-
                 <!-- .接收启动完成的广播 -->
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.HOME"/>
             </intent-filter>
         </receiver>
 
@@ -99,6 +113,7 @@
         <activity android:name=".ui.activity.LevelActivity"></activity>
         <activity android:name=".ui.activity.Laser_controlActivity"></activity>
         <activity android:name=".ui.activity.Utility_toolsActivity"></activity>
+        <activity android:name=".ui.activity.LaserControlActivity"></activity>
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="com.cs.dzl.fileProvider"

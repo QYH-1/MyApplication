@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/blue"
+        android:background="@color/Light_blue"
         android:gravity="center">
 
     <LinearLayout
@@ -37,7 +37,7 @@
 
             <EditText
                     android:id="@+id/threshold"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/edit_bg"
@@ -63,13 +63,36 @@
 
             <EditText
                     android:id="@+id/declination"
-                    android:layout_width="wrap_content"
+                    android:layout_width="65dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/edit_bg"
-                    android:hint="0.00"
+                    android:gravity="center"
+                    android:hint="2.38"
                     android:maxLength="12"
                     android:textSize="25dp" />
+
+
+
+
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="90dp">
+
+            <Spinner
+                    android:id="@+id/placeName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_centerHorizontal="true"
+                   />
+            <Spinner
+                    android:id="@+id/place"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="-20dp"
+                    android:gravity="center"/>
         </LinearLayout>
 
         <Button
@@ -77,9 +100,10 @@
                 android:layout_width="150dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/border_line_while"
                 android:text="@string/Confirm_settings"
+                android:textColor="@color/white"
                 android:textSize="25dp" />
 
         <Button
@@ -90,6 +114,7 @@
                 android:layout_marginTop="25dp"
                 android:background="@drawable/border_line_while"
                 android:text="@string/EXIT"
+                android:textColor="@color/white"
                 android:textSize="25dp" />
     </LinearLayout>
 </LinearLayout>

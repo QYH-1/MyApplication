@@ -63,13 +63,13 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private TextView save; //保存
     private ConnectThread connectThread;//wifi连接
     private Concerto concerto;//wifi的数据处理
-    private Socket socket;
+    private Socket socket ;
     private String Objectdistance;//目标距离
     private static final String DATABASE_NAME = "cqhk.db"; //数据库名称
     private int num = 1; //文件出现次数
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/测距数据";  //文件保存的目录
     SharedPreferences sp = null;
     private OutputStream outputStream;  //数据输出流
     private DataInputStream inputStream;
@@ -102,18 +102,17 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
             public void run() {
                 //执行子线程，向硬件发送消息和接受wifi传递过来的信息
                 getWifiData();
-
-                Log.i("Signal_quality", String.valueOf(Signal_quality));
+                // Log.i("Signal_quality", String.valueOf(Signal_quality));
                 //不能在子线程中更新UI，所以只能再建立一个主线程
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //此处更新UI
-                        if (Signal_quality < 150) {
-                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        //此处更新UI
+//                        if (Signal_quality < 150) {
+//                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
             }
         }, 0, 2000 * 2);
     }
@@ -146,20 +145,28 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
             @Override
             public void run() {
                 try {
-                    socket = new Socket("10.10.100.254", 8899);
-                    inputStream = new DataInputStream(socket.getInputStream());
-                    outputStream = socket.getOutputStream();
+                        socket = new Socket("10.10.100.254", 8899);
+                        inputStream = new DataInputStream(socket.getInputStream());
+                        outputStream = socket.getOutputStream();
+
                     try {
-                        Log.i("-------------timer", "timer");
-                        byte[] bytes = {69, 73, 87, 1};
-                        send.sendData(outputStream, bytes);
-                        Log.i("receiveMsg", "receiveMsg");
-                        receiveMsg = new ReceiveMsg();
-                        receiveMsg.receiveMsg(inputStream, myHandler);
+                            Log.i("-------------timer", "timer");
+                            byte[] bytes = {69, 73, 87, 1};
+                            send.sendData(outputStream, bytes);
+                            Log.i("receiveMsg", "receiveMsg");
+                            receiveMsg = new ReceiveMsg();
+                            receiveMsg.receiveMsg(inputStream, myHandler);
+
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        socket = null;
                     }
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -177,7 +184,7 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
             Log.w("是否进行赋值", "执行当当前语句");
             String data = bundle.getString("msg");
             Log.d("LineFragmentwifi_data", data);
-            if (data.length() < 24) {
+            if (data.length() < 30) {
                 Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
             }
             concerto = new Concerto();
@@ -238,12 +245,14 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
+        EditText fileName = view.findViewById(R.id.name1);
 
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
+        fileName.setText(date);
         new AlertDialog.Builder(getActivity())
                 .setTitle("系统提示")
                 .setView(view)

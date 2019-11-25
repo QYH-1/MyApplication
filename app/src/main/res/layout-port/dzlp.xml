@@ -78,6 +78,7 @@
                 android:layout_weight="1"
                 android:checked="true"
                 android:showText="true"
+                android:clickable="false"
                 android:switchTextAppearance="@style/SwitchTheme"
                 android:textOff="@string/Simple_measurement"
                 android:textOn="@string/Ordinary_measurement"

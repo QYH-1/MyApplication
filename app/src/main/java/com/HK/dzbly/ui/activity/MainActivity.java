@@ -1,23 +1,30 @@
 package com.HK.dzbly.ui.activity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Method;
 
 /**
  * @Author：qyh 版本：1.0
@@ -36,6 +43,7 @@ public class MainActivity extends BaseActivity {
             "android.intent.action.REBOOT";
     public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,7 +157,7 @@ public class MainActivity extends BaseActivity {
         shutdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // dataDisplay();
+                // dataDisplay();
                 Intent intent = new Intent(MainActivity.this, DatadisplayActivity.class);
                 //  Intent intent = new Intent(MainActivity.this,wifi.class);
                 startActivity(intent);
@@ -200,11 +208,11 @@ public class MainActivity extends BaseActivity {
     /**
      * 其他软件
      */
-    private void setOther_software(){
+    private void setOther_software() {
         Other_software.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,Utility_toolsActivity.class);
+                Intent intent = new Intent(MainActivity.this, Utility_toolsActivity.class);
                 startActivity(intent);
             }
         });
@@ -214,36 +222,69 @@ public class MainActivity extends BaseActivity {
     /**
      * 激光控制
      */
-    private void setLaser_control(){
+    private void setLaser_control() {
         laser_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,Laser_controlActivity.class);
+                Intent intent = new Intent(MainActivity.this, LaserControlActivity.class);
                 startActivity(intent);
             }
         });
         laser_control1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,Laser_controlActivity.class);
+                Intent intent = new Intent(MainActivity.this, LaserControlActivity.class);
                 startActivity(intent);
             }
         });
     }
-    private void setLevel(){
+
+    private void setLevel() {
         Level.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                Intent intent = new Intent(MainActivity.this, LevelActivity.class);
                 startActivity(intent);
             }
         });
         Level1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,LevelActivity.class);
+                Intent intent = new Intent(MainActivity.this, LevelActivity.class);
                 startActivity(intent);
             }
         });
     }
+
+    /**
+     * 设置系统返回键
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+
+    }
+
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        disableStatusBar();
+//        super.onWindowFocusChanged(hasFocus);
+//    }
+//    public void disableStatusBar() {
+//        try {
+//            @SuppressLint("WrongConstant") Object service = getSystemService("statusbar");
+//            Class<?> claz = Class.forName("android.app.StatusBarManager");
+//            Method expand = claz.getMethod("collapsePanels");
+//            expand.invoke(service);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -77,7 +77,7 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
     private int num = 2; //文件出现次数
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/测距数据";  //文件保存的目录
     SharedPreferences sp = null;
     private double distance = 00.000; //获取每次测得的距离
     private int number = 1; //测量的次数
@@ -205,6 +205,13 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
                         receiveMsg.receiveMsg(inputStream, myHandler);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }finally {
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        socket = null;
                     }
 
                 } catch (IOException e) {
@@ -352,12 +359,13 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
-
+        EditText fileName = view.findViewById(R.id.name1);
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
+        fileName.setText(date);
         new AlertDialog.Builder(getActivity())
                 .setTitle("系统提示")
                 .setView(view)

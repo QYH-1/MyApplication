@@ -72,7 +72,6 @@ class CaptureActivity : Activity() {
         sp = PreferenceManager.getDefaultSharedPreferences(this)//获取了SharePreferences对象
         btnCaptureRaw.setOnClickListener { gotoCaptureRaw() }        //拍照(返回原始图)
         btnCaptureAndClip.setOnClickListener { gotoCaptureCrop() }   //拍照 + 裁切
-        btnAlbumAndClip.setOnClickListener { gotoGallery() }   //打开系统相册
         btnCaptureVideo.setOnClickListener { gotoCaptureVideo() }   //录视频 + 播放
         btnCapturesave.setOnClickListener { gotoCaptureSave() } //保存数据
 
@@ -82,13 +81,19 @@ class CaptureActivity : Activity() {
      * 保存数据
      */
     private fun gotoCaptureSave() {
-        val view = LayoutInflater.from(this).inflate(R.layout.layout, null, false)
+        var view: View? = null
+        if (type == 1) {
+            view = LayoutInflater.from(this).inflate(R.layout.layoutjpg, null, false)
+        } else {
+            view = LayoutInflater.from(this).inflate(R.layout.layoutvideo, null, false)
+        }
         val dialog = AlertDialog.Builder(this).setView(view).create()
         val desc1 = view.findViewById<TextView>(R.id.desc1)
-
+        val fileName = view.findViewById<EditText>(R.id.name1)
         //获取当前时间
         val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
         desc1.text = date
+        fileName.setText(date)
         AlertDialog.Builder(this)
             .setTitle("系统提示")
             .setView(view)
@@ -218,6 +223,7 @@ class CaptureActivity : Activity() {
                 startActivityForResult(intent, REQUEST_CODE_CAPTURE)
             }
         }
+        type = 1;
     }
 
     //裁剪

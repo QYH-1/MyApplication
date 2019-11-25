@@ -1,11 +1,14 @@
 package com.HK.dzbly.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -37,8 +40,8 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
     private LevelView levelView;
     private LevelHew levelHew;
     private LevelVew levelVew;
-    private TextView tvHorz;
-    private TextView tvVert;
+    private TextView tvHorz,tvl_horz;
+    private TextView tvVert,tvl_vertical;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,8 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         levelHew = findViewById(R.id.level_h);
         levelVew = findViewById(R.id.level_v);
         tvVert = findViewById(R.id.tvv_vertical);
+        tvl_vertical = findViewById(R.id.tvl_vertical);
+        tvl_horz = findViewById(R.id.tvl_horz);
         tvHorz = findViewById(R.id.tvv_horz);
 
         //获取传感器服务
@@ -108,6 +113,21 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         // 获取沿着Y轴的滚动时与X轴的角度
         float rollAngle = -mOrientationAngles[ROLL];
 
+        //当出现水平时，改变字体的颜色
+        if (Math.abs(Math.toDegrees(rollAngle)) < 1) {
+            tvHorz.setTextColor(Color.GREEN);
+            tvl_horz.setTextColor(Color.GREEN);
+        } else {
+            tvHorz.setTextColor(Color.WHITE);
+            tvl_horz.setTextColor(Color.WHITE);
+        }
+        if (Math.abs(Math.toDegrees(pitchAngle)) < 1) {
+            tvVert.setTextColor(Color.GREEN);
+            tvl_vertical.setTextColor(Color.GREEN);
+        } else {
+            tvVert.setTextColor(Color.WHITE);
+            tvl_vertical.setTextColor(Color.WHITE);
+        }
         updateOrientationAngles(rollAngle, pitchAngle);
     }
 
@@ -121,7 +141,13 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         levelView.setAngle(rollAngle, pitchAngle);
         levelHew.setAngle(rollAngle, pitchAngle);
         levelVew.setAngle(rollAngle, pitchAngle);
+
         tvHorz.setText(String.valueOf((int) Math.toDegrees(rollAngle)) + "°");
+//        if (pitchAngle == 0) {
+//            tvVert.setTextColor(R.color.app_color_theme_4);
+//        }else {
+//            tvVert.setTextColor(R.color.white);
+//        }
         tvVert.setText(String.valueOf((int) Math.toDegrees(pitchAngle)) + "°");
     }
 }

@@ -22,15 +22,15 @@ public class Laser_control {
      * 向硬件发送信息
      * @param msg
      */
-    public void laserControl(byte msg){
+    public void laserControl(byte[] msg){
         try {
             socket = new Socket("10.10.100.254", 8899);
             outputStream = socket.getOutputStream();
             outputStream.write(msg);
             Log.d("向服务器端发送消息", String.valueOf(msg));
-            outputStream.flush();
-            outputStream.close();
-            socket.close();
+            //outputStream.flush();
+            //outputStream.close();
+            //socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

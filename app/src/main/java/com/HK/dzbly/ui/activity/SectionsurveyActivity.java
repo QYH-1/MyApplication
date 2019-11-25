@@ -31,7 +31,7 @@ import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.utils.auxiliary.Calculated_area;
 import com.HK.dzbly.utils.auxiliary.Data_normalization;
-import com.HK.dzbly.utils.auxiliary.Screenshot;
+import com.HK.dzbly.utils.file.Screenshot;
 import com.HK.dzbly.utils.auxiliary.planar_equation;
 import com.HK.dzbly.utils.drawing.dynamicDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
@@ -90,6 +90,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     FileOutputStream fileOutputStream = null; //文件输入流
     File root = Environment.getExternalStorageDirectory();
     String path = root.getAbsolutePath() + "/CameraDemo" + "/capture";  //文件保存的目录
+    String path1 = root.getAbsolutePath() + "/CameraDemo" + "/测距数据";  //文件保存的目录
     private int num = 1; //文件出现次数
     private Context context;
     private Screenshot screenshot;
@@ -196,6 +197,9 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 Log.d("dataList", String.valueOf(drawingList));
                 dynamicDrawing.setData(drawingList);
                 area.setText("所测的面积:" + df.format(calculated_area.area(dataList))+"平方米");
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("area",df.format(calculated_area.area(dataList))+"平方米");
+                editor.commit();
                 break;
             case R.id.reset:
                 Intent intent2 = new Intent(SectionsurveyActivity.this, SectionsurveyActivity.class);
@@ -246,6 +250,13 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                         receiveMsg.receiveMsg(inputStream, myHandler);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }finally {
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        socket = null;
                     }
 
                 } catch (IOException e) {
@@ -358,15 +369,17 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     }
     //保存数据
     private void showDialog() {
-        final View view = LayoutInflater.from(this).inflate(R.layout.layout, null, false);
+        final View view = LayoutInflater.from(this).inflate(R.layout.layoutjpg, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
+        EditText fileName = view.findViewById(R.id.name1);
 
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String date1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
+        fileName.setText(date);
         new AlertDialog.Builder(this)
                 .setTitle("系统提示")
                 .setView(view)
@@ -375,7 +388,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText text = view.findViewById(R.id.name1);
                         String name = text.getText().toString();
-
+                        String area = sp.getString("area","0.00平方米");
                         try {
                             // 通过bitmap保存当前截图
                             screenshot = new Screenshot();

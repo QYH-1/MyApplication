@@ -12,7 +12,7 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:src="@drawable/txt" />
+            android:src="@drawable/jpg" />
 
     <LinearLayout
             android:id="@+id/text1"

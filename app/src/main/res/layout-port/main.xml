@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/backdground"
+        android:background="@drawable/laser_brackground"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -36,7 +36,7 @@
                     android:layout_marginTop="6dp"
                     android:clickable="true"
                     android:text="@string/SETING"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
 
@@ -62,7 +62,7 @@
                     android:layout_marginTop="6dp"
                     android:clickable="true"
                     android:text="@string/camera"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                     android:layout_marginTop="6dp"
                     android:clickable="true"
                     android:text="@string/Laser_ranging"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
@@ -121,7 +121,7 @@
                     android:layout_marginTop="6dp"
                     android:clickable="true"
                     android:text="水平仪"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
 
@@ -147,7 +147,7 @@
                     android:layout_marginTop="6dp"
                     android:clickable="true"
                     android:text="@string/geological_record"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
 
@@ -171,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="@string/View_data"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
@@ -202,7 +202,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:clickable="true"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:text="@string/File_management" />
         </LinearLayout>
@@ -228,7 +228,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:clickable="true"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:text="激光控制" />
         </LinearLayout>
@@ -253,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:text="实用工具" />
         </LinearLayout>

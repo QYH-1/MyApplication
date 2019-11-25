@@ -304,8 +304,8 @@ public class Drawtriangle extends View {
         String haldane1 = String.valueOf(haldane);
 
         this.angle = Float.parseFloat(angle1.substring(0, angle1.indexOf(".") + 2));
-        this.Verticaldistance = Float.parseFloat(df.format(Double.parseDouble(valance1)));
-        this.Horizontaldistance = Float.parseFloat(df.format(Double.parseDouble(haldane1)));
+        this.Verticaldistance =Math.abs(Float.parseFloat(df.format(Double.parseDouble(valance1)))) ;
+        this.Horizontaldistance = Math.abs(Float.parseFloat(df.format(Double.parseDouble(haldane1))));
         float Odistance = (float) Math.sqrt(Verticaldistance * Verticaldistance + Horizontaldistance * Horizontaldistance);
         String ODistance = String.valueOf(Odistance);
         this.Objectdistance = Float.parseFloat(df.format(Double.parseDouble(ODistance)));

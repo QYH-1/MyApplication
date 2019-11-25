@@ -102,7 +102,6 @@ public class ConnectThread extends Thread {
                             stringBuilder = null;
                             break;
                         }
-                        //socket.close();
                     } catch (NullPointerException e) {
 
                     }
@@ -112,6 +111,13 @@ public class ConnectThread extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            socket = null;
         }
     }
 

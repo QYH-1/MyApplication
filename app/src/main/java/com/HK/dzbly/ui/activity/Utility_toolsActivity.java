@@ -61,9 +61,14 @@ public class Utility_toolsActivity extends BaseActivity {
         calculator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClassName("com.android.calculator2", "com.android.calculator2.Calculator");
-                startActivity(intent);
+                try{
+                    Intent intent = new Intent();
+                    //intent.setClassName("com.android.calculator2", "com.android.calculator2.Calculator");
+                    intent.setClassName("com.miui.calculator", ".Calculator");
+                    startActivity(intent);
+                }catch (Exception e){
+                }
+
             }
         });
     }

@@ -1,4 +1,4 @@
-package com.HK.dzbly.utils.auxiliary;
+package com.HK.dzbly.utils.file;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

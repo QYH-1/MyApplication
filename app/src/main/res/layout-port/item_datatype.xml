@@ -5,6 +5,7 @@
         android:layout_height="fill_parent"
         android:gravity="center"
         android:padding="10dp"
+        android:textAlignment="gravity"
         android:textSize="20sp"
         tools:ignore="MissingDefaultResource">
 

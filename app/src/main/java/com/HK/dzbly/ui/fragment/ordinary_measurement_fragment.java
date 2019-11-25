@@ -55,7 +55,7 @@ public class ordinary_measurement_fragment extends Fragment {
     String result;//产状信息
 
     File root = Environment.getExternalStorageDirectory();
-    String path = root.getAbsolutePath() + "/CameraDemo" + "/data";  //文件保存的目录
+    String path = root.getAbsolutePath() + "/CameraDemo" + "/产状数据";  //文件保存的目录
 
     public ordinary_measurement_fragment() {
     }
@@ -108,7 +108,8 @@ public class ordinary_measurement_fragment extends Fragment {
                 explain.setPadding(15, 60, 0, 0);//设置边距
                 //explain.setGravity(Gravity.CENTER);//居中显示
                 String text = "<p> 测量方法：<br>\n" +
-                        "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
+//                        "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
+                        "\t\t1）保持测量端与待测的产状面平行；<br>\n" +
                         "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
                         "\t</p>";
                 explain.setText(Html.fromHtml(text));
@@ -152,11 +153,14 @@ public class ordinary_measurement_fragment extends Fragment {
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout, null, false);
         final AlertDialog dialog = new AlertDialog.Builder(getActivity()).setView(view).create();
         TextView desc1 = view.findViewById(R.id.desc1);
+        EditText fileName = view.findViewById(R.id.name1);
 
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
         //获取当前时间
         final String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        //final String fileDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         desc1.setText(date);
+        fileName.setText(date);
         new AlertDialog.Builder(getActivity())
                 .setTitle("系统提示")
                 .setView(view)

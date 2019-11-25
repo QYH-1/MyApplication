@@ -86,17 +86,18 @@ public class Laser_controlActivity extends BaseActivity {
                 Map<String, Object> map = (Map<String, Object>) Laser_controlActivity.this.sim_adapter.getItem(position);
                 clickText = (String) map.get("openText");
 //                Log.d("position", String.valueOf(position));
-//                Log.d("clinkData", clickText);
+                Log.d("-----clinkData-----", clickText);
                 ControlData controlData = new ControlData();
                 //利用子线程向硬件发送控制指令
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("laser_control","laser_control");
                         Laser_control laser_control = new Laser_control();
                         laser_control.laserControl(controlData.setData(clickText));
                     }
-                });
-                Toast.makeText(getApplicationContext(), "单击的是" + clickText, Toast.LENGTH_LONG).show();
+                }).start();
+              //  Toast.makeText(getApplicationContext(), "单击的是" + clickText, Toast.LENGTH_LONG).show();
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putString("clickText", clickText);
