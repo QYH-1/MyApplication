@@ -2,22 +2,40 @@ package com.HK.dzbly.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.utils.drawing.LevelHew;
 import com.HK.dzbly.utils.drawing.LevelVew;
 import com.HK.dzbly.utils.drawing.LevelView;
+import com.HK.dzbly.utils.wifi.Concerto;
+import com.HK.dzbly.utils.wifi.ReceiveMsg;
+import com.HK.dzbly.utils.wifi.Send;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
@@ -40,8 +58,19 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
     private LevelView levelView;
     private LevelHew levelHew;
     private LevelVew levelVew;
-    private TextView tvHorz,tvl_horz;
-    private TextView tvVert,tvl_vertical;
+    private TextView tvHorz, tvl_horz;
+    private TextView tvVert, tvl_vertical;
+    private Timer timer;
+    private Socket socket;
+    private OutputStream outputStream;  //数据输出流
+    private DataInputStream inputStream;
+    private Send send;
+    private ReceiveMsg receiveMsg;
+    private String data;//wifi传递过来的数据
+    private String data1 = null; //俯仰角
+    private String data2 = null; //横滚角
+    private SharedPreferences sp; //用来保存数据，传递给fragment进行存储
+    private Concerto concerto;//处理wifi传递过来的数据
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +87,67 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         tvl_horz = findViewById(R.id.tvl_horz);
         tvHorz = findViewById(R.id.tvv_horz);
 
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Data();
+            }
+        }, 0, 2000 * 2);
         //获取传感器服务
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
     }
+
+    private void Data() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("10.10.100.254", 8899);
+                    inputStream = new DataInputStream(socket.getInputStream());
+                    outputStream = socket.getOutputStream();
+                    try {
+                        Log.i("-------------timer", "timer");
+                        byte[] bytes = {69, 73, 87, 0, 0};
+                        send.sendData(outputStream, bytes);
+                        Log.i("receiveMsg", "receiveMsg");
+                        receiveMsg = new ReceiveMsg();
+                        receiveMsg.receiveMsg(inputStream, handler);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 接收wifi的数据，并对控件进行设置
+     */
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Bundle bundle = new Bundle();
+            bundle = msg.getData();
+            data = bundle.getString("msg");
+            Log.d("DzlpActivity_data", data);
+            if (data.length() == 30) {
+                //对wifi获取的数据进行处理
+                //俯仰角
+                data1 = concerto.Dataconversion(data.substring(0, 6));
+                Log.d("data1-dzlpActivity", String.valueOf(data1));
+                //横滚角
+                data2 = concerto.Dataconversion(data.substring(6, 12));
+                //向画图类传递传感器读取到的值
+                updateOrientationAngles(Float.valueOf(data2), Float.valueOf(data1));
+            }
+        }
+    };
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -128,7 +214,7 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
             tvVert.setTextColor(Color.WHITE);
             tvl_vertical.setTextColor(Color.WHITE);
         }
-        updateOrientationAngles(rollAngle, pitchAngle);
+        //updateOrientationAngles(rollAngle, pitchAngle);
     }
 
     /**
@@ -143,11 +229,6 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         levelVew.setAngle(rollAngle, pitchAngle);
 
         tvHorz.setText(String.valueOf((int) Math.toDegrees(rollAngle)) + "°");
-//        if (pitchAngle == 0) {
-//            tvVert.setTextColor(R.color.app_color_theme_4);
-//        }else {
-//            tvVert.setTextColor(R.color.white);
-//        }
         tvVert.setText(String.valueOf((int) Math.toDegrees(pitchAngle)) + "°");
     }
 }

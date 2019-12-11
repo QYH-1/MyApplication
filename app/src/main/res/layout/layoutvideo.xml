@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:padding="5dp"
+        android:background="@drawable/laser_brackground"
+        tools:ignore="MissingDefaultResource">
+
+    <ImageView
+            android:id="@+id/icon1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/mp4" />
+
+    <LinearLayout
+            android:id="@+id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="68dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dp"
+            android:layout_toRightOf="@id/icon1"
+            android:orientation="vertical">
+
+        <EditText
+                android:id="@+id/name1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:hint="@string/Please_enter_a_file_name"
+                android:singleLine="true"
+                android:textColor="#000"
+                android:textSize="16sp" />
+
+        <TextView
+                android:id="@+id/desc1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="2014-03-24 10:06"
+                android:textColor="#9f9f9f"
+                android:textSize="14sp" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

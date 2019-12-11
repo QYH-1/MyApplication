@@ -19,12 +19,12 @@ import java.util.List;
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/11/4
- * 描述：
+ * 描述：给出其他工具图标，调用其他工具
  * 修订历史：
  */
 public class Utility_toolsActivity extends BaseActivity {
-    private ImageButton calculator, other;
-    private TextView calculator1;
+    private ImageButton calculator, CAD,wpsImageButton;
+    private TextView calculator1,wpsTextView;
     private PackageInfoManager packageInfoManager = new PackageInfoManager(); //调用第三方应用
     private List<PackageInfo> list;
 
@@ -38,7 +38,8 @@ public class Utility_toolsActivity extends BaseActivity {
         inint();
         setCalculator();
         setOther();
-        //packageInfoManager = new PackageInfoManager();
+        setWps();
+
         list = packageInfoManager.getAllApps(this);
         Log.i("packageInfoManager", "----------------");
         Log.i("packageInfoManager", String.valueOf(list));
@@ -49,7 +50,8 @@ public class Utility_toolsActivity extends BaseActivity {
      */
     private void inint() {
         calculator = findViewById(R.id.calculator);
-        other = findViewById(R.id.other);
+        CAD = findViewById(R.id.CAD);
+        wpsImageButton  =findViewById(R.id.wps);
 
         calculator1 = findViewById(R.id.calculator1);
     }
@@ -63,8 +65,8 @@ public class Utility_toolsActivity extends BaseActivity {
             public void onClick(View view) {
                 try{
                     Intent intent = new Intent();
-                    //intent.setClassName("com.android.calculator2", "com.android.calculator2.Calculator");
-                    intent.setClassName("com.miui.calculator", ".Calculator");
+                    intent.setClassName("com.android.calculator2", "com.android.calculator2.Calculator");
+//                    intent.setClassName("com.miui.calculator", ".Calculator");
                     startActivity(intent);
                 }catch (Exception e){
                 }
@@ -74,10 +76,19 @@ public class Utility_toolsActivity extends BaseActivity {
     }
 
     private void setOther() {
-        other.setOnClickListener(new View.OnClickListener() {
+        CAD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                packageInfoManager.startThridApp(Utility_toolsActivity.this, "com.sankuai.meituan");
+                packageInfoManager.startThridApp(Utility_toolsActivity.this, "com.glodon.drawingexplorer");
+            }
+        });
+    }
+
+    private void setWps(){
+        wpsImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                packageInfoManager.startThridApp(Utility_toolsActivity.this, "cn.wps.moffice_eng");
             }
         });
     }

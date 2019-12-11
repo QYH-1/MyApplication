@@ -2,12 +2,26 @@ package com.HK.dzbly.ui.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+
 import com.HK.dzbly.R;
-import com.HK.dzbly.database.DBhelper;
+import com.HK.dzbly.utils.LocationUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 /**
  * @Author：qyh 版本：1.0
@@ -16,67 +30,85 @@ import com.HK.dzbly.database.DBhelper;
  * 修订历史：
  */
 public class testActivity extends Activity {
+
     private Button test1;
-    private Button test2;
+    private TextView textView;
     public Context context;
+
+    private String result;
+    private TextView info;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test );
+        setContentView(R.layout.test);
+        //获取GPS权限
+        ActivityCompat.requestPermissions(testActivity.this, new String[]
+                {android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 122);
+
+        info = (TextView) findViewById(R.id.tv);
         test1 = findViewById(R.id.test1);
-        test2 = findViewById(R.id.test2);
+        textView = findViewById(R.id.TextView);
+
         test1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //创建一个DatabaseHelper对象
-                DBhelper dbHelper1 = new DBhelper(testActivity.this, "english.db");
-                //取得一个只读的数据库对象
-                SQLiteDatabase db1 = dbHelper1.getReadableDatabase();
+                LocationUtils utils = new LocationUtils(getApplicationContext());
+                Location l = utils.getLocation();
+                double lat = l.getLatitude();
+                double lon = l.getLongitude();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String strUrlPath = "https://cloud.cqhky.com:7777/api/cpj?lat=" + lat + "&lon=" + lon + "";
+                        result = getServiceInfo(strUrlPath);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textView.setText(result);
+                            }
+                        });
+                    }
+                }).start();
             }
         });
-        test2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                //创建存放数据的ContentValues对象
-//                ContentValues values = new ContentValues();
-//                //像ContentValues中存放数据
-//               // values.put("id", 1);
-//                values.put("name","zhang");
-//                DBHelper dbHelper3 = new DBHelper(StudyWordActivity.this, "english.db");
-//                SQLiteDatabase db3 = dbHelper3.getWritableDatabase();
-//                //数据库执行插入命令
-//                db3.insert("user", null, values);
-//                Log.d("插入数据","插入成功");
-                DBhelper dbHelper2 = new DBhelper(testActivity.this, "cqhk.db");
-               //SQLiteDatabase db3 = dbHelper2.getWritableDatabase();
-//                ContentValues cv = new ContentValues();
-//                cv.put("Dname","第二");
-//                cv.put("Dval","22");
-//                cv.put("Drollangle","22");
-//                cv.put("Delevation","22");
-//                cv.put("type","dzbl");
-//                cv.put("Dresult","11");
-//                dbHelper2.Insert(context,"DZBLY",cv);
-
-                dbHelper2.DeleteTable(context,"File");
-//                dbHelper2.Insert(context,"DATA",cv);
-
-//                dbHelper2.DeleteTable(context,"book");
-//                dbHelper2.DeleteTable(context,"BOOKS");
-
-//                Log.d("创建", "111");
-//                ContentValues cv = new ContentValues();
-//                cv.put("ID", 1);
-//                cv.put("SPELLING", "as");
-//                cv.put("MEANNING", "像");
-//                cv.put("PHONETIC_ALPHABET", "as");
-//                cv.put("LIST", 1);
-//                dbHelper2.Insert(context, bookName, cv);
-//                Log.d("插入数据", "插入成功");
-                //dbHelper2.DeleteTable(context, bookName);
-
-            }
-        });
-
     }
+
+    /**
+     * 发送Get请求到服务器
+     *
+     * @param strUrlPath:接口地址（带参数）
+     * @return
+     */
+    public String getServiceInfo(String strUrlPath) {
+        String strResult = "";
+        try {
+            URL url = new URL(strUrlPath);
+            Log.d("url", String.valueOf(url));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setUseCaches(false);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+            while ((line = in.readLine()) != null) {
+                buffer.append(line);
+            }
+            strResult = buffer.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("strResult", strResult);
+        return strResult;
+    }
+
 }

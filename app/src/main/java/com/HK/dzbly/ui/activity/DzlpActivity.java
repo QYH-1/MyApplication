@@ -81,10 +81,12 @@ public class DzlpActivity extends FragmentActivity {
     private String data4 = null; //显示结果
     private String data5 = null; //计算后的产转的角
     private Timer timer;
+    private String declination; //获取地磁偏角
 
-    private WifiManager mWifiManager ;
+    private WifiManager mWifiManager;
     private ConnectivityManager mConnectivityManager;
     private com.HK.dzbly.utils.wifi.checkNetworkConnection checkNetworkConnection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +103,7 @@ public class DzlpActivity extends FragmentActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
         concerto = new Concerto();
         inint(); //获取控件
+        declination = sp.getString("declination", "0.00"); //获取地磁偏角
 
         selectFragment(0);//设置界面开始加载的fragment
         setSelection_method();//切换fregment
@@ -118,7 +121,7 @@ public class DzlpActivity extends FragmentActivity {
         mConnectivityManager = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         WifiInfo mWifiInfo = mWifiManager.getConnectionInfo();
         checkNetworkConnection = new checkNetworkConnection();
-        boolean temp = checkNetworkConnection.isConnected("",mWifiInfo);
+        boolean temp = checkNetworkConnection.isConnected("", mWifiInfo);
     }
 
     private void Data() {
@@ -327,8 +330,8 @@ public class DzlpActivity extends FragmentActivity {
                 Log.d("data1-dzlpActivity", String.valueOf(data1));
                 //横滚角
                 data2 = concerto.Dataconversion(data.substring(6, 12));
-                //方位角
-                data3 = concerto.Dataconversion(data.substring(12, 18));
+                //方位角(将传感器得到的数据减去磁偏角的值，得到真实的值)
+                data3 =String.valueOf(Double.parseDouble(concerto.Dataconversion(data.substring(12, 18)))-Double.parseDouble(declination));
                 Log.d("DzlpActivity_data3", data3);
                 //结果显示
                 //当俯仰角的值在±1之间时，产状信息显示横滚角

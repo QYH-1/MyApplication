@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -59,6 +60,7 @@ class CaptureActivity : Activity() {
         internal lateinit var imageNewPath: String //新的文件地址
         internal lateinit var videoOldPath: String //当前文件地址
         internal lateinit var videoNewPath: String //新的文件地址
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +71,7 @@ class CaptureActivity : Activity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )//隐藏状态栏
         setContentView(com.HK.dzbly.R.layout.activity_capture)
+
         sp = PreferenceManager.getDefaultSharedPreferences(this)//获取了SharePreferences对象
         btnCaptureRaw.setOnClickListener { gotoCaptureRaw() }        //拍照(返回原始图)
         btnCaptureAndClip.setOnClickListener { gotoCaptureCrop() }   //拍照 + 裁切
@@ -105,7 +108,6 @@ class CaptureActivity : Activity() {
                     var newImageFile = imageOldPath.substring(0, imageOldPath.indexOf("I"))
                     imageNewPath = newImageFile + name + ".jpg"
                     val imageName = name + ".jpg"
-
                     val file1 = File(imageNewPath)
                     if (file1.exists()) {
                         Toast.makeText(this, "该名称已存在，请重新输入", Toast.LENGTH_SHORT).show()
@@ -277,7 +279,6 @@ class CaptureActivity : Activity() {
 
             vidoUri = FileProvider.getUriForFile(this, AUTHORITY, it)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, vidoUri)
-
             if (intent.resolveActivity(packageManager) != null)
                 startActivityForResult(intent, REQUEST_CODE_VIDEO)
         }
@@ -348,5 +349,4 @@ class CaptureActivity : Activity() {
             videoView.pause()
         super.onStop()
     }
-
 }

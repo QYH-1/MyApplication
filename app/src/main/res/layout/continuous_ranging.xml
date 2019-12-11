@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?><!--连续测距布局-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/laser_brackground"
+        tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="12"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        <com.HK.dzbly.utils.drawing.Continuous_rangingDrawing
+                android:id="@+id/drawingView"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/Total_length_measured"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="测量总距离："
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+            <TextView
+                    android:id="@+id/total_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"/>
+
+            <TextView
+                    android:id="@+id/current_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="当前距离："
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+            <TextView
+                    android:id="@+id/current_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+            <TextView
+                    android:id="@+id/Detailed_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="测量详细数据："
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+            <ScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fadingEdge="vertical"
+                    android:scrollbars="vertical">
+
+                <TextView
+                        android:id="@+id/detailed_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ranging_boder"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
+                   
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/boder"
+                android:orientation="horizontal">
+
+            <RadioGroup
+                    android:id="@+id/Initial_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/boder"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                <RadioButton
+                        android:id="@+id/nIncluding_length_length"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Doesnot_include_instrument_length" />
+
+                <RadioButton
+                        android:id="@+id/Including_length"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="含仪器长度  " />
+            </RadioGroup>
+
+            <TextView
+                    android:id="@+id/reset"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/boder"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/reset"
+                    android:textColor="@color/black" />
+
+            <TextView
+                    android:id="@+id/lock"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/boder"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/lock"
+                    android:textColor="@color/black" />
+
+            <TextView
+                    android:id="@+id/Save"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/boder"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/Save"
+                    android:textColor="@color/black" />
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

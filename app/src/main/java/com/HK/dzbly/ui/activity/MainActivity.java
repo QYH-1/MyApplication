@@ -67,9 +67,9 @@ public class MainActivity extends BaseActivity {
      * 获取界面中的各个按钮
      */
     public void inint() {
-        prompt = findViewById(R.id.prompt);//信号连接指示灯
+        //prompt = findViewById(R.id.prompt);//信号连接指示灯
         setting = findViewById(R.id.setting);//设置
-        data = findViewById(R.id.data_management);//数据管理
+        data = findViewById(R.id.data_management);   //数据管理
         camera = findViewById(R.id.camera);//相机
         tools = findViewById(R.id.tools);//工具
         shutdown = findViewById(R.id.shutdown);//数据展示

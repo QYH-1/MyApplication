@@ -33,6 +33,7 @@ public class WelcomeActivity extends BaseActivity {
     Context mcontext;
     private static final String TODO = null;
     private TextView prompt; //提示信息文本框
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,23 +52,23 @@ public class WelcomeActivity extends BaseActivity {
             //showInformation();
             return;
         }
-        String imei = getIMEI(mcontext);
-        Log.d("imei",imei);
-        if (imei.equals("868375038978679")){
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    Intent intent1 = new Intent(WelcomeActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent1);
-                    WelcomeActivity.this.finish();
-                }
-            };
-            timer.schedule(timerTask, 3000 * 1);
-        }else {
-           // Toast.makeText(WelcomeActivity.this, "对不起，该手机不支持使用该应用！", Toast.LENGTH_SHORT).show();
-            prompt.setText("对不起，该手机不支持使用该应用！");
-        }
+//        String imei = getIMEI(mcontext);
+//        Log.d("imei",imei);
+//        if (imei.equals("868375038978679")){
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent1 = new Intent(WelcomeActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent1);
+                WelcomeActivity.this.finish();
+            }
+        };
+        timer.schedule(timerTask, 3000 * 1);
+//        }else {
+//           // Toast.makeText(WelcomeActivity.this, "对不起，该手机不支持使用该应用！", Toast.LENGTH_SHORT).show();
+//            prompt.setText("对不起，该手机不支持使用该应用！");
+//        }
 
     }
 
@@ -84,6 +85,7 @@ public class WelcomeActivity extends BaseActivity {
 
         return imei;
     }
+
     /**
      * 获取手机MSISDN号
      */
