@@ -15,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,27 +26,27 @@ import java.util.TimerTask;
  * 修订历史：
  */
 public class Threedimensional_coordinates implements Renderer {
-    float x = -0.5f, y = -0.5f, z = -0.5f;
+    private float x = -0.5f, y = -0.5f, z = -0.5f;
     private float r = 0;
-    Handler handler, handler2;
+    private Handler handler, handler2;
     private Timer timer = new Timer();
     private TimerTask task;
     private float x1 = 0f, y1 = 0f, z1 = 0f, x2 = 0f, y2 = 0f, z2 = 0f;
     private final Context mContext;
 
     // 定义Open GL ES绘制所需要的Buffer对象
-    FloatBuffer lineVerticesBuffer;
-    FloatBuffer xyzVerticesBuffer;
+    private FloatBuffer lineVerticesBuffer;
+    private FloatBuffer xyzVerticesBuffer;
 
-    FloatBuffer poointVerticesBuffer;
+    private FloatBuffer poointVerticesBuffer;
 
-    ByteBuffer lineFacetsBuffer;
-    ByteBuffer xiangliangFacetsBuffer;
-    ByteBuffer XFacetsBuffer;
-    ByteBuffer YFacetsBuffer;
-    ByteBuffer ZFacetsBuffer;
-    ByteBuffer AFacetsBuffer;
-    ByteBuffer BFacetsBuffer;
+    private ByteBuffer lineFacetsBuffer;
+    private ByteBuffer xiangliangFacetsBuffer;
+    private ByteBuffer XFacetsBuffer;
+    private ByteBuffer YFacetsBuffer;
+    private ByteBuffer ZFacetsBuffer;
+    private ByteBuffer AFacetsBuffer;
+    private ByteBuffer BFacetsBuffer;
 
     private LabelMaker mLabels;
     private int mString1;
@@ -53,12 +54,16 @@ public class Threedimensional_coordinates implements Renderer {
     private int mWidth;
     private int mHeight;
     private Typeface mFace;
-    float[] lineVertices;
+    public float[] lineVertices;
+    public float[] pointFacets;
+    public float[] xyzVertices;
+    public byte[] lineFacets;
+    public byte[] xLiangFacets;
     //位图
     private Bitmap bitmap;
 
 
-    void updateXYZ() {  //2.1创建各种数组
+    private void updateXYZ() {  //2.1创建各种数组
         //纹理坐标系
 
         // 定义直线的点                                                       
@@ -68,12 +73,12 @@ public class Threedimensional_coordinates implements Renderer {
 
         };
         //画特殊点
-        float[] pointFacets = new float[]{
+        pointFacets = new float[]{
                 x1, y1, z1,//0
                 x2, y2, z2//1
         };
         //定义XYZ坐标和显示的字
-        float xyzVertices[] = new float[]{
+        xyzVertices = new float[]{
                 -2.0f, 0f, 0f,//0 x起点，画坐标轴的
                 2.0f, 0f, 0f,//1 X轴的终点
                 1.8f, 0.1f, 0f,//2 X轴箭头1
@@ -181,11 +186,11 @@ public class Threedimensional_coordinates implements Renderer {
 
         };
         //点画直线
-        byte[] lineFacets = new byte[]{
+        lineFacets = new byte[]{
                 0, 1
         };
         //向量从原点6指向长方体的0点  
-        byte[] xiangliangFacets = new byte[]{
+        xLiangFacets = new byte[]{
                 //2,0,//2,0
                 //2,1 //2,1
         };
@@ -289,13 +294,15 @@ public class Threedimensional_coordinates implements Renderer {
 
         };
         // 将立方体的顶点位置数据数组包装成FloatBuffer;
+        Log.d("lineVertices", Arrays.toString(lineVertices));
         lineVerticesBuffer = floatBufferUtil(lineVertices);
+        Log.d("------lineVerticesBuffer--------", String.valueOf(lineVerticesBuffer));
         xyzVerticesBuffer = floatBufferUtil(xyzVertices);
         //绘制两个点
         poointVerticesBuffer = floatBufferUtil(pointFacets);
         // 将直线的数组包装成ByteBuffer
         lineFacetsBuffer = ByteBuffer.wrap(lineFacets);
-        xiangliangFacetsBuffer = ByteBuffer.wrap(xiangliangFacets);
+        xiangliangFacetsBuffer = ByteBuffer.wrap(xLiangFacets);
         XFacetsBuffer = ByteBuffer.wrap(XFacets);
         YFacetsBuffer = ByteBuffer.wrap(YFacets);
         ZFacetsBuffer = ByteBuffer.wrap(ZFacets);
@@ -366,7 +373,7 @@ public class Threedimensional_coordinates implements Renderer {
 
             }
         };
-        timer.schedule(task, 0, 7000);
+        timer.schedule(task, 0, 500);
     }
 
     //2.3 实现接口里的三个方法
@@ -444,66 +451,77 @@ public class Threedimensional_coordinates implements Renderer {
         //gl.glRotatef(0f, 0.1f, 0f, 0f);
         gl.glLineWidth(2.0f);
         // 设置顶点的位置数据 因为所有的数据都在次数组中，所以长方体和向量的只要设置这一次就好
-        //Log.d("lineVerticesBuffer", String.valueOf(lineVerticesBuffer));
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer); //2.3.3.3
-        // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f); // 2.3.3.4
-        //这里不用二维，用三维的画法，注意是GL_LINES三维中画线             
-        gl.glDrawElements(GL10.GL_LINES, lineFacetsBuffer.remaining(),//2.3.3.5
-                GL10.GL_UNSIGNED_BYTE, lineFacetsBuffer);
-
+        if (lineVerticesBuffer != null) {
+            Log.d("lineVerticesBuffer", String.valueOf(lineVerticesBuffer));
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer); //2.3.3.3
+            // 设置顶点的颜色数据
+            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f); // 2.3.3.4
+            //这里不用二维，用三维的画法，注意是GL_LINES三维中画线             
+            gl.glDrawElements(GL10.GL_LINES, lineFacetsBuffer.remaining(),//2.3.3.5
+                    GL10.GL_UNSIGNED_BYTE, lineFacetsBuffer);
+        }
         // --------------------绘制点---------------------
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, poointVerticesBuffer);
-        gl.glColor4f(1f, 0f, 0f, 0f);
-        gl.glPointSize(10f);
-        gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
-
+        if (poointVerticesBuffer != null) {
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, poointVerticesBuffer);
+            gl.glColor4f(1f, 0f, 0f, 0f);
+            gl.glPointSize(10f);
+            gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
+        }
 
         // --------------------绘制向量---------------------
         //绘制向量
-        gl.glLineWidth(6.0f);//直线宽度 5倍于其他线
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer);//向量
-        gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);//向量
-        gl.glDrawElements(GL10.GL_LINES, xiangliangFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, xiangliangFacetsBuffer);//向量
+        if (xiangliangFacetsBuffer != null) {
+            gl.glLineWidth(6.0f);//直线宽度 5倍于其他线
+            //无需再设置点了，都是用的上面的数组中的
+            // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBuffer);//向量
+            gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);//向量
+            gl.glDrawElements(GL10.GL_LINES, xiangliangFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, xiangliangFacetsBuffer);//向量
+        }
 
         // --------------------绘制X坐标---------------------
         //绘制x坐标
-        gl.glLineWidth(3.0f);//直线宽度
-        //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
-        // 设置顶点的颜色数据
-        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
-        gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
+        if (xyzVerticesBuffer != null) {
+            gl.glLineWidth(3.0f);//直线宽度
+            //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
+            // 设置顶点的颜色数据
+            gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
+            gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
 
-        // --------------------绘制Y坐标---------------------
-        //绘制Y坐标
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferY);//Y
-        // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
-        gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
-        // --------------------绘制Z坐标---------------------
-        //绘制Z坐标
-        //无需再设置点了，都是用的上面的数组中的
-        // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferZ);//Y
-        // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
-        gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
+            // --------------------绘制Y坐标---------------------
+            //绘制Y坐标
+            //无需再设置点了，都是用的上面的数组中的
+            // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferY);//Y
+            // 设置顶点的颜色数据
+            gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
+            gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
+            // --------------------绘制Z坐标---------------------
+            //绘制Z坐标
+            //无需再设置点了，都是用的上面的数组中的
+            // gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lineVerticesBufferZ);//Y
+            // 设置顶点的颜色数据
+            gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
+            gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
+        }
 
-        // --------------------绘制A点标记---------------------
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
-        gl.glDrawElements(GL10.GL_LINES, AFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, AFacetsBuffer);
+        if (AFacetsBuffer != null) {
+            // --------------------绘制A点标记---------------------
+            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
+            gl.glDrawElements(GL10.GL_LINES, AFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, AFacetsBuffer);
+        }
+
 
         // --------------------绘制B点标记---------------------
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
-        gl.glDrawElements(GL10.GL_LINES, BFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, BFacetsBuffer);
+        if (BFacetsBuffer != null) {
+            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
+            gl.glDrawElements(GL10.GL_LINES, BFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, BFacetsBuffer);
+        }
 
         // 绘制结束
         gl.glFinish();//2.3.3.6

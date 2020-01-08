@@ -14,6 +14,8 @@ import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
 import com.HK.dzbly.utils.auxiliary.PackageInfoManager;
 
+import org.w3c.dom.CDATASection;
+
 import java.util.List;
 
 /**
@@ -79,9 +81,14 @@ public class Utility_toolsActivity extends BaseActivity {
         CAD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                packageInfoManager.startThridApp(Utility_toolsActivity.this, "com.glodon.drawingexplorer");
+//                packageInfoManager.startThridApp(Utility_toolsActivity.this, "com.glodon.drawingexplorer");
+                Intent intent = new Intent(Utility_toolsActivity.this,SocketActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
+
+
     }
 
     private void setWps(){

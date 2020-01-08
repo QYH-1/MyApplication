@@ -24,28 +24,30 @@ import java.util.TimerTask;
  * 修订历史：
  */
 public class FontRenderer implements Renderer {
-    float x = -0.5f, y = -0.5f, z = -0.5f;
+    private float x = -0.5f, y = -0.5f, z = -0.5f;
     private float r = 0;
-    Handler handler, handler2;
+    private Handler handler, handler2;
     private Timer timer = new Timer();
     private TimerTask task;
-    private float x1 = 0f, y1 = 0f, z1 = 0f,x2 = 0f, y2 = 0f, z2 = 0f;
+    private float x1 = 0f, y1 = 0f, z1 = 0f, x2 = 0f, y2 = 0f, z2 = 0f;
     private final Context mContext;
 
     // 定义Open GL ES绘制所需要的Buffer对象
-    FloatBuffer lineVerticesBuffer;
-    FloatBuffer xyzVerticesBuffer;
-    FloatBuffer pointVerticesBuffer;
+    private FloatBuffer lineVerticesBuffer;
+    private FloatBuffer xyzVerticesBuffer;
+    private FloatBuffer pointVerticesBuffer;
 
-    ByteBuffer xiangliangFacetsBuffer;
-    ByteBuffer XFacetsBuffer;
-    ByteBuffer YFacetsBuffer;
-    ByteBuffer ZFacetsBuffer;
-    ByteBuffer AFacetsBuffer;
-    float[] lineVertices;
+    private ByteBuffer xiangliangFacetsBuffer;
+    private ByteBuffer XFacetsBuffer;
+    private ByteBuffer YFacetsBuffer;
+    private ByteBuffer ZFacetsBuffer;
+    private ByteBuffer AFacetsBuffer;
+    public float[] lineVertices;
+    public float[] xyzVertices;
+    public float[] pointFacets;
 
 
-    void updateXYZ() {  //2.1创建各种数组
+    private void updateXYZ() {  //2.1创建各种数组
         // 定义立方体的8个顶点                                                       
         lineVertices = new float[]{
                 // 上顶面正方形的四个顶点
@@ -56,12 +58,13 @@ public class FontRenderer implements Renderer {
         Log.i(" x1", String.valueOf(x1));
         Log.i(" y1", String.valueOf(y1));
         Log.i(" z1", String.valueOf(z1));
+        Log.d("特殊点", "特殊点");
+        pointFacets = new float[]{
 
-        float[] pointFacets = new float[]{
                 x1, y1, z1//0
         };
         //定义XYZ坐标和显示的字
-        float xyzVertices[] = new float[]{
+        xyzVertices = new float[]{
                 -2.0f, 0f, 0f,//0 x起点，画坐标轴的
                 2.0f, 0f, 0f,//1 X轴的终点
                 1.8f, 0.1f, 0f,//2 X轴箭头1
@@ -219,7 +222,7 @@ public class FontRenderer implements Renderer {
 
             }
         };
-        timer.schedule(task, 0, 7000);
+        timer.schedule(task, 0, 500);
     }
 
     //2.3 实现接口里的三个方法
@@ -296,38 +299,45 @@ public class FontRenderer implements Renderer {
         gl.glLineWidth(2.0f);
 
         // --------------------绘制点---------------------
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, pointVerticesBuffer);
-        gl.glColor4f(1f, 0f, 0f, 0f);
-        gl.glPointSize(10f);
-        gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
+//        Log.d("pointVerticesBuffer", String.valueOf(pointVerticesBuffer));
+        if (pointVerticesBuffer != null) {
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, pointVerticesBuffer);
+            gl.glColor4f(1f, 0f, 0f, 0f);
+            gl.glPointSize(10f);
+            gl.glDrawArrays(GL10.GL_POINTS, 0, 2);
+        }
 
         // --------------------绘制X坐标---------------------
         //绘制x坐标
-        gl.glLineWidth(3.0f);//直线宽度
-        //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
-        // 设置顶点的颜色数据
-        gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
-        gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
+        if (xyzVerticesBuffer != null) {
+            gl.glLineWidth(3.0f);//直线宽度
+            //设置XYZ的顶点 因为所有XYZ的数据都在次数组中，所以XYZ的只要设置这一次就好
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, xyzVerticesBuffer);
+            // 设置顶点的颜色数据
+            gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);//X
+            gl.glDrawElements(GL10.GL_LINES, XFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, XFacetsBuffer);//X
 
-        // --------------------绘制Y坐标---------------------
-        //绘制Y坐标
-        // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
-        gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
-        // --------------------绘制Z坐标---------------------
-        //绘制Z坐标
-        // 设置顶点的颜色数据
-        gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
-        gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
+            // --------------------绘制Y坐标---------------------
+            //绘制Y坐标
+            // 设置顶点的颜色数据
+            gl.glColor4f(1.0f, 1.0f, 0.0f, 1.0f);//Y
+            gl.glDrawElements(GL10.GL_LINES, YFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, YFacetsBuffer);//Y
+            // --------------------绘制Z坐标---------------------
+            //绘制Z坐标
+            // 设置顶点的颜色数据
+            gl.glColor4f(1.0f, 0.0f, 1.0f, 1.0f);//z
+            gl.glDrawElements(GL10.GL_LINES, ZFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, ZFacetsBuffer);//Z
+        }
 
         // --------------------绘制A点标记---------------------
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
-        gl.glDrawElements(GL10.GL_LINES, AFacetsBuffer.remaining(),
-                GL10.GL_UNSIGNED_BYTE, AFacetsBuffer);
+        if (AFacetsBuffer != null) {
+            gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);//
+            gl.glDrawElements(GL10.GL_LINES, AFacetsBuffer.remaining(),
+                    GL10.GL_UNSIGNED_BYTE, AFacetsBuffer);
+        }
         // 绘制结束
         gl.glFinish();//2.3.3.6
         // 禁止顶点设置

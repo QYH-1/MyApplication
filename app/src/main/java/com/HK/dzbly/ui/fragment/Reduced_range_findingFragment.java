@@ -1,14 +1,20 @@
 package com.HK.dzbly.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -26,6 +32,7 @@ import androidx.fragment.app.Fragment;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
+import com.HK.dzbly.utils.TestServiceOne;
 import com.HK.dzbly.utils.drawing.Accumulative_rangingDrawing;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
@@ -48,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.ServiceConfigurationError;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -95,6 +103,14 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     private Timer timer;
     private double Signal_quality = 200; //测距时信号质量参数
 
+    MyServiceConn myServiceConn;
+    TestServiceOne.MyBinder binder;
+    private byte[] bytes = {69, 73, 87, 1};
+    private String wifiData = "1";
+    private long time = 500;
+    private Intent it;
+    private boolean isConnected = false;
+
     //义用来与外部activity交互，获取到宿主activity
     private Continuous_rangingFragment.CallBack callback;
 
@@ -134,26 +150,86 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
     private void Content(View view) {
         initView(view);
         //定时获取向硬件发送信息，得到最新的数据
-        send = new Send();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                getWifiData();
+        it = new Intent(getActivity(), TestServiceOne.class);//绑定服务，连接wifi
+        //用intent启动Service并传值
+        this.bytes = new byte[]{69, 73, 87, 1};
+        it.putExtra("data", bytes);
+        it.putExtra("time", time);
+        getActivity().startService(it);
+        //绑定Service
+        myServiceConn = new MyServiceConn();
+        try {
+            getActivity().bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+            isConnected = getActivity().bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+        } catch (ServiceConfigurationError s) {
+            s.getLocalizedMessage();
+        }
+        Log.d("bytes", String.valueOf(bytes));
+        //注意：需要先绑定，才能同步数据
+        if (binder != null) {
+            Log.d("同步数据", "同步数据");
+            binder.setData(bytes);
+        }
+    }
 
-                Log.i("Signal_quality", String.valueOf(Signal_quality));
-                //不能在子线程中更新UI，所以只能再建立一个主线程
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //此处更新UI
-                        if (Signal_quality <150) {
-                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+    class MyServiceConn implements ServiceConnection {
+        // 服务被绑定成功之后执行
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            //取得Service里的binder对象
+            binder = (TestServiceOne.MyBinder) iBinder;
+            //自定义回调
+            binder.getService().setDataCallback(new TestServiceOne.DataCallback() {
+                //执行回调函数
+                @Override
+                public void dataChanged(String str) {
+                    Log.d("--str--", str);
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("str", str);
+                    msg.setData(bundle);
+                    //发送通知
+                    handler.sendMessage(msg);
+
+                }
+            });
+        }
+
+        /**
+         * 接收wifi的数据，并对控件进行设置
+         */
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //在handler中更新UI
+                wifiData = msg.getData().getString("str");
+                Log.i("----data====:", wifiData);
+                if (wifiData.length() == 30) {
+                    //处理wifi传递过来的数据
+                    concerto = new Concerto();
+                    distance = Double.parseDouble((concerto.Dataconversion(wifiData.substring(18, 24))));
+                    aAzimuth = Float.parseFloat(concerto.Dataconversion(wifiData.substring(12, 18)));
+                    angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    double a = Math.abs((distance));
+                    x = (a * Math.cos(angle) * Math.sin(aAzimuth));
+                    y = (a * Math.sin(angle));
+                    //保存坐标和距离数据
+                    Map<String, Object> mMap = new HashMap<>();//保存wifi传递过来点的具体坐标
+                    mMap.put("x", x);
+                    mMap.put("y", y);
+                    mMap.put("distance", distance);
+                    mList.add(mMap);
+                    current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
+                }
             }
-        }, 0, 2000 * 2);
+        };
+
+        // 服务奔溃或者被杀掉执行
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            binder = null;
+        }
     }
 
     /**
@@ -181,68 +257,6 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
         save.setOnClickListener(this);
     }
 
-    /**
-     * 获取wifi传递过来的数据
-     */
-    private void getWifiData() {
-        //在子线程获取连接
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    socket = new Socket("10.10.100.254", 8899);
-                    inputStream = new DataInputStream(socket.getInputStream());
-                    outputStream = socket.getOutputStream();
-                    try {
-                        Log.i("-------------timer", "timer");
-                        byte[] bytes = {69,73,87,0,1};
-                        send.sendData(outputStream, bytes);
-                        Log.i("receiveMsg", "receiveMsg");
-                        receiveMsg = new ReceiveMsg();
-                        receiveMsg.receiveMsg(inputStream, myHandler);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    Handler myHandler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle bundle = new Bundle();
-            bundle = msg.getData();
-            Log.d("bundle", String.valueOf(bundle));
-            Log.w("是否进行赋值", "执行当当前语句");
-            String data = bundle.getString("msg");
-            Log.d("LineFragmentwifi_data", data);
-            if (data.length() < 24) {
-                Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
-            }
-            //处理wifi传递过来的数据
-            concerto = new Concerto();
-            distance = Double.parseDouble((concerto.Dataconversion(data.substring(18,24))));
-            aAzimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
-            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
-            double a = Math.abs((distance));
-            x = (a * Math.cos(angle) * Math.sin(aAzimuth));
-            y = (a * Math.sin(angle));
-            //保存坐标和距离数据
-            Map<String, Object> mMap = new HashMap<>();//保存wifi传递过来点的具体坐标
-            mMap.put("x", x);
-            mMap.put("y", y);
-            mMap.put("distance", distance);
-            mList.add(mMap);
-            current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
-        }
-    };
-
     //单选按钮，判断是否包含仪器长度
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
@@ -269,10 +283,10 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
                 //getWifiData();
                 //setCoordinateSet();
                 //当点击有效值，锁定点时，将接受wifi传递过来的最新数据保存到有效数据list中
-                if(mList.size() == 1){
-                    list.add( mList.get(0));
-                }else {
-                    list.add(mList.get(mList.size()-1));
+                if (mList.size() == 1) {
+                    list.add(mList.get(0));
+                } else {
+                    list.add(mList.get(mList.size() - 1));
                 }
 
                 videoData();
@@ -309,12 +323,12 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
         for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
                 totalDistance = (double) list.get(i).get("distance");
-                BigDecimal b  =new BigDecimal(totalDistance);
-                totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal(totalDistance);
+                totalDistance = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
             } else {
                 totalDistance = totalDistance - (double) list.get(i).get("distance");
-                BigDecimal b  =new BigDecimal(totalDistance);
-                totalDistance  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal(totalDistance);
+                totalDistance = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
             }
         }
         Log.d("totalDistance", String.valueOf(totalDistance));
@@ -322,13 +336,13 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
         //current_length.setText("\t\t\t\t" + (double) mList.get(mList.size() - 1).get("distance") + "米");
         for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
-                BigDecimal b  =new BigDecimal((Double) mList.get(i).get("distance"));
-                double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
+                BigDecimal b = new BigDecimal((Double) mList.get(i).get("distance"));
+                double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                 content = "第 1 次测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
             } else {
-                BigDecimal b  =new BigDecimal((Double) list.get(i).get("distance"));
-                double f1  =  b.setScale(3,  RoundingMode.HALF_UP).doubleValue();
-                content = content + "第 " + (i + 1) + " 次测量的距离：" + "\n" + "\t\t\t\t" + f1  + "米" + "\n";
+                BigDecimal b = new BigDecimal((Double) list.get(i).get("distance"));
+                double f1 = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
+                content = content + "第 " + (i + 1) + " 次测量的距离：" + "\n" + "\t\t\t\t" + f1 + "米" + "\n";
             }
         }
         detailed_data.setText(content);
@@ -428,9 +442,22 @@ public class Reduced_range_findingFragment extends Fragment implements RadioGrou
                 .create()
                 .show();
     }
+
     @Override
     public void onPause() {
         super.onPause();
-        timer.cancel();
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("改变bytes", "改变bytes");
+        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        if (binder != null) {
+            binder.setData(bytes);
+        }
+        if(isConnected){
+            getActivity().unbindService(myServiceConn);
+            isConnected = false;
+        }
     }
 }

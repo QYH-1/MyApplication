@@ -126,4 +126,5 @@ public class Laser_controlActivity extends BaseActivity {
         }
         return data;
     }
+
 }

@@ -113,6 +113,8 @@ public class ConnectThread extends Thread {
             e.printStackTrace();
         }finally {
             try {
+                outputStream.close();
+
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();

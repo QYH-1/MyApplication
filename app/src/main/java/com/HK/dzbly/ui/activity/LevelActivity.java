@@ -87,13 +87,13 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
         tvl_horz = findViewById(R.id.tvl_horz);
         tvHorz = findViewById(R.id.tvv_horz);
 
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Data();
-            }
-        }, 0, 2000 * 2);
+//        timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Data();
+//            }
+//        }, 0, 2000 * 2);
         //获取传感器服务
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -214,7 +214,7 @@ public class LevelActivity extends AppCompatActivity implements SensorEventListe
             tvVert.setTextColor(Color.WHITE);
             tvl_vertical.setTextColor(Color.WHITE);
         }
-        //updateOrientationAngles(rollAngle, pitchAngle);
+       updateOrientationAngles(rollAngle, pitchAngle);
     }
 
     /**

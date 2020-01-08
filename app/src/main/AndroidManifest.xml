@@ -56,6 +56,7 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
+            android:networkSecurityConfig="@xml/network_security_config"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <meta-data
@@ -117,6 +118,9 @@
         <activity android:name=".ui.activity.Laser_controlActivity"></activity>
         <activity android:name=".ui.activity.Utility_toolsActivity"></activity>
         <activity android:name=".ui.activity.LaserControlActivity"></activity>
+        <activity android:name=".ui.activity.SocketActivity"></activity>
+       <service android:name="com.HK.android.tcp.WifiService"></service>
+        <service android:name=".utils.TestServiceOne"></service>
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="com.cs.dzl.fileProvider"

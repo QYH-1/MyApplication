@@ -75,7 +75,7 @@
                         android:layout_marginTop="6dp"
                         android:clickable="true"
                         android:text="@string/Photograph"
-                        android:textColor="@color/yellow"
+                        android:textColor="@color/black"
                         android:textSize="20sp" />
             </LinearLayout>
 
@@ -101,7 +101,7 @@
                         android:layout_marginTop="6dp"
                         android:clickable="true"
                         android:text="@string/Photograph_cut"
-                        android:textColor="@color/yellow"
+                        android:textColor="@color/black"
                         android:textSize="20sp" />
             </LinearLayout>
 
@@ -127,7 +127,7 @@
                         android:layout_marginTop="6dp"
                         android:clickable="true"
                         android:text="@string/Record_video"
-                        android:textColor="@color/yellow"
+                        android:textColor="@color/black"
                         android:textSize="20sp" />
             </LinearLayout>
         </LinearLayout>

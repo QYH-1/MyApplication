@@ -2,7 +2,10 @@ package com.HK.dzbly.ui.activity;
 
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,17 +16,16 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -31,6 +33,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.fragment.ordinary_measurement_fragment;
 import com.HK.dzbly.ui.fragment.simple_measurement_fragment;
+import com.HK.dzbly.utils.TestServiceOne;
 import com.HK.dzbly.utils.drawing.CompassView;
 import com.HK.dzbly.utils.drawing.Elevation;
 import com.HK.dzbly.utils.drawing.Rollangle;
@@ -41,16 +44,15 @@ import com.HK.dzbly.utils.wifi.Send;
 import com.HK.dzbly.utils.wifi.checkNetworkConnection;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ServiceConfigurationError;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @Author：qyh 版本：1.0
  * 创建日期：2019/7/24$
- * 描述：地质参数仪首页
+ * 描述： 地质参数仪首页
  * 修订历史：
  */
 public class DzlpActivity extends FragmentActivity {
@@ -80,12 +82,14 @@ public class DzlpActivity extends FragmentActivity {
     private String data3 = null;//方位角
     private String data4 = null; //显示结果
     private String data5 = null; //计算后的产转的角
-    private Timer timer;
     private String declination; //获取地磁偏角
 
     private WifiManager mWifiManager;
     private ConnectivityManager mConnectivityManager;
     private com.HK.dzbly.utils.wifi.checkNetworkConnection checkNetworkConnection;
+    private MyServiceConn myServiceConn;
+    private TestServiceOne.MyBinder binder = null;
+    private byte[] bytes = {69, 73, 87, 0, 0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,45 +113,187 @@ public class DzlpActivity extends FragmentActivity {
         setSelection_method();//切换fregment
         //使用子线程得到wifi的socket连接
         send = new Send();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Data();
-            }
-        }, 0, 2000 * 2);
 
         mWifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mConnectivityManager = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         WifiInfo mWifiInfo = mWifiManager.getConnectionInfo();
         checkNetworkConnection = new checkNetworkConnection();
         boolean temp = checkNetworkConnection.isConnected("", mWifiInfo);
+
+        final Intent it = new Intent(this, TestServiceOne.class);
+        //用intent启动Service并传值
+        it.putExtra("data", bytes);
+        startService(it);
+        //绑定Service
+        myServiceConn = new MyServiceConn();
+        try {
+            bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+        } catch (ServiceConfigurationError s) {
+            s.getLocalizedMessage();
+        }
+
+        //注意：需要先绑定，才能同步数据
+        if (binder != null) {
+            binder.setData(bytes);
+        }
     }
 
-    private void Data() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    socket = new Socket("10.10.100.254", 8899);
-                    inputStream = new DataInputStream(socket.getInputStream());
-                    outputStream = socket.getOutputStream();
-                    try {
-                        Log.i("-------------timer", "timer");
-                        byte[] bytes = {69, 73, 87, 0, 0};
-                        send.sendData(outputStream, bytes);
-                        Log.i("receiveMsg", "receiveMsg");
-                        receiveMsg = new ReceiveMsg();
-                        receiveMsg.receiveMsg(inputStream, handler);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+    class MyServiceConn implements ServiceConnection {
+        // 服务被绑定成功之后执行
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // IBinder service为onBind方法返回的Service实例
+            binder = (TestServiceOne.MyBinder) service;
+            binder.getService().setDataCallback(new TestServiceOne.DataCallback() {
+                //执行回调函数
+                @Override
+                public void dataChanged(String str) {
+                    Log.d("--str--", str);
+
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("str", str);
+                    msg.setData(bundle);
+                    //发送通知
+                    handler.sendMessage(msg);
+
+                }
+            });
+        }
+
+        /**
+         * 接收wifi的数据，并对控件进行设置
+         */
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //在handler中更新UI
+                String data = msg.getData().getString("str");
+                Log.i("----data====", data);
+                if (data.length() == 30) {
+                    //对wifi获取的数据进行处理
+                    //俯仰角
+                    data1 = concerto.Dataconversion(data.substring(0, 6));
+                    Log.d("data1-dzlpActivity", String.valueOf(data1));
+                    //横滚角
+                    data2 = concerto.Dataconversion(data.substring(6, 12));
+                    //方位角(将传感器得到的数据减去磁偏角的值，得到真实的值)
+                    data3 = String.valueOf(Double.parseDouble(concerto.Dataconversion(data.substring(12, 18))) - Double.parseDouble(declination));
+                    Log.d("DzlpActivity_data3", data3);
+                    //结果显示
+                    //当俯仰角的值在±1之间时，产状信息显示横滚角
+                    if (Math.abs(Float.valueOf(data1)) <= 1) {
+                        String t = data3.substring(0, data3.indexOf("."));
+                        int t1 = Integer.parseInt(t) + 180;
+                        if (t1 >= 360) {
+                            t1 = t1 - 360;
+                        }
+                        String tmp = t1 + data3.substring(data3.indexOf("."));
+                        float temp = Float.parseFloat(tmp);
+                        Log.d("temp", String.valueOf(temp));
+                        data5 = String.valueOf(temp);
+                        Log.d("data5", data5);
+                        data4 = data5 + "∠" + data2;
+                        //调用显示
+                        //setFragment(data4);
+                        //当选择了产状测量控件后才显示结果
+
+                        if (occurrence_survey.isChecked() && !data4.equals("")) {
+                            FragmentManager manager = getSupportFragmentManager();
+                            try {
+                                TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
+                                textView.setText(data4);
+                                textView.setTextSize(35);
+                                textView.setGravity(Gravity.CENTER);
+                                textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                            } catch (NullPointerException e) {
+                                e.fillInStackTrace();
+                            }
+
+                        }
+                        //setLo(data4);
+                    } else if (Math.abs(Float.valueOf(data2)) <= 1) {
+                        //当横滚角的值在±1之间时，产状信息使用俯仰角
+                        String t = data3.substring(0, data3.indexOf("."));
+                        int t1 = Integer.parseInt(t) + 180;
+                        if (t1 >= 360) {
+                            t1 = t1 - 360;
+                        }
+                        String tmp = t1 + data3.substring(data3.indexOf("."));
+                        float temp = Float.parseFloat(tmp);
+                        Log.d("temp", String.valueOf(temp));
+                        data5 = String.valueOf(temp);
+                        Log.d("data5", data5);
+                        data4 = data5 + "∠" + data1;
+                        //调用显示
+                        // setFragment(data4);
+                        //当选择了产状测量控件后才显示结果
+                        if (occurrence_survey.isChecked() && !data4.equals("")) {
+                            FragmentManager manager = getSupportFragmentManager();
+                            try {
+                                TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
+                                textView.setText(data4);
+                                textView.setTextSize(35);
+                                textView.setGravity(Gravity.CENTER);
+                                textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                            } catch (NullPointerException e) {
+                                e.fillInStackTrace();
+                            }
+
+
+                        }
+                        //setLo(data4);
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    //将最新的数据存储起来
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("setElevation", data1);
+                    editor.putString("setRollangle", data2);
+                    editor.putString("Compass", data3);
+                    editor.putString("setFragment", data4);
+
+                    //改变控件的显示
+                    setElevation(data1);
+                    setRollangle(data2);
+                    //setFragment(data4);
+                    setChaosCompassView(data3);
+                    FragmentManager manager = getSupportFragmentManager();
+                    try {
+                        TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
+                        occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                                if (isChecked && !data4.equals("")) {
+                                    textView.setText(data4);
+                                    textView.setTextSize(35);
+                                    textView.setGravity(Gravity.CENTER);
+                                    textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
+                                } else {
+
+                                    String text = "<p> 测量方法：<br>\n" +
+                                            "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
+                                            "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
+                                            "\t</p>";
+                                    textView.setText(Html.fromHtml(text));
+                                    textView.setTextSize(18);
+                                    textView.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
+                                }
+                            }
+                        });
+                    } catch (NullPointerException e) {
+                        e.fillInStackTrace();
+                    }
+
+
                 }
             }
-        }).start();
+        };
+
+        // 服务奔溃或者被杀掉执行
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            binder = null;
+        }
     }
 
     /**
@@ -187,15 +333,6 @@ public class DzlpActivity extends FragmentActivity {
         };
         //注册传感器
         mSensorManager.registerListener(mSensorEventListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
-    }
-
-    /**
-     * 传感器取消注册
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     /**
@@ -312,122 +449,25 @@ public class DzlpActivity extends FragmentActivity {
 
     }
 
-    /**
-     * 接收wifi的数据，并对控件进行设置
-     */
-    private final Handler handler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle bundle = new Bundle();
-            bundle = msg.getData();
-            data = bundle.getString("msg");
-            Log.d("DzlpActivity_data", data);
-            if (data.length() == 30) {
-                //对wifi获取的数据进行处理
-                //俯仰角
-                data1 = concerto.Dataconversion(data.substring(0, 6));
-                Log.d("data1-dzlpActivity", String.valueOf(data1));
-                //横滚角
-                data2 = concerto.Dataconversion(data.substring(6, 12));
-                //方位角(将传感器得到的数据减去磁偏角的值，得到真实的值)
-                data3 =String.valueOf(Double.parseDouble(concerto.Dataconversion(data.substring(12, 18)))-Double.parseDouble(declination));
-                Log.d("DzlpActivity_data3", data3);
-                //结果显示
-                //当俯仰角的值在±1之间时，产状信息显示横滚角
-                if (Math.abs(Float.valueOf(data1)) <= 1) {
-                    String t = data3.substring(0, data3.indexOf("."));
-                    int t1 = Integer.parseInt(t) + 180;
-                    if (t1 >= 360) {
-                        t1 = t1 - 360;
-                    }
-                    String tmp = t1 + data3.substring(data3.indexOf("."));
-                    float temp = Float.parseFloat(tmp);
-                    Log.d("temp", String.valueOf(temp));
-                    data5 = String.valueOf(temp);
-                    Log.d("data5", data5);
-                    data4 = data5 + "∠" + data2;
-                    //调用显示
-                    //setFragment(data4);
-                    //当选择了产状测量控件后才显示结果
-
-                    if (occurrence_survey.isChecked() && !data4.equals("")) {
-                        FragmentManager manager = getSupportFragmentManager();
-                        TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
-                        textView.setText(data4);
-                        textView.setTextSize(35);
-                        textView.setGravity(Gravity.CENTER);
-                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-                    }
-                    //setLo(data4);
-                } else if (Math.abs(Float.valueOf(data2)) <= 1) {
-                    //当横滚角的值在±1之间时，产状信息使用俯仰角
-                    String t = data3.substring(0, data3.indexOf("."));
-                    int t1 = Integer.parseInt(t) + 180;
-                    if (t1 >= 360) {
-                        t1 = t1 - 360;
-                    }
-                    String tmp = t1 + data3.substring(data3.indexOf("."));
-                    float temp = Float.parseFloat(tmp);
-                    Log.d("temp", String.valueOf(temp));
-                    data5 = String.valueOf(temp);
-                    Log.d("data5", data5);
-                    data4 = data5 + "∠" + data1;
-                    //调用显示
-                    // setFragment(data4);
-                    //当选择了产状测量控件后才显示结果
-                    if (occurrence_survey.isChecked() && !data4.equals("")) {
-                        FragmentManager manager = getSupportFragmentManager();
-                        TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
-                        textView.setText(data4);
-                        textView.setTextSize(35);
-                        textView.setGravity(Gravity.CENTER);
-                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-                    }
-                    //setLo(data4);
-                }
-
-                //将最新的数据存储起来
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putString("setElevation", data1);
-                editor.putString("setRollangle", data2);
-                editor.putString("Compass", data3);
-                editor.putString("setFragment", data4);
-
-            }
-            //改变控件的显示
-            setElevation(data1);
-            setRollangle(data2);
-            //setFragment(data4);
-            setChaosCompassView(data3);
-            FragmentManager manager = getSupportFragmentManager();
-            TextView textView = manager.findFragmentById(R.id.measurement_content).getView().findViewById(R.id.explain);
-            occurrence_survey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked && !data4.equals("")) {
-                        textView.setText(data4);
-                        textView.setTextSize(35);
-                        textView.setGravity(Gravity.CENTER);
-                        textView.setTextColor(android.graphics.Color.parseColor("#FF0000"));
-                    } else {
-
-                        String text = "<p> 测量方法：<br>\n" +
-                                "\t\t1）保持设备与待测产状平行（建议使用激光线辅助）；<br>\n" +
-                                "\t\t2）调整设备姿态，视倾角为仰角，当仰角在±1°之间时，横滚角即为真倾角。\n" +
-                                "\t</p>";
-                        textView.setText(Html.fromHtml(text));
-                        textView.setTextSize(18);
-                        textView.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
-                    }
-                }
-            });
-        }
-    };
-
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
     }
+
+    /**
+     * 传感器取消注册
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        doDestroy();
+    }
+
+    private void doDestroy() {
+        mSensorManager.unregisterListener(mSensorEventListener);
+        unbindService(myServiceConn);
+        Intent intent2 = new Intent(this, TestServiceOne.class);
+        stopService(intent2);// 关闭服务
+    }
+
 }

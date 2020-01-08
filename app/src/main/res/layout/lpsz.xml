@@ -17,7 +17,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="80dp"
                 android:text="@string/Compass_advanced_settings"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="35sp" />
 
         <LinearLayout
@@ -32,7 +32,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
                     android:text="@string/The_geomagnetic_judgment_threshold_setting"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="25dp" />
 
             <EditText
@@ -58,7 +58,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
                     android:text="@string/Magnetic_declination_setting"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="25dp" />
 
             <EditText

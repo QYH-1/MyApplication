@@ -1,10 +1,14 @@
 package com.HK.dzbly.utils.drawing;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+
+import com.HK.dzbly.R;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +20,7 @@ import java.util.Map;
  * 修订历史：
  */
 public class dynamicDrawing extends View {
+    private String TAG = "--dynamicDrawing--";
     // 用于存放将要画线的点
     float[] tx = new float[100];
     float[] ty = new float[100];
@@ -27,6 +32,8 @@ public class dynamicDrawing extends View {
     private int width;
     private int height;
     private int data; //用于记录点的个数
+    private Bitmap baseBitmap;
+    private Canvas canvas;
 
     public dynamicDrawing(Context context) {
         super(context);
@@ -48,8 +55,8 @@ public class dynamicDrawing extends View {
         p.setAntiAlias(true);
         p.setStrokeWidth(3);
         //画图形
-        int x = width * 3 / 4;
-        int y = height * 3 / 4;
+        int x = width / 2;
+        int y = height / 2;
         initTriangle(canvas, x, y);
     }
 
@@ -65,23 +72,32 @@ public class dynamicDrawing extends View {
 
     //画三角形
     private void initTriangle(Canvas canvas, int x, int y) {
-        p.setColor(0xff0000ff);
+        // p.setColor(0xff0000ff);
+        p.setColor(Color.RED);
         p.setStyle(Paint.Style.STROKE);
         p.setAntiAlias(true);
-        p.setStrokeWidth(3);
-        Log.i("--width--", String.valueOf(width));
-        Log.i("--height--", String.valueOf(height));
+        p.setStrokeWidth(5);
+        Log.d("width", String.valueOf(x));
+        Log.d("height", String.valueOf(y));
         //实例化路径
         Path path = new Path();
-        if (data > 0) {
+        if (data == 0) {
+            p.setStrokeWidth(10);
+            canvas.drawPoint(x + tx[0] * x, y + ty[0] * y, p);
+            Log.w(TAG, "画点");
+        } else {
             for (int i = 0; i < data; i++) {
                 if (i == 0) {
-                    path.moveTo(tx[i] * x, ty[i] * y);// 此点为多边形的起点 A
-                } else path.lineTo(tx[i] * x, ty[i] * y);   //B
+                    if (tx[i] < 0) {
+                        path.moveTo(x + tx[i] * x, y + ty[i] * y);// 此点为多边形的起点 A
+                    }
+
+                } else
+                    path.lineTo(x + tx[i] * x, y + ty[i] * y);   //B
             }
+            path.close(); // 使这些点构成封闭的多边形
+            canvas.drawPath(path, p);
         }
-        path.close(); // 使这些点构成封闭的多边形
-        canvas.drawPath(path, p);
     }
 
     /**

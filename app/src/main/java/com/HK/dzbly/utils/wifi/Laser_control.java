@@ -1,12 +1,13 @@
 package com.HK.dzbly.utils.wifi;
 
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 
 /**
  * @Author：qyh 版本：1.0
@@ -20,17 +21,21 @@ public class Laser_control {
 
     /**
      * 向硬件发送信息
+     *
      * @param msg
      */
-    public void laserControl(byte[] msg){
+    public void laserControl(byte[] msg) {
         try {
-            socket = new Socket("10.10.100.254", 8899);
-            outputStream = socket.getOutputStream();
-            outputStream.write(msg);
+            try {
+                socket = new Socket();
+                SocketAddress socketAddress = new InetSocketAddress("10.10.100.254", 8899);
+                socket.connect(socketAddress, 3000);
+                outputStream = socket.getOutputStream();
+                outputStream.write(msg);
+            } catch (SocketException e) {
+                System.out.println("socket连接建立失败");
+            }
             Log.d("向服务器端发送消息", String.valueOf(msg));
-            //outputStream.flush();
-            //outputStream.close();
-            //socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

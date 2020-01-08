@@ -1,17 +1,21 @@
 package com.HK.dzbly.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -29,6 +33,8 @@ import androidx.annotation.NonNull;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
+import com.HK.dzbly.ui.fragment.LineFragment;
+import com.HK.dzbly.utils.TestServiceOne;
 import com.HK.dzbly.utils.auxiliary.Calculated_area;
 import com.HK.dzbly.utils.auxiliary.Data_normalization;
 import com.HK.dzbly.utils.file.Screenshot;
@@ -53,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.ServiceConfigurationError;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -98,10 +105,19 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     private DataInputStream inputStream;
     private Send send;
     private ReceiveMsg receiveMsg;
-    private Timer timer;
     private Calculated_area calculated_area = new Calculated_area(); //计算面积
-    private DecimalFormat df = new DecimalFormat("0.##");
+    private DecimalFormat df = new DecimalFormat("0.###");
     private double Signal_quality = 200; //测距时信号质量参数
+
+    MyServiceConn myServiceConn;
+    TestServiceOne.MyBinder binder;
+    private byte[] bytes = {69, 73, 87, 1};
+    private String wifiData = "1";
+    private long time = 1000;
+    private Intent it;
+    private boolean isConnected = false;
+    private boolean addData = false;
+    private int temp = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,8 +127,37 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         setContentView(R.layout.sectionsurvey);
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
 
-        setCoordinateSet();
+        //setCoordinateSet();
         inInt();
+
+        //定时获取向硬件发送信息，得到最新的数据
+        it = new Intent(this, TestServiceOne.class);
+        bytes = new byte[]{69, 73, 87, 1};
+        //用intent启动Service并传值
+        it.putExtra("data", bytes);
+        it.putExtra("time", time);
+        startService(it);
+        //绑定Service
+        myServiceConn = new MyServiceConn();
+        try {
+            bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+            isConnected = bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+            Log.d("isConnected", String.valueOf(isConnected));
+        } catch (ServiceConfigurationError s) {
+            s.getLocalizedMessage();
+        }
+        //注意：需要先绑定，才能同步数据
+        if (binder != null) {
+            System.out.println("同步数据");
+            binder.setData(bytes);
+        }
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                binder.setData(bytes);
+            }
+        }, 1000);
     }
 
     private void inInt() {
@@ -140,28 +185,70 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         reset.setOnClickListener(this);
         save.setOnClickListener(this);
         Initial_length.setOnCheckedChangeListener(this);
+    }
 
-        //定时获取向硬件发送信息，得到最新的数据
-        send = new Send();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                getPointsData();
+    class MyServiceConn implements ServiceConnection {
+        // 服务被绑定成功之后执行
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            //取得Service里的binder对象
+            binder = (TestServiceOne.MyBinder) iBinder;
+            //自定义回调
+            binder.getService().setDataCallback(new TestServiceOne.DataCallback() {
+                //执行回调函数
+                @Override
+                public void dataChanged(String str) {
+                    Log.d("--str--", str);
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("str", str);
+                    msg.setData(bundle);
+                    //发送通知
+                    handler.sendMessage(msg);
+                }
+            });
+        }
 
-                Log.i("Signal_quality", String.valueOf(Signal_quality));
-                //不能在子线程中更新UI，所以只能再建立一个主线程
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //此处更新UI
-                        if (Signal_quality <150) {
-                            Toast.makeText(SectionsurveyActivity.this, "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        /**
+         * 接收wifi的数据，并对控件进行设置
+         */
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //在handler中更新UI
+                wifiData = msg.getData().getString("str");
+                Log.i("----data====:", wifiData);
+                if (wifiData.length() == 30 && addData) {
+                    //获取一组数据
+                    concerto = new Concerto();
+                    angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
+                    Azimuth = Float.parseFloat(concerto.Dataconversion(wifiData.substring(12, 18)));
+                    Rdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18, 24)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    //根据距离和角度求出空间点的坐标
+                    x = Double.parseDouble(df.format(Rdistance * Math.cos(angle) * Math.sin(Azimuth)));
+                    y = Double.parseDouble(df.format(Rdistance * Math.sin(angle)));
+                    z = Double.parseDouble(df.format(Rdistance * Math.cos(angle) * Math.cos(Azimuth)));
+                    //将数据存入到list中
+                    Map<String, Object> mmap = new HashMap<>();//保存wifi传递过来点的具体坐标
+                    mmap.put("x", x);
+                    mmap.put("y", y);
+                    mmap.put("z", z);
+                    mlist.add(mmap);
+                    Log.d("将数据存入到list中", String.valueOf(mlist));
+                    temp++;
+                    addData = false;
+                }
+                Log.d("temp", String.valueOf(temp));
+
             }
-        }, 0, 2000 * 2);
+        };
+
+        // 服务奔溃或者被杀掉执行
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            binder = null;
+        }
     }
 
     //单选按钮，判断是否包含仪器长度
@@ -190,21 +277,25 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 break;
             case R.id.measurement:
                 //调用画图
-                Log.d("mlist", String.valueOf(mlist));
-                dataList = getPointData(mlist);
-                Log.d("dataList", String.valueOf(dataList));
-                drawingList = drawingData(dataList);
-                Log.d("dataList", String.valueOf(drawingList));
-                dynamicDrawing.setData(drawingList);
-                area.setText("所测的面积:" + df.format(calculated_area.area(dataList))+"平方米");
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putString("area",df.format(calculated_area.area(dataList))+"平方米");
-                editor.commit();
+                addData = true;
+                if (mlist.size() > 0) {
+                    Log.d("------mlist------", String.valueOf(mlist));
+                    dataList = getPointData(mlist);
+                    Log.d("dataList", String.valueOf(dataList));
+                    drawingList = drawingData(dataList);
+                    Log.d("dataList", String.valueOf(drawingList));
+                    dynamicDrawing.setData(drawingList);
+                    // area.setText("所测的面积:" + df.format(calculated_area.area(dataList)) + "平方米");
+                    //SharedPreferences.Editor editor = sp.edit();
+                    //editor.putString("area", df.format(calculated_area.area(dataList)) + "平方米");
+                    // editor.commit();
+                }
                 break;
             case R.id.reset:
                 Intent intent2 = new Intent(SectionsurveyActivity.this, SectionsurveyActivity.class);
                 startActivity(intent2);
                 finish();
+                break;
             case R.id.Save:
                 showDialog();
                 break;
@@ -228,74 +319,6 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 break;
         }
     }
-
-    /**
-     * 通过wifi获得传感器传递的一组数据，并将数据存入二维数组中
-     */
-    private void getPointsData() {
-        //在子线程获取连接
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    socket = new Socket("10.10.100.254", 8899);
-                    inputStream = new DataInputStream(socket.getInputStream());
-                    outputStream = socket.getOutputStream();
-                    try {
-                        Log.i("-------------timer", "timer");
-                        byte[] bytes = {69,73,87,0,1};
-                        send.sendData(outputStream, bytes);
-                        Log.i("receiveMsg", "receiveMsg");
-                        receiveMsg = new ReceiveMsg();
-                        receiveMsg.receiveMsg(inputStream, myHandler);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }finally {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        socket = null;
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
-
-    Handler myHandler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            concerto = new Concerto();
-            Bundle bundle = new Bundle();
-            bundle = msg.getData();
-            String data = bundle.getString("msg");
-            Log.d("TWO_wifi_data1", data);
-            if (data.length() < 24) {
-                Toast.makeText(SectionsurveyActivity.this, "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
-            }
-            //获取一组数据
-            Rdistance = Float.parseFloat(concerto.Dataconversion(data.substring(18,24)));
-            Azimuth = Float.parseFloat(concerto.Dataconversion(data.substring(12, 18)));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
-            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
-            //根据距离和角度求出空间点的坐标
-            x = Rdistance * Math.cos(angle) * Math.sin(Azimuth);
-            y = Rdistance * Math.sin(angle);
-            z = Rdistance * Math.cos(angle) * Math.cos(Azimuth);
-            //将数据存入到list中
-            Map<String, Object> mmap = new HashMap<>();//保存wifi传递过来点的具体坐标
-            mmap.put("x", x);
-            mmap.put("y", y);
-            mmap.put("z", z);
-            mlist.add(mmap);
-        }
-    };
 
     /**
      * 用于测试的数据
@@ -341,7 +364,8 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         Log.d("SecActivity-list", String.valueOf(list));
         return list;
     }
-    private List<Map<String, Object>> drawingData(List<Map<String, Object>> list){
+
+    private List<Map<String, Object>> drawingData(List<Map<String, Object>> list) {
         //定义数组接受凸包算法得到的坐标的集合
         List<Map<String, Object>> datalist = new ArrayList<Map<String, Object>>();
         double[] detox = new double[list.size()]; //x
@@ -354,19 +378,21 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
         }
         //将得到的凸包坐标进行归一化
         Data_normalization dn = new Data_normalization();
-        double[] dxTemp = dn.normalization(detox);
-        double[] dyTemp = dn.normalization(decoy);
-        double[] dzTemp = dn.normalization(deco);
+        Map<String, double[]> mapData = new HashMap<>();
+        mapData = dn.normalization(detox,decoy);
+        double[] dxTemp = mapData.get("pX");
+        double[] dyTemp = mapData.get("pY");
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> pMap = new HashMap<String, Object>();
             //将数据存储在list中
             pMap.put("xp", dxTemp[i]);
             pMap.put("yp", dyTemp[i]);
-            pMap.put("zp", dzTemp[i]);
+            pMap.put("zp", deco[i]);
             datalist.add(pMap);
         }
         return datalist;
     }
+
     //保存数据
     private void showDialog() {
         final View view = LayoutInflater.from(this).inflate(R.layout.layoutjpg, null, false);
@@ -388,7 +414,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText text = view.findViewById(R.id.name1);
                         String name = text.getText().toString();
-                        String area = sp.getString("area","0.00平方米");
+                        String area = sp.getString("area", "0.00平方米");
                         try {
                             // 通过bitmap保存当前截图
                             screenshot = new Screenshot();
@@ -425,8 +451,20 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
 
     @Override
     public void onPause() {
-//        timer.cancel();
         super.onPause();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("改变bytes", "改变bytes");
+        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        if (binder != null) {
+            binder.setData(bytes);
+        }
+        if (isConnected) {
+            unbindService(myServiceConn);
+            isConnected = false;
+        }
     }
 }

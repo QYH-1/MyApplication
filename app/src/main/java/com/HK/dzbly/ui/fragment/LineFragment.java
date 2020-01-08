@@ -1,14 +1,19 @@
 package com.HK.dzbly.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -17,12 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.database.DBhelper;
 import com.HK.dzbly.ui.activity.Laser_rangingActivity;
+import com.HK.dzbly.utils.TestServiceOne;
 import com.HK.dzbly.utils.drawing.Drawtriangle;
 import com.HK.dzbly.utils.wifi.Concerto;
 import com.HK.dzbly.utils.wifi.ConnectThread;
@@ -39,6 +44,7 @@ import java.net.Socket;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ServiceConfigurationError;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,7 +69,7 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private TextView save; //保存
     private ConnectThread connectThread;//wifi连接
     private Concerto concerto;//wifi的数据处理
-    private Socket socket ;
+    private Socket socket;
     private String Objectdistance;//目标距离
     private static final String DATABASE_NAME = "cqhk.db"; //数据库名称
     private int num = 1; //文件出现次数
@@ -77,6 +83,13 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private ReceiveMsg receiveMsg;
     private Timer timer;
     private double Signal_quality = 200.0; //测距时信号质量参数
+    MyServiceConn myServiceConn;
+    TestServiceOne.MyBinder binder;
+    private byte[] bytes;
+    private String wifiData = "1";
+    private long time = 500;
+    private Intent it;
+    private boolean isConnected  = false;
 
     public LineFragment() {
         // Required empty public constructor
@@ -94,27 +107,93 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     private void Content(View view) {
         initView(view);
 
-        //定时获取向硬件发送信息，得到最新的数据
-        send = new Send();
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                //执行子线程，向硬件发送消息和接受wifi传递过来的信息
-                getWifiData();
-                // Log.i("Signal_quality", String.valueOf(Signal_quality));
-                //不能在子线程中更新UI，所以只能再建立一个主线程
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        //此处更新UI
-//                        if (Signal_quality < 150) {
-//                            Toast.makeText(getActivity(), "当前有磁干扰，信号质量差！", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
+        it = new Intent(getActivity(), TestServiceOne.class);//绑定服务，连接wifi
+        //用intent启动Service并传值
+        this.bytes = new byte[]{69, 73, 87, 1};
+        it.putExtra("data", bytes);
+        it.putExtra("time", time);
+        getActivity().startService(it);
+        //绑定Service
+        myServiceConn = new MyServiceConn();
+        try {
+            getActivity().bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+            isConnected = getActivity().bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+        } catch (ServiceConfigurationError s) {
+            s.getLocalizedMessage();
+        }
+        Log.d("bytes", String.valueOf(bytes));
+        //注意：需要先绑定，才能同步数据
+        if (binder != null) {
+            Log.d("同步数据", "同步数据");
+            binder.setData(bytes);
+        }
+    }
+
+    class MyServiceConn implements ServiceConnection {
+        // 服务被绑定成功之后执行
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            //取得Service里的binder对象
+            binder = (TestServiceOne.MyBinder) iBinder;
+            //自定义回调
+            binder.getService().setDataCallback(new TestServiceOne.DataCallback() {
+                //执行回调函数
+                @Override
+                public void dataChanged(String str) {
+                    Log.d("--str--", str);
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("str", str);
+                    msg.setData(bundle);
+                    //发送通知
+                    handler.sendMessage(msg);
+
+                }
+            });
+        }
+
+        /**
+         * 接收wifi的数据，并对控件进行设置
+         */
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //在handler中更新UI
+                wifiData = msg.getData().getString("str");
+                Log.i("----data====:", wifiData);
+                if (wifiData.length() == 30) {
+                    concerto = new Concerto();
+                    String distance = concerto.Dataconversion(wifiData.substring(18, 24));
+                    angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    float a = Math.abs(Float.parseFloat(distance));
+                    Verticaldistance = (float) (a * Math.sin(angle));
+                    Horizontaldistance = (float) (a * Math.cos(angle));
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    float Odistance = (float) Math.sqrt(Verticaldistance * Verticaldistance + Horizontaldistance * Horizontaldistance);
+                    String ODistance = String.valueOf(Odistance);
+                    Objectdistance = df.format(Double.parseDouble(ODistance));
+
+                    Log.d("LineFragment_angle", String.valueOf(angle));
+                    Log.d("LineVerticaldistance", String.valueOf(Verticaldistance));
+                    Log.d("LineHorizontaldistance", String.valueOf(Horizontaldistance));
+
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putFloat("angle", angle);
+                    editor.putFloat("Verticaldistance", Verticaldistance);
+                    editor.putFloat("Horizontaldistance", Horizontaldistance);
+                    editor.putString("Objectdistance", Objectdistance);
+                    editor.commit();
+                    drawtriangle.setData(angle, Verticaldistance, Horizontaldistance);
+                }
             }
-        }, 0, 2000 * 2);
+        };
+
+        // 服务奔溃或者被杀掉执行
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            binder = null;
+        }
     }
 
     private void initView(View view) {
@@ -138,81 +217,38 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
      * 获取wifi传递过来的数据
      */
     private void getWifiData() {
-//            connectThread = new ConnectThread(socket, myHandler);
-//            connectThread.start();
-        //在子线程获取连接
+        Log.d("---LineFragmentwifi_data--- =  :", wifiData);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                        socket = new Socket("10.10.100.254", 8899);
-                        inputStream = new DataInputStream(socket.getInputStream());
-                        outputStream = socket.getOutputStream();
+                if (wifiData.length() == 30) {
+                    concerto = new Concerto();
+                    String distance = concerto.Dataconversion(wifiData.substring(18, 24));
+                    angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    float a = Math.abs(Float.parseFloat(distance));
+                    Verticaldistance = (float) (a * Math.sin(angle));
+                    Horizontaldistance = (float) (a * Math.cos(angle));
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    float Odistance = (float) Math.sqrt(Verticaldistance * Verticaldistance + Horizontaldistance * Horizontaldistance);
+                    String ODistance = String.valueOf(Odistance);
+                    Objectdistance = df.format(Double.parseDouble(ODistance));
 
-                    try {
-                            Log.i("-------------timer", "timer");
-                            byte[] bytes = {69, 73, 87, 1};
-                            send.sendData(outputStream, bytes);
-                            Log.i("receiveMsg", "receiveMsg");
-                            receiveMsg = new ReceiveMsg();
-                            receiveMsg.receiveMsg(inputStream, myHandler);
+                    Log.d("LineFragment_angle", String.valueOf(angle));
+                    Log.d("LineVerticaldistance", String.valueOf(Verticaldistance));
+                    Log.d("LineHorizontaldistance", String.valueOf(Horizontaldistance));
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        socket = null;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putFloat("angle", angle);
+                    editor.putFloat("Verticaldistance", Verticaldistance);
+                    editor.putFloat("Horizontaldistance", Horizontaldistance);
+                    editor.putString("Objectdistance", Objectdistance);
+                    editor.commit();
+                    drawtriangle.setData(angle, Verticaldistance, Horizontaldistance);
                 }
             }
         }).start();
     }
-
-    Handler myHandler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle bundle = new Bundle();
-            bundle = msg.getData();
-            Log.d("bundle", String.valueOf(bundle));
-            Log.w("是否进行赋值", "执行当当前语句");
-            String data = bundle.getString("msg");
-            Log.d("LineFragmentwifi_data", data);
-            if (data.length() < 30) {
-                Toast.makeText(getActivity(), "网络错误！请检查网络连接", Toast.LENGTH_SHORT).show();
-            }
-            concerto = new Concerto();
-            String distance = concerto.Dataconversion(data.substring(18, 24));
-            angle = Float.parseFloat(concerto.Dataconversion(data.substring(0, 6)));
-            Signal_quality = Double.parseDouble(concerto.Dataconversion(data.substring(24)));
-            float a = Math.abs(Float.parseFloat(distance));
-            Verticaldistance = (float) (a * Math.sin(angle));
-            Horizontaldistance = (float) (a * Math.cos(angle));
-            DecimalFormat df = new DecimalFormat("#.00");
-            float Odistance = (float) Math.sqrt(Verticaldistance * Verticaldistance + Horizontaldistance * Horizontaldistance);
-            String ODistance = String.valueOf(Odistance);
-            Objectdistance = df.format(Double.parseDouble(ODistance));
-
-            Log.d("LineFragment_angle", String.valueOf(angle));
-            Log.d("LineVerticaldistance", String.valueOf(Verticaldistance));
-            Log.d("LineHorizontaldistance", String.valueOf(Horizontaldistance));
-
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putFloat("angle", angle);
-            editor.putFloat("Verticaldistance", Verticaldistance);
-            editor.putFloat("Horizontaldistance", Horizontaldistance);
-            editor.putString("Objectdistance", Objectdistance);
-            editor.commit();
-            drawtriangle.setData(angle, Verticaldistance, Horizontaldistance);
-
-        }
-    };
 
     //单选按钮，判断是否包含仪器长度
     @Override
@@ -234,7 +270,11 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                 Toast.makeText(getActivity(), "重置成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.lock:
-                getWifiData();
+                Log.d("改变bytes", "改变bytes");
+                this.bytes = new byte[]{69, 73, 87, 0, 0};
+                if (binder != null) {
+                    binder.setData(bytes);
+                }
                 break;
             case R.id.Save:
                 showDialog();
@@ -333,7 +373,20 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
 
     @Override
     public void onPause() {
-        timer.cancel();
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("改变bytes", "改变bytes");
+        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        if (binder != null) {
+            binder.setData(bytes);
+        }
+        if(isConnected){
+            getActivity().unbindService(myServiceConn);
+            isConnected = false;
+        }
     }
 }

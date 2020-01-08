@@ -60,7 +60,7 @@ public class Drawtriangle extends View {
         //画扇形外的水平倾角
         initScale(canvas);
         //画圆及文字
-        initGarden(canvas, x, y);
+//        initGarden(canvas, x, y);
         //画目标距离
         initObjectdistance(canvas);
         //画垂距
@@ -168,29 +168,29 @@ public class Drawtriangle extends View {
         canvas.drawTextOnPath("目标距离  " + Objectdistance, path, 0f, 0f, p);
     }
 
-    //画圆及文字
-    private void initGarden(Canvas canvas, double x, double y) {
-        // 从资源文件中生成位图bitmap
-        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.timg2);
-        if (angle > 0 && angle <= 80) {
-            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
-        } else if (angle > 80 && angle < 90) {
-            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 23 / 2), p);
-        } else if (angle == 0) {
-            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
-        } else if (angle == 90) {
-            canvas.drawBitmap(bitmap, (float) (width / 10 * 17 / 5), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
-        } else if (angle == -90) {
-            canvas.drawBitmap(bitmap, (float) (width / 10 * 17 / 5), (float) (heitht / 14 * 5 / 2), p);
-        } else if (angle < 0 && angle >= -80) {
-            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 9 / 2), p);
-        } else if (angle < -80 && angle > -90) {
-            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 3 / 2), p);
-        }
-
-        bitmap.recycle();
-
-    }
+//    //画圆及文字
+//    private void initGarden(Canvas canvas, double x, double y) {
+//        // 从资源文件中生成位图bitmap
+//        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.point);
+//        if (angle > 0 && angle <= 80) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
+//        } else if (angle > 80 && angle < 90) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 23 / 2), p);
+//        } else if (angle == 0) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
+//        } else if (angle == 90) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10 * 17 / 5), (float) (heitht / 14 * 17 / 2), p); //开始绘制图片
+//        } else if (angle == -90) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10 * 17 / 5), (float) (heitht / 14 * 5 / 2), p);
+//        } else if (angle < 0 && angle >= -80) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 9 / 2), p);
+//        } else if (angle < -80 && angle > -90) {
+//            canvas.drawBitmap(bitmap, (float) (width / 10), (float) (heitht / 14 * 3 / 2), p);
+//        }
+//
+//        bitmap.recycle();
+//
+//    }
 
     //画扇形外的角度
     private void initScale(Canvas canvas) {
@@ -217,6 +217,7 @@ public class Drawtriangle extends View {
             path.moveTo((float) (width / 10 * 4), heitht / 14 * 6 / 2 - y / 8);// 此点为多边形的起点 A
             path.lineTo(width / 10 * 9, heitht / 14 * 8 / 2 - y / 6);
         }
+        p.setTextSize(50);
         canvas.drawTextOnPath("水平倾角  " + angle + "°", path, 10f, 0f, p);
     }
 
@@ -262,29 +263,40 @@ public class Drawtriangle extends View {
         Log.d("xb", String.valueOf(xb));
         Log.d("xc", String.valueOf(xc));
 
+        Paint mPaint= new Paint();
+        mPaint.setColor(Color.RED);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeWidth(25);
         //实例化路径
         Path path = new Path();
         if (angle > 0 && angle <= 80) {
             //屏幕的水平为横坐标，垂直为纵坐标
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 9),mPaint);
             path.moveTo(xa, (float) (heitht / 14 * 9));// 此点为多边形的起点 A
             path.lineTo(xb, (float) (heitht / 14 * 9));   //B
             path.lineTo(xc, (float) (heitht / 14 * 4 - y));  //C
             Log.d("heitht/14*4+y", String.valueOf(heitht / 14 * 4 - y));
         } else if (angle > 80 && angle < 90) {
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 12),mPaint);
             path.moveTo(xa, (float) (heitht / 14 * 12));// 此点为多边形的起点 A
             path.lineTo(xb, (float) (heitht / 14 * 12));   //B
             path.lineTo(xc, (float) (heitht / 14 - y));  //C
         } else if (angle == 0) {
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 9),mPaint);
             path.moveTo(xa, (float) (heitht / 14 * 9));// 此点为多边形的起点 A
             path.lineTo(xb, (float) (heitht / 14 * 9));
         } else if (angle == 90 || angle == -90) {
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 9),mPaint);
             path.moveTo(width / 10 * 4, (float) (heitht / 14 * 9));// 此点为多边形的起点 A
             path.lineTo(width / 10 * 4, (float) (heitht / 14 * 3));
         } else if (angle < 0 && angle >= -80) {
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 5),mPaint);
             path.moveTo(xa, (float) (heitht / 14 * 5));// 此点为多边形的起点 A
             path.lineTo(xb, (float) (heitht / 14 * 5));   //B
             path.lineTo(xc, (float) (heitht / 14 * 10 - y));  //C
         } else if (angle < -80 && angle > -90) {
+            canvas.drawPoint(xa-10,(float) (heitht / 14 * 2),mPaint);
             path.moveTo(xa, (float) (heitht / 14 * 2));// 此点为多边形的起点 A
             path.lineTo(xb, (float) (heitht / 14 * 2));   //B
             path.lineTo(xc, (float) (heitht / 14 * 14 - y));  //C
