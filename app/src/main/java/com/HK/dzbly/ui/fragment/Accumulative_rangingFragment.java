@@ -459,7 +459,7 @@ public class Accumulative_rangingFragment extends Fragment implements RadioGroup
     public void onDestroy() {
         super.onDestroy();
         Log.d("改变bytes", "改变bytes");
-        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        this.bytes = new byte[]{69, 73, 87, 32};
         if (binder != null) {
             binder.setData(bytes);
         }

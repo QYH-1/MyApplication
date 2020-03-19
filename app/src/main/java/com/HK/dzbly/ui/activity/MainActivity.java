@@ -1,30 +1,40 @@
 package com.HK.dzbly.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
 import com.HK.dzbly.R;
 import com.HK.dzbly.ui.base.BaseActivity;
+import com.HK.dzbly.utils.TestServiceOne;
+import com.HK.dzbly.utils.view.BatteryView;
+import com.HK.dzbly.utils.view.SensorBatterView;
+import com.HK.dzbly.utils.wifi.Concerto;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.util.ServiceConfigurationError;
 
 /**
  * @Author：qyh 版本：1.0
@@ -33,6 +43,17 @@ import java.lang.reflect.Method;
  * 修订历史：
  */
 public class MainActivity extends BaseActivity {
+    private int intLevel;  //手机当前电量
+    private int intScale = 100;   //手机总电量参考值
+    private int sensorLevel;  //传感器当前电量
+    private int sensorScale = 100;   //传感器总电量参考值
+    private TextView battery;
+    private TextView sensorBattery;
+    private TextView tv_voltameter_value; //手机电量百分比
+    private TextView sensorBattery_value; //传感器电量百分比
+    private BatteryView batteryView; //绘制手机电池
+    private SensorBatterView sensorBatterView; //绘制传感器电池
+
     private static final int REQUEST_TAKE_PHOTO_CODE = 1;
     private ImageButton prompt, setting, data, camera, tools, dzcsy, shutdown, Other_software, laser_control, Level;
     private TextView setting1, data1, camera1, jgcj, dzcsy1, Other_software1, laser_control1, Level1;
@@ -43,6 +64,32 @@ public class MainActivity extends BaseActivity {
             "android.intent.action.REBOOT";
     public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
 
+    private MainServiceConn myServiceConn;
+    private TestServiceOne.MyBinder binder = null;
+    private byte[] bytes = {69, 73, 87, 32};
+    private boolean isConnected = false;
+
+    /* 创建BroadcastReceiver */
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            /*
+             * 如果捕捉到的action是ACTION_BATTERY_CHANGED， 就运行onBatteryInfoReceiver()
+             */
+            if (Intent.ACTION_BATTERY_CHANGED.equals(action)) {
+                intLevel = intent.getIntExtra("level", 0);
+                intScale = intent.getIntExtra("scale", 100);
+                Log.i("", "intLevel = " + intLevel);
+                Log.i("", "intScale = " + intScale);
+                onBatteryInfoReceiver(intLevel, intScale);
+                batteryView.setPower(intLevel);
+
+                //sensorBatterView(sensorLevel, sensorScale);
+                //sensorBatterView.setPower(sensorLevel);
+            }
+        }
+    };
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +98,18 @@ public class MainActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
         setContentView(R.layout.main);
         sp = PreferenceManager.getDefaultSharedPreferences(this);//获取了SharePreferences对象
+
+        batteryView = findViewById(R.id.battery_view);
+        sensorBatterView = findViewById(R.id.sensorBattery_view);
+        battery = findViewById(R.id.battery);
+        sensorBattery = findViewById(R.id.sensorBattery);
+        tv_voltameter_value = findViewById(R.id.tv_voltameter_value);
+        sensorBattery_value = findViewById(R.id.sensorBattery_value);
+        // 注册一个系统 BroadcastReceiver，作为访问电池计+量之用
+        // 這個不能直接在AndroidManifest.xml中註冊
+        registerReceiver(mBatInfoReceiver, new IntentFilter(
+                Intent.ACTION_BATTERY_CHANGED));
+
         inint();//获取所有的控件
         camera(); //相机的处理事件
         setting();//设置的处理事件
@@ -61,6 +120,92 @@ public class MainActivity extends BaseActivity {
         setLevel(); //水平仪
         setLaser_control(); //激光控制
         setOther_software(); //实用工具
+
+        final Intent it = new Intent(this, TestServiceOne.class);//绑定服务，连接wifi
+        //用intent启动Service并传值
+        it.putExtra("data", bytes);
+        startService(it);
+        //绑定Service
+        myServiceConn = new MainServiceConn();
+        try {
+            bindService(it, myServiceConn, Context.BIND_AUTO_CREATE);
+        } catch (ServiceConfigurationError s) {
+            s.getLocalizedMessage();
+        }
+
+        //注意：需要先绑定，才能同步数据
+        if (binder != null) {
+            binder.setData(bytes);
+        }
+    }
+
+    class MainServiceConn implements ServiceConnection {
+        // 服务被绑定成功之后执行
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            //取得Service里的binder对象
+            binder = (TestServiceOne.MyBinder) iBinder;
+            //自定义回调
+            binder.getService().setDataCallback(new TestServiceOne.DataCallback() {
+                //执行回调函数
+                @Override
+                public void dataChanged(String str) {
+                    Log.d("--str--", str);
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("str", str);
+                    msg.setData(bundle);
+                    //发送通知
+                    handler.sendMessage(msg);
+
+                }
+            });
+        }
+
+        /**
+         * 接收wifi的数据，并对控件进行设置
+         */
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //在handler中更新UI
+                String data = msg.getData().getString("str");
+                Log.i("----MianActivitydata====:", data);
+                if (data.length() == 32) {
+                    sensorLevel = Integer.parseInt(data.substring(30, 32));
+
+                    Log.d("----sensorLevel----", String.valueOf(sensorLevel));
+                    sensorBatterView(sensorLevel, sensorScale);
+                    sensorBatterView.setPower(sensorLevel);
+                }
+            }
+        };
+
+        // 服务奔溃或者被杀掉执行
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            binder = null;
+        }
+    }
+
+    //手机电量百分比
+    public void onBatteryInfoReceiver(int intLevel, int intScale) {
+        String data = (intLevel * 100 / intScale) + "%";
+        Log.d("电量百分比", data);
+        if (intLevel <= 20) {
+            battery.setText("请充电...");
+        }
+        tv_voltameter_value.setText(data);
+    }
+
+    //传感器电量百分比
+    public void sensorBatterView(int sensorLevel, int sensorScale) {
+        String data = (sensorLevel * 100 / sensorScale) + "%";
+        Log.d("电量百分比", data);
+        if (sensorLevel <= 20) {
+            sensorBattery.setText("请充电...");
+        }
+        sensorBattery_value.setText(data);
     }
 
     /**
@@ -213,6 +358,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, Utility_toolsActivity.class);
+                //Intent intent = new Intent(MainActivity.this, BatteryInfo.class);
                 startActivity(intent);
             }
         });
@@ -272,19 +418,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
-//    @Override
-//    public void onWindowFocusChanged(boolean hasFocus) {
-//        disableStatusBar();
-//        super.onWindowFocusChanged(hasFocus);
-//    }
-//    public void disableStatusBar() {
-//        try {
-//            @SuppressLint("WrongConstant") Object service = getSystemService("statusbar");
-//            Class<?> claz = Class.forName("android.app.StatusBarManager");
-//            Method expand = claz.getMethod("collapsePanels");
-//            expand.invoke(service);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    /**
+     * 传感器取消注册
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //doDestroy();
+    }
 }

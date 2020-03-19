@@ -218,13 +218,13 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
                 //在handler中更新UI
                 wifiData = msg.getData().getString("str");
                 Log.i("----data====:", wifiData);
-                if (wifiData.length() == 30 && addData) {
+                if (wifiData.length() == 32 && addData) {
                     //获取一组数据
                     concerto = new Concerto();
                     angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
                     Azimuth = Float.parseFloat(concerto.Dataconversion(wifiData.substring(12, 18)));
                     Rdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18, 24)));
-                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24,30)));
                     //根据距离和角度求出空间点的坐标
                     x = Double.parseDouble(df.format(Rdistance * Math.cos(angle) * Math.sin(Azimuth)));
                     y = Double.parseDouble(df.format(Rdistance * Math.sin(angle)));
@@ -458,7 +458,7 @@ public class SectionsurveyActivity extends Activity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         Log.d("改变bytes", "改变bytes");
-        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        this.bytes = new byte[]{69, 73, 87, 32};
         if (binder != null) {
             binder.setData(bytes);
         }

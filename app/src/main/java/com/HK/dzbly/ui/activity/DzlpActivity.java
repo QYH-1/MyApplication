@@ -90,6 +90,7 @@ public class DzlpActivity extends FragmentActivity {
     private MyServiceConn myServiceConn;
     private TestServiceOne.MyBinder binder = null;
     private byte[] bytes = {69, 73, 87, 0, 0};
+    private boolean isConnected  = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +171,7 @@ public class DzlpActivity extends FragmentActivity {
                 //在handler中更新UI
                 String data = msg.getData().getString("str");
                 Log.i("----data====", data);
-                if (data.length() == 30) {
+                if (data.length() == 32) {
                     //对wifi获取的数据进行处理
                     //俯仰角
                     data1 = concerto.Dataconversion(data.substring(0, 6));
@@ -464,10 +465,18 @@ public class DzlpActivity extends FragmentActivity {
     }
 
     private void doDestroy() {
-        mSensorManager.unregisterListener(mSensorEventListener);
-        unbindService(myServiceConn);
-        Intent intent2 = new Intent(this, TestServiceOne.class);
-        stopService(intent2);// 关闭服务
+       // mSensorManager.unregisterListener(mSensorEventListener);
+       // unbindService(myServiceConn);
+        //Intent intent2 = new Intent(this, TestServiceOne.class);
+        //stopService(intent2);// 关闭服务
+        this.bytes = new byte[]{69, 73, 87,32};
+        if (binder != null) {
+            binder.setData(bytes);
+        }
+        if (isConnected) {
+            unbindService(myServiceConn);
+            isConnected = false;
+        }
     }
 
 }

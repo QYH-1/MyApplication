@@ -7,12 +7,12 @@
         android:versionName="1.0.0">
 
     <!-- 声明接收启动完成广播的权限 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
-    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
 
     <!-- 开机启动所需权限 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -35,12 +35,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.REORDER_TASKS" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+    <uses-permission
+            android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
             tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.STATUS_BAR"
+    <uses-permission
+            android:name="android.permission.STATUS_BAR"
             tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name = "android.permission.DISABLE_KEYGUARD"/>
-    <uses-permission android:name = "android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- GPS定位权限 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -55,8 +57,8 @@
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
             android:networkSecurityConfig="@xml/network_security_config"
+            android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <meta-data
@@ -70,9 +72,10 @@
             <intent-filter>
                 <!-- .接收启动完成的广播 -->
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
 
@@ -119,8 +122,10 @@
         <activity android:name=".ui.activity.Utility_toolsActivity"></activity>
         <activity android:name=".ui.activity.LaserControlActivity"></activity>
         <activity android:name=".ui.activity.SocketActivity"></activity>
-       <service android:name="com.HK.android.tcp.WifiService"></service>
+
+        <service android:name="com.HK.android.tcp.WifiService"></service>
         <service android:name=".utils.TestServiceOne"></service>
+
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="com.cs.dzl.fileProvider"

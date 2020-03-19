@@ -161,11 +161,11 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
                 //在handler中更新UI
                 wifiData = msg.getData().getString("str");
                 Log.i("----data====:", wifiData);
-                if (wifiData.length() == 30) {
+                if (wifiData.length() == 32) {
                     concerto = new Concerto();
                     String distance = concerto.Dataconversion(wifiData.substring(18, 24));
                     angle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
-                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24)));
+                    Signal_quality = Double.parseDouble(concerto.Dataconversion(wifiData.substring(24,30)));
                     float a = Math.abs(Float.parseFloat(distance));
                     Verticaldistance = (float) (a * Math.sin(angle));
                     Horizontaldistance = (float) (a * Math.cos(angle));
@@ -380,7 +380,7 @@ public class LineFragment extends Fragment implements RadioGroup.OnCheckedChange
     public void onDestroy() {
         super.onDestroy();
         Log.d("改变bytes", "改变bytes");
-        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        this.bytes = new byte[]{69, 73, 87, 32};
         if (binder != null) {
             binder.setData(bytes);
         }

@@ -23,7 +23,7 @@ public class ControlData {
      */
     public byte[] setData(String clickText) {
         if (clickText.equals(data[0])) {
-//            msg = (byte) 0x45495704;
+            //msg = (byte) 0x45495704;
             msg = new byte[]{69, 73, 87, 4};
         } else if (clickText.equals(data[1])) {
             //msg = (byte) 0x45495705;

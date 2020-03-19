@@ -17,8 +17,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * @Author：qyh 版本：1.0
@@ -83,7 +81,7 @@ public class TestServiceOne extends Service {
                     Thread.sleep(285);
                     if (dataCallback != null) {
                         dataCallback.dataChanged(message);//传送数据到activity 数据可以为jason数据等 自己定义
-                        message = "1";
+                        //message = "1";
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -179,7 +177,7 @@ public class TestServiceOne extends Service {
             while (mIsStart == true && !mmSocket.isClosed()) {
                 System.out.println(this.currentThread().getName() + "开始时间[" + new java.util.Date().getTime());
                 StringBuilder stringBuilder = new StringBuilder();
-                message = "1";
+                //  message = "1";
                 Log.w(TAG, "BEGIN mConnectedThread");
                 String buffer = null;
                 int bytes = 0;
@@ -187,7 +185,7 @@ public class TestServiceOne extends Service {
                 if (mmSocket == null || mmInputStream == null
                         || mmOutputStream == null)
                     return;
-                while (message.length() < 30) {
+                while (message.length() < 32) {
                     try {
                         mmOutputStream.write(byteSS);
                         bytes = mmInputStream.read();
@@ -212,8 +210,9 @@ public class TestServiceOne extends Service {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Log.d(TAG, "得到的数据： " + message);
+
                 }
+                Log.d(TAG, "得到的数据： " + message);
                 System.out.println(this.currentThread().getName() + "结束时间[" + new java.util.Date().getTime());
                 try {
                     Thread.sleep(time);

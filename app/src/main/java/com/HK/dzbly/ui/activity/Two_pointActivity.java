@@ -191,11 +191,11 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                 wifiData = msg.getData().getString("str");
                 SharedPreferences.Editor editor = sp.edit();
                 Log.i("----data====:", wifiData);
-                if (wifiData.length() == 30 && addData) {
+                if (wifiData.length() == 32 && addData) {
                     //获取一组数据
                     concerto = new Concerto();
                     if (temp == 1) {
-                        aRdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18)));
+                        aRdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18,24)));
                         aAzimuth = Float.parseFloat(concerto.Dataconversion(wifiData.substring(12, 18)));
                         abangle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
 
@@ -210,7 +210,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
                         RECORD_VARIABLE = true;
                         setPointData();
                     } else if (temp == 2) {
-                        bRdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18)));
+                        bRdistance = Float.parseFloat(concerto.Dataconversion(wifiData.substring(18,24)));
                         bAzimuth = Float.parseFloat(concerto.Dataconversion(wifiData.substring(12, 18)));
                         bangle = Float.parseFloat(concerto.Dataconversion(wifiData.substring(0, 6)));
 
@@ -609,7 +609,7 @@ public class Two_pointActivity extends Activity implements View.OnClickListener,
         editor.putInt("STATE", 0);
         editor.commit();
 
-        this.bytes = new byte[]{69, 73, 87, 0, 0};
+        this.bytes = new byte[]{69, 73, 87,32};
         if (binder != null) {
             binder.setData(bytes);
         }

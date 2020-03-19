@@ -62,4 +62,6 @@
     <string name="vertical">垂直</string>
     <string name="horizontal">水平</string>
     <string name="dynamic_permissions">动态权限</string>
+    <string name="str_dialog_body">电量</string>
+    <string name="str_dialog_title">电量显示</string>
 </resources>
